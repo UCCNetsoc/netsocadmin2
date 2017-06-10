@@ -1,8 +1,11 @@
 from flask import Flask, request, render_template
-from registerTools import send_confirmation_email, get_next_user_id_number
+import register_tools as r 
 
 import string, random, crypt 
 
+
+HOST = "127.0.0.1"
+PORT = "5000"
 app = Flask(__name__)
 
 """
@@ -14,6 +17,8 @@ Route: /
 def register():
     return render_template("register.html")
 
+
+
 """
 Route: /sendconfirmation
     Users will be lead to this route when they submit an email for server sign up from route /
@@ -23,41 +28,32 @@ Route: /sendconfirmation
 """
 @app.route("/sendconfirmation", methods=["POST", "GET"])
 def sendconfirmation():
-    if request.method == "POST":            #Making sure user used POST
-        form = request.form                 #Getting form data; comes as dict
-        email = form['email']               #Getting email key
-        if "umail.ucc.ie" in email:         #Checking to see if email is UCC email
-            confirmation_sent = send_confirmation_email(email)
-            if confirmation_sent:
-                return render_template("sentconfirmation.html")
-            else:
-                return render_template("register.html", error_message="An error occured. Please try again later or contact us at ...")
-        else:
-            return render_template("register.html", error_message="Must be a UCC Umail email address")
-    elif request.method == "GET":           
-        return render_template("register.html", error_message="")
-    return render_template("register.html", error_message="Something is fucked")
+    if request.method != "POST":
+        return render_template("register.html")
+    form = request.form           
+    email = form['email']         
+    if "umail.ucc.ie" not in email:
+        return render_template("register.html", error_message="Must be a UCC Umail email address")
+    confirmation_sent = r.send_confirmation_email(email, "%s:%s"%(HOST, PORT))
+    if confirmation_sent:
+        return render_template("sentconfirmation.html", email=email)
+    return render_template("register.html", error_message="An error occured. Please try again or contact us")
 
 """
-Route for filling in the form
+Route: signup
+    This is the link which they will be taken to viw the confirmation email.
+    It checks if the token they have used is valid and corresponds to the email.
 """
 @app.route("/signup", methods=["GET"])
-def signUp():
-    if request.method == "GET":
-        email = request.args.get('e')
-        tokenValid = False
-        token = request.args.get('t')
-        uriFile = open("TempUris.txt", "r")
-        for line in uriFile:
-            if line == token + "\n":
-                tokenValid = True
-        if tokenValid:
-            return render_template("form.html", emailAddress=email)
-        else:
-            return render_template("404.html")
-    else:
-        return render_template("404.html")
-
+def signup():
+    if request.method != "GET":
+        return render_template("register.html")
+    email = request.args.get('e')
+    uri = request.args.get('t')
+    if not r.good_token(email, uri):
+        return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
+    return render_template("form.html", email_address=email)
+    
 @app.route("/registercomplete", methods=["POST", "GET"])
 def completeRef():
     if request.method == "POST":
@@ -97,7 +93,7 @@ def completeRef():
         with ldap.Connection(
                 ldap_server,
                 "cn=admin,dc=netsoc,dc=co",
-                "8(H5uR3<u)=<VH:B",
+                p.LDAP_KEY,
                 auto_bind=True) as conn:
             if conn.search("cn=member,dc=netsoc,dc=co", "(objectClass=account)"):
                 return render_template("form.html", already_taken="Username in use")
@@ -114,4 +110,4 @@ def completeRef():
                 return render_template("form.html", error_message="Something went wrong. Please contact a Sys Admin.")
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host=HOST, port=int(PORT), debug=True)
