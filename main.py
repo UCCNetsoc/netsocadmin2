@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template
 import register_tools as r 
 
-import string, random, crypt 
+import string, random, crypt, re 
 
 
 HOST = "127.0.0.1"
@@ -15,6 +15,7 @@ Route: /
 """
 @app.route('/')
 def register():
+    app.logger.debug("Received register page request")
     return render_template("register.html")
 
 
@@ -29,85 +30,96 @@ Route: /sendconfirmation
 @app.route("/sendconfirmation", methods=["POST", "GET"])
 def sendconfirmation():
     if request.method != "POST":
+        app.logger.debug("sendconfirmation(): method not POST: %s"%request.method)
         return render_template("register.html")
-    form = request.form           
-    email = form['email']         
-    if "umail.ucc.ie" not in email:
+    # make sure is ucc email           
+    email = request.form['email']         
+    if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
+        app.logger.debug("sendconfirmation(): address %s is not a valid UCC email"%email)
         return render_template("register.html", error_message="Must be a UCC Umail email address")
+    
+    # make sure email has not already been used to make an account
+    if r.has_account(email):
+        caption = "Sorry!"
+        message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
+        app.logger.debug("senconfirmation(): account already exists with email %s"%(email))
+        return render_template("message.html", caption=caption, message=message)
+    # send confirmation link to endure they own the email account
     confirmation_sent = r.send_confirmation_email(email, "%s:%s"%(HOST, PORT))
-    if confirmation_sent:
-        return render_template("sentconfirmation.html", email=email)
-    return render_template("register.html", error_message="An error occured. Please try again or contact us")
-
+    if not confirmation_sent:
+        app.logger.debug("sendconfirmation(): confirmation email failed to send")
+        return render_template("register.html", error_message="An error occured. Please try again or contact us")
+    
+    caption = "Thank you!"
+    message = "Your confirmation link has been sent to %s"%(email)
+    return render_template("message.html", caption=caption, message=message)
+    
 """
 Route: signup
-    This is the link which they will be taken to viw the confirmation email.
+    This is the link which they will be taken to with the confirmation email.
     It checks if the token they have used is valid and corresponds to the email.
 """
 @app.route("/signup", methods=["GET"])
 def signup():
     if request.method != "GET":
+        app.logger.debug("signup(): method was not GET: %s"%request.method)
         return render_template("register.html")
     email = request.args.get('e')
     uri = request.args.get('t')
     if not r.good_token(email, uri):
+        app.logger.debug("signup(): bad token %s used for email %s"%(uri, email))
         return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
-    return render_template("form.html", email_address=email)
+    return render_template("form.html", email_address=email, token=uri)
+
+"""
+Route: register
+    This is the route which is run by the registration form
+    and should only be available through POST. It adds the
+    given data to the Netsoc LDAP database.
+"""
+@app.route("/completeregistration", methods=["POST", "GET"])
+def completeregistration():
+    if request.method != "POST":
+        app.logger.debug("completeregistration(): method was not POST: %s"%request.method)
+        return render_template("register.html")
+
+    email = request.form["email"]
+    uri = request.form["_token"]
+
+    # make sure token is valid
+    if not r.good_token(email, uri, delete=True):
+        app.logger.debug("completeregistration(): invalid token %s for email %s"%(uri, email))
+        return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
+
+    # add user to ldap db
+    user = request.form["uid"]
+    success, reason, info = r.add_ldap_user(user)
+    if not success:
+        if reason:
+            app.logger.debug("completeregistration(): %s"%reason)
+            return render_template("form.html", email_address=email, token=uri, already_taken="Username is already in use")
+        app.logger.debug("completeregistration(): failed to add user to LDAP")
+        return render_template("register.html", error_message="An error occured. Please try again or contact us")
     
-@app.route("/registercomplete", methods=["POST", "GET"])
-def completeRef():
-    if request.method == "POST":
-        email_address = request.form["email"]
-        with open("used_emails", "r") as f:
-            if any(line.strip() == email_address for line in f):
-                return render_template("form.html", already_taken="You already have an account") 
+    # add all info to Netsoc MySQL DB
+    info["name"] = request.form["name"]
+    info["student_id"] = request.form["student_id"]
+    info["course"] = request.form["course"]
+    info["grad_year"] = request.form["graduation_year"]
+    info["email"] = email
+    app.logger.debug("info: %s"%(info))
+    if not r.add_netsoc_database(info):
+        app.logger.debug("completeregistration(): failed to add data to mysql db")
+        return render_template("register.html", error_message="An error occured. Please try again or contact us")
 
-        user_id = request.form["uid"]
-        user_id_number = get_next_user_id_number()
+    # send user's details to them
+    if not r.send_details_email(email, user, info["password"]):
+        app.logger.debug("completeregistration(): failed to send confirmation email")
+        return render_template("register.html", error_message="An error occured. Please try again or contact us")
 
-        if not user_id_number:
-            return render_template("form.html", error_message="Something went wrong. Please contact a Sys Admin.")
-
-        password_string = "".join(random.choice(string.ascii_letters + string.ascii_digits) for _ in range(10))
-        crypt_hashed_password = "{crypt}" + crypt.crypt(password_string)
-
-        
-        object_class = [
-            "account",
-            "top",
-            "posixAccount",
-            "mailAccount"
-        ]
-        attributes = {
-            "cn" : user_id ,
-            "gidNumber" : 422,
-            "homeDirectory" : "/home/users/%s"%user_id,
-            "mail" : "%s@netsoc.co"%user_id,
-            "uid" : user_id,
-            "uidNumber" : user_id_number, 
-            "loginShell" : "/bin/bash",
-            "userPassword" : crypt_hashed_password,
-        }
-
-        ldap_server = ldap3.Server("ldap.netsoc.co", get_info=ldap.ALL)
-        with ldap.Connection(
-                ldap_server,
-                "cn=admin,dc=netsoc,dc=co",
-                p.LDAP_KEY,
-                auto_bind=True) as conn:
-            if conn.search("cn=member,dc=netsoc,dc=co", "(objectClass=account)"):
-                return render_template("form.html", already_taken="Username in use")
-
-            success = conn.add(
-                "cn=%s,cn=member,dc=netsoc,dc=co"%user_id, 
-                object_class, 
-                attributes)
-            if success:
-                with open("used_emails", "a") as f:
-                    f.write(email_address + "\n")
-                return render_template("some_other_page_to_tell_them_they_are_done")
-            else:
-                return render_template("form.html", error_message="Something went wrong. Please contact a Sys Admin.")
+    caption = "Thank you!"
+    message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
+    return render_template("message.html", caption=caption, message=message)
 
 if __name__ == '__main__':
-    app.run(host=HOST, port=int(PORT), debug=True)
+    app.run(host=HOST, port=int(PORT))

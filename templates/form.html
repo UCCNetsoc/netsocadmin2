@@ -61,69 +61,55 @@
 		<img src="https://admin.netsoc.co/images/logo.png" class="form-logo"/>
 
 		<h3 class="center-align"> Register </h3>
+		<form method="POST" action="/completeregistration" accept-charset="UTF-8" class="row col s12">
+			<input name="_token" type="hidden" value="{{ token }}">
 
-		<form method="POST" action="/registercomplete" accept-charset="UTF-8" class="row col s12"><input name="_token" type="hidden" value="ORZLhesJgbZLuRB2vReUJxYufAUJGjLpyNizBRYB">
+			<div class="row">
+				<div class="input-field">
+					<input disabled="disabled" name="email" type="text" value="{{ email_address }}">
+					<input name="email" type="hidden" value="{{ email_address }}">
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field">
+					<label for="name">Full Name</label>
+					<input class="example" autofocus="autofocus" name="name" type="text" id="name">
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field">
+					<label for="student_id">Student Number</label>
+					<input class="example" name="student_id" type="text" id="student_id">
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field">
+					<label for="uid">Username (lowercase-only)</label>
+					<input class="example" name="uid" type="text" id="uid">
+				</div>
+				<div> {{ already_taken }}</div>
+			</div>
 
-		<div class="row">
-			<div class="input-field">
-				<input disabled="disabled" name="email" type="text" value={{ email_address }}>
-				<input name="email" type="hidden" value="{{ email_address }}">
+			<div class="row">
+				<div class="input-field">
+					<label for="course">Your Course</label>
+					<input class="example" name="course" type="text" id="course">
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="input-field">
-				<label for="name">Full Name</label>
-				<input class="example" autofocus="autofocus" name="name" type="text" id="name">
-			</div>
-		</div>
-		<div class="row">
-			<div class="input-field">
-				<label for="student_id">Student Number</label>
-				<input class="example" name="student_id" type="text" id="student_id">
-			</div>
-		</div>
-		<div class="row">
-			<div class="input-field">
-				<label for="uid">Username (lowercase-only)</label>
-				<input class="example" name="uid" type="text" id="uid">
-			</div>
-			<div> {{ already_taken }}</div>
-		</div>
 
-		<div class="row">
-			<div class="input-field">
-				<label for="password">Password</label>
-				<input name="password" type="password" value="" id="password">
+			<div class="row">
+				<div class="input-field">
+					<label for="graduation_year">Your (Predicted) Graduation Year</label>
+					<input class="example" name="graduation_year" type="text" id="graduation_year">
+				</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="input-field">
-				<label for="password_confirmation">Confirm Password</label>
-				<input name="password_confirmation" type="password" value="" id="password_confirmation">
-			</div>
-		</div>
+			<button class="btn waves-effect waves-light" type="submit" name="action">Register
+				<i class="mdi-content-send right"></i>
+			</button>
 
-		<div class="row">
-			<div class="input-field">
-				<label for="course">Your Course</label>
-				<input class="example" name="course" type="text" id="course">
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="input-field">
-				<label for="graduation_year">Your (Predicted) Graduation Year</label>
-				<input class="example" name="graduation_year" type="text" id="graduation_year">
-			</div>
-		</div>
-		<button class="btn waves-effect waves-light" type="submit" name="action">Register
-			<i class="mdi-content-send right"></i>
-		</button>
-
-		<input name="token" type="hidden" value="{{ token }}">
+			<input name="token" type="hidden" value="{{ token }}">
 		</form>
-
-		<br />
+		<br>
 		<div> {{ error_message }} </div>
 	</section>
 
