@@ -1,11 +1,14 @@
+"""
+This file contains the main program for netsoc admin.
+Sets up a local server running the website. Requests should
+then be proxied to this address.
+"""
+import string, random, crypt, re
 from flask import Flask, request, render_template
 import register_tools as r 
 
-import string, random, crypt, re 
-
-
 HOST = "127.0.0.1"
-PORT = "5000"
+PORT = "5050"
 app = Flask(__name__)
 
 """
@@ -39,13 +42,13 @@ def sendconfirmation():
         return render_template("register.html", error_message="Must be a UCC Umail email address")
     
     # make sure email has not already been used to make an account
-    if r.has_account(email):
+    if False: #r.has_account(email):
         caption = "Sorry!"
         message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
         app.logger.debug("senconfirmation(): account already exists with email %s"%(email))
         return render_template("message.html", caption=caption, message=message)
     # send confirmation link to endure they own the email account
-    confirmation_sent = r.send_confirmation_email(email, "%s:%s"%(HOST, PORT))
+    confirmation_sent = r.send_confirmation_email(email, "admin.netsoc.co")
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
         return render_template("register.html", error_message="An error occured. Please try again or contact us")
@@ -68,7 +71,7 @@ def signup():
     uri = request.args.get('t')
     if not r.good_token(email, uri):
         app.logger.debug("signup(): bad token %s used for email %s"%(uri, email))
-        return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
+        return render_template("register.html", error_message="Your request was not valid. Please try again or contact us")
     return render_template("form.html", email_address=email, token=uri)
 
 """
@@ -122,4 +125,7 @@ def completeregistration():
     return render_template("message.html", caption=caption, message=message)
 
 if __name__ == '__main__':
-    app.run(host=HOST, port=int(PORT))
+    app.run(
+        host=HOST,
+        port=int(PORT),
+        threaded=True)

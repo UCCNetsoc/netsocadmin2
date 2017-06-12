@@ -1,16 +1,13 @@
-import random
-import string
-import hashlib
-import passwords as p
-
-import smtplib
-import sqlite3
-import pymysql
-import ldap3
-import crypt
-
+"""
+This file contains functions which are used during
+registration by the main netsoc admin file.
+"""
+import random, string, hashlib, smtplib, sqlite3, crypt
 from sendgrid import Email, sendgrid
 from sendgrid.helpers.mail import Content, Mail
+import pymysql
+import ldap3
+import passwords as p
 
 def send_confirmation_email(email:string, server_url:string):
     """
@@ -23,16 +20,16 @@ def send_confirmation_email(email:string, server_url:string):
     uri = generate_uri(email)
     message_body = \
     """
-    Hello,
+Hello,
 
-    Please confirm your account by going to:
+Please confirm your account by going to:
 
-    http://%s/signup?t=%s&e=%s 
+http://%s/signup?t=%s&e=%s 
 
-    Yours,
-    The UCC Netsoc Sys Admin Team
+Yours,
+The UCC Netsoc Sys Admin Team
     """%(server_url, uri, email)
-    """ Uncomment when send grid works again
+    """#Uncomment when send grid works again
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("lowdown@netsoc.co")
     subject = "Account Registration"
@@ -44,7 +41,7 @@ def send_confirmation_email(email:string, server_url:string):
     #"""
     to = email
     from_ = p.EMAIL
-    subject = "server signup test"
+    subject = "Server Signup Test"
     email = "\From: %s\nTo: %s\nSubject: %s\n\n\n%s" % (from_, to, subject, message_body)
     with smtplib.SMTP("smtp.gmail.com:587") as smtp:
         smtp.starttls()
@@ -57,6 +54,7 @@ def send_details_email(email:string, user:string, password:string):
     """
     Sends an email once a user has registered succesfully confirming
     the details they have signed up with.
+
     :param email the email address which this email is being sent
     :param user the username which you log into the servers with
     :param password the password which you log into the servers with
@@ -64,19 +62,19 @@ def send_details_email(email:string, user:string, password:string):
     """
     message_body = \
     """
-    Hello,
+Hello,
 
-    Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
+Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
 
-    username: %s
-    password: %s
+username: %s
+password: %s
 
-    To log in, run:
-        ssh %s@leela.netsoc.co
-    and enter your password when prompted. Please change your password when you first log-in to something you'll remember.
+To log in, run:
+    ssh %s@leela.netsoc.co
+and enter your password when prompted. Please change your password when you first log-in to something you'll remember.
 
-    Yours,
-    The UCC Netsoc Sys Admin Team
+Yours,
+The UCC Netsoc Sys Admin Team
     """%(user, password, user)
 
     """ Uncomment when send grid works again
@@ -158,6 +156,7 @@ def good_token(email:string, uri:string, delete=False):
 def add_ldap_user(user:string):
     """
     Adds the user to the Netsoc LDAP DB.
+
     :param user the username which has been requested
     :returns (success, reason, info) tuple
         sucess is True if detals were succesfully added and False otherwise.
@@ -174,7 +173,7 @@ def add_ldap_user(user:string):
     }
     with ldap3.Connection(
                         ldap_server,
-                        user="cn=admin,dc=netsoc,dc=co",
+                        user=p.LDAP_USER,
                         password=p.LDAP_KEY,
                         auto_bind=True) as conn:
         # checks if username exists and also gets next uid number
@@ -225,6 +224,13 @@ def add_ldap_user(user:string):
     return True, None, info
 
 def add_netsoc_database(info:dict):
+    """
+    Adds a user's details to the Netsoc MySQL database.
+
+    :param info a dictionary containing all the information
+        collected during signup to go in the database.
+    :returns Boolean True if the data was succesfully added
+    """
     conn = None
     try:
         conn = pymysql.connect(
@@ -264,6 +270,7 @@ def add_netsoc_database(info:dict):
 def has_account(email:string):
     """
     Sees if their is already an account on record with this email address.
+
     :param email the in-question email address being used to sign up
     :returns True if their already as an account with that email, False otherwise.
     """

@@ -1,3 +1,9 @@
+"""
+Execute this file in order to reset the database file.
+
+Import this file into a python interpreter and call
+print_db() in order to examine the contents of the DB.
+"""
 import sqlite3
 import passwords as p
 
