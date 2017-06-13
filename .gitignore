@@ -5,3 +5,6 @@ __pycache__/
 /**/passwords.py
 # db files
 /**/*.db
+
+# logging from init conf file
+/*.log
