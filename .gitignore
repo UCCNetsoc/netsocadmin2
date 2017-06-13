@@ -1,0 +1,7 @@
+# Python shit
+__pycache__/
+/**/*.pyc
+# to import passwords
+/**/passwords.py
+# db files
+/**/*.db
