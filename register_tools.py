@@ -90,7 +90,7 @@ The UCC Netsoc Sys Admin Team
     
     to = email
     from_ = "adamgillessen@gmail.com"
-    subject = "server signup test"
+    subject = "Server Signup Test"
     email = "\From: %s\nTo: %s\nSubject: %s\n\n\n%s" % (from_, to, subject, message_body)
     with smtplib.SMTP("smtp.gmail.com:587") as smtp:
         smtp.starttls()
