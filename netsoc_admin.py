@@ -42,7 +42,7 @@ def sendconfirmation():
         return render_template("register.html", error_message="Must be a UCC Umail email address")
     
     # make sure email has not already been used to make an account
-    if False: #r.has_account(email):
+    if r.has_account(email):
         caption = "Sorry!"
         message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
         app.logger.debug("senconfirmation(): account already exists with email %s"%(email))
