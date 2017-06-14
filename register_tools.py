@@ -7,6 +7,7 @@ from sendgrid import Email, sendgrid
 from sendgrid.helpers.mail import Content, Mail
 import pymysql
 import ldap3
+import db
 import passwords as p
 
 def send_confirmation_email(email:string, server_url:string):
@@ -116,6 +117,11 @@ def generate_uri(email:string):
         uri = hashlib.sha256(id_.encode()).hexdigest()
         conn = sqlite3.connect(p.DBNAME)
         c = conn.cursor()
+        c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
+        conn.commit()
+    except sqlite3.OperationalError:
+        c.execute(db.RESET)
+        c.execute(db.CREATE)
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
     finally:
