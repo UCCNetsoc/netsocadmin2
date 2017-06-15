@@ -30,7 +30,6 @@ http://%s/signup?t=%s&e=%s
 Yours,
 The UCC Netsoc Sys Admin Team
     """%(server_url, uri, email)
-    """#Uncomment when send grid works again
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("lowdown@netsoc.co")
     subject = "Account Registration"
@@ -39,17 +38,6 @@ The UCC Netsoc Sys Admin Team
     mail = Mail(from_email, subject, to_email, content)
     response = sg.client.mail.send.post(request_body=mail.get())
     return str(response.status_code).startswith("20")
-    #"""
-    to = email
-    from_ = p.EMAIL
-    subject = "Server Signup Test"
-    email = "\From: %s\nTo: %s\nSubject: %s\n\n\n%s" % (from_, to, subject, message_body)
-    with smtplib.SMTP("smtp.gmail.com:587") as smtp:
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(from_, p.EMAIL_PASSWORD)
-        smtp.sendmail(from_, to, email)
-    return True
 
 def send_details_email(email:string, user:string, password:string):
     """
@@ -77,8 +65,6 @@ and enter your password when prompted. Please change your password when you firs
 Yours,
 The UCC Netsoc Sys Admin Team
     """%(user, password, user)
-
-    """ Uncomment when send grid works again
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("lowdown@netsoc.co")
     subject = "Account Registration"
@@ -87,18 +73,6 @@ The UCC Netsoc Sys Admin Team
     mail = Mail(from_email, subject, to_email, content)
     response = sg.client.mail.send.post(request_body=mail.get())
     return str(response.status_code).startswith("20")
-    #"""
-    
-    to = email
-    from_ = "adamgillessen@gmail.com"
-    subject = "Server Signup Test"
-    email = "\From: %s\nTo: %s\nSubject: %s\n\n\n%s" % (from_, to, subject, message_body)
-    with smtplib.SMTP("smtp.gmail.com:587") as smtp:
-        smtp.starttls()
-        smtp.ehlo()
-        smtp.login(from_, p.EMAIL_PASSWORD)
-        smtp.sendmail(from_, to, email)
-    return True
 
 def generate_uri(email:string):
     """
