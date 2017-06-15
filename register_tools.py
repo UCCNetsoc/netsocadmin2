@@ -105,7 +105,7 @@ def generate_uri(email:string):
             conn.close()
     return uri
 
-def good_token(email:string, uri:string, delete=False):
+def good_token(email:string, uri:string):
     """
     Confirms whether an email and uri pair are valid.
 
@@ -122,9 +122,6 @@ def good_token(email:string, uri:string, delete=False):
         row = c.fetchone()
         if not row or row[0] != email:
             return False
-        if delete:
-            c.execute("DELETE FROM uris WHERE uri=?", (uri,))
-        conn.commit()
     finally:
         if c:
             c.close()
@@ -132,16 +129,31 @@ def good_token(email:string, uri:string, delete=False):
             conn.close()
     return True
 
+def remove_token(email:string):
+    """
+    Removes a token from the database for a given email address.
+
+    :param email the email address corresponding to the token being removed
+    """
+    conn, c = None, None
+    try:
+        conn = sqlite3.connect(p.DBNAME)
+        c = conn.cursor()
+        c.execute("DELETE FROM uris WHERE email=?", (email,))
+        conn.commit()
+    finally:
+        if c:
+            c.close()
+        if conn:
+            conn.close()
 
 def add_ldap_user(user:string):
     """
     Adds the user to the Netsoc LDAP DB.
 
     :param user the username which has been requested
-    :returns (success, reason, info) tuple
+    :returns (success, info) tuple
         sucess is True if detals were succesfully added and False otherwise.
-        reason is None if success == True or success == False due to an internal
-            error. reason is not None of the error was due to the user.
         info is a dictionary of information values for the mysql db. This will
             have to be added to when the user completes the form.
     """
@@ -162,11 +174,11 @@ def add_ldap_user(user:string):
                     search_filter="(objectClass=account)",
                     attributes=["uidNumber", "uid"],)
         if not success:
-            return False, None, None
+            return False, None
         last = None
         for account in conn.entries:
             if account["uid"] == user:
-                return False, "Username already in use", None
+                return False, None
             last = account["uidNumber"]
         next_uid = int(str(last)) + 1
         info["uid_num"] = next_uid
@@ -200,8 +212,8 @@ def add_ldap_user(user:string):
             object_class, 
             attributes)
         if not success:
-            return False, None, None
-    return True, None, info
+            return False, None
+    return True, info
 
 def add_netsoc_database(info:dict):
     """
@@ -262,6 +274,25 @@ def has_account(email:string):
     with conn.cursor() as c:
         sql = "SELECT * FROM users WHERE email=%s;"
         c.execute(sql, (email,))
+        if c.fetchone():
+            return True
+    return False
+
+def has_username(uid:string):
+    """
+    Tells whether or not a uid is already used on the server.
+
+    :param uid the uid being queried about
+    :returns True if the uid exists, False otherwise
+    """
+    conn = pymysql.connect(
+        host=p.SQL_HOST,
+        user=p.SQL_USER,
+        password=p.SQL_PASS,
+        db=p.SQL_DB,)
+    with conn.cursor() as c:
+        sql = "SELECT * FROM users WHERE uid=%s;"
+        c.execute(sql, (uid,))
         if c.fetchone():
             return True
     return False

@@ -4,7 +4,7 @@ Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
 import string, random, crypt, re
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, make_response
 import register_tools as r 
 
 HOST = "127.0.0.1"
@@ -20,8 +20,6 @@ Route: /
 def register():
     app.logger.debug("Received register page request")
     return render_template("register.html")
-
-
 
 """
 Route: /sendconfirmation
@@ -90,18 +88,17 @@ def completeregistration():
     uri = request.form["_token"]
 
     # make sure token is valid
-    if not r.good_token(email, uri, delete=True):
+    if not r.good_token(email, uri):
         app.logger.debug("completeregistration(): invalid token %s for email %s"%(uri, email))
         return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
 
     # add user to ldap db
     user = request.form["uid"]
-    success, reason, info = r.add_ldap_user(user)
+    success, info = r.add_ldap_user(user)
     if not success:
-        if reason:
-            app.logger.debug("completeregistration(): %s"%reason)
-            return render_template("form.html", email_address=email, token=uri, already_taken="Username is already in use")
         app.logger.debug("completeregistration(): failed to add user to LDAP")
+        # clean db of token
+        r.remove_token(email)
         return render_template("register.html", error_message="An error occured. Please try again or contact us")
     
     # add all info to Netsoc MySQL DB
@@ -120,12 +117,41 @@ def completeregistration():
         app.logger.debug("completeregistration(): failed to send confirmation email")
         return render_template("register.html", error_message="An error occured. Please try again or contact us")
 
+    # registration complete, remove their token
+    r.remove_token(email)
+
     caption = "Thank you!"
     message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
     return render_template("message.html", caption=caption, message=message)
+
+"""
+Route: username
+    This should be called by javascript in the registration form
+    to test whether or not a username is already used.
+"""
+@app.route("/username", methods=["POST", "GET"])
+def username():
+    if request.method != "POST" or \
+            "email" not in request.headers or \
+            "uid" not in request.headers or \
+            "token" not in request.headers:
+        return make_response("", 400)
+
+    # check if request is legit
+    email = request.headers["email"]
+    token = request.headers["token"]
+    if not r.good_token(email, token):
+        return make_response("", 403)
+    
+    # check db for username
+    requested_uername = request.headers["uid"]
+    if r.has_username(requested_uername):
+        app.logger.debug("username(): uid %s is in use"%(requested_uername))
+        return "Not available"
+    return "Available"
 
 if __name__ == '__main__':
     app.run(
         host=HOST,
         port=int(PORT),
-        threaded=True)
+        threaded=True,)

@@ -51,6 +51,34 @@
 	  ga('create', 'UA-71411325-3', 'auto');
 	  ga('send', 'pageview');
 
+	  function checkUsername() {
+	  	// disable until good uid has been found
+	  	document.getElementById("register-button").disabled = true;
+
+	  	var token = document.getElementById("_token").value;
+	  	var email = document.getElementById("email").value;
+	  	var uid = document.getElementById("uid").value;
+
+	  	var req = new XMLHttpRequest();
+	  	req,open("POST", "http://admin.netsoc.co/username")
+	  	req.setRequestHeader("email", email);
+	  	req.setRequestHeader("token", token);
+	  	req.setRequestHeader("uid", uid);
+
+	  	req.addEventListener("load", function() {
+	  		var err = document.querySelector("#taken-error");
+	  		if (response.status !== "200") {
+	  			err.innerText = "Invalid request"
+	  		} else if (req.responseText !== "Available") {
+	  			err.innerText = "Username not available";
+	  		} else {
+	  			document.getElementById("register-button").disabled = false;
+	  		}
+	  		console.log(req);
+	  	});
+	  	req.send();
+	  }
+
 	</script>
 
 	</head>
@@ -62,12 +90,12 @@
 
 		<h3 class="center-align"> Register </h3>
 		<form method="POST" action="/completeregistration" accept-charset="UTF-8" class="row col s12">
-			<input name="_token" type="hidden" value="{{ token }}">
+			<input id="_token" name="_token" type="hidden" value="{{ token }}">
 
 			<div class="row">
 				<div class="input-field">
 					<input disabled="disabled" name="email" type="text" value="{{ email_address }}">
-					<input name="email" type="hidden" value="{{ email_address }}">
+					<input id="email" name="email" type="hidden" value="{{ email_address }}">
 				</div>
 			</div>
 			<div class="row">
@@ -87,7 +115,8 @@
 					<label for="uid">Username (lowercase-only)</label>
 					<input class="example" name="uid" type="text" id="uid">
 				</div>
-				<div> {{ already_taken }}</div>
+				<button onclick="checkusername()"> Check Username </button>
+				<div id="taken-error"> </div>
 			</div>
 
 			<div class="row">
@@ -103,7 +132,7 @@
 					<input class="example" name="graduation_year" type="text" id="graduation_year">
 				</div>
 			</div>
-			<button class="btn waves-effect waves-light" type="submit" name="action">Register
+			<button id="register-button" class="btn waves-effect waves-light" type="submit" name="action">Register
 				<i class="mdi-content-send right"></i>
 			</button>
 
