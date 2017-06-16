@@ -55,26 +55,27 @@
 	  	// disable until good uid has been found
 	  	document.getElementById("register-button").disabled = true;
 
+	  	// get shit from form
 	  	var token = document.getElementById("_token").value;
 	  	var email = document.getElementById("email").value;
 	  	var uid = document.getElementById("uid").value;
 
+	  	// make AJAX request
 	  	var req = new XMLHttpRequest();
-	  	req,open("POST", "http://admin.netsoc.co/username")
+	  	req.open("POST", window.location.origin + "/username")
 	  	req.setRequestHeader("email", email);
 	  	req.setRequestHeader("token", token);
 	  	req.setRequestHeader("uid", uid);
 
 	  	req.addEventListener("load", function() {
 	  		var err = document.querySelector("#taken-error");
-	  		if (response.status !== "200") {
+	  		if (req.status !== 200) {
 	  			err.innerText = "Invalid request"
 	  		} else if (req.responseText !== "Available") {
 	  			err.innerText = "Username not available";
 	  		} else {
 	  			document.getElementById("register-button").disabled = false;
 	  		}
-	  		console.log(req);
 	  	});
 	  	req.send();
 	  }
@@ -115,8 +116,8 @@
 					<label for="uid">Username (lowercase-only)</label>
 					<input class="example" name="uid" type="text" id="uid">
 				</div>
-				<button onclick="checkusername()"> Check Username </button>
-				<div id="taken-error"> </div>
+				<button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>
+				<span id="taken-error" style="color: red;"> </span>
 			</div>
 
 			<div class="row">
@@ -132,7 +133,7 @@
 					<input class="example" name="graduation_year" type="text" id="graduation_year">
 				</div>
 			</div>
-			<button id="register-button" class="btn waves-effect waves-light" type="submit" name="action">Register
+			<button id="register-button" class="btn waves-effect waves-light" type="submit" name="action" disabled> Register
 				<i class="mdi-content-send right"></i>
 			</button>
 

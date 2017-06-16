@@ -9,6 +9,7 @@ import register_tools as r
 
 HOST = "127.0.0.1"
 PORT = "5050"
+
 app = Flask(__name__)
 
 """
@@ -30,9 +31,11 @@ Route: /sendconfirmation
 """
 @app.route("/sendconfirmation", methods=["POST", "GET"])
 def sendconfirmation():
+    # if they got here through GET, something done fucked up
     if request.method != "POST":
         app.logger.debug("sendconfirmation(): method not POST: %s"%request.method)
         return render_template("register.html")
+    
     # make sure is ucc email           
     email = request.form['email']         
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
@@ -45,7 +48,8 @@ def sendconfirmation():
         message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
         app.logger.debug("senconfirmation(): account already exists with email %s"%(email))
         return render_template("message.html", caption=caption, message=message)
-    # send confirmation link to endure they own the email account
+    
+    # send confirmation link to ensure they own the email account
     confirmation_sent = r.send_confirmation_email(email, "admin.netsoc.co")
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
@@ -62,14 +66,18 @@ Route: signup
 """
 @app.route("/signup", methods=["GET"])
 def signup():
+    # this check isn't vital but better safe than sorry
     if request.method != "GET":
         app.logger.debug("signup(): method was not GET: %s"%request.method)
         return render_template("register.html")
+    
+    # make sure they haven't forged the URI
     email = request.args.get('e')
     uri = request.args.get('t')
     if not r.good_token(email, uri):
         app.logger.debug("signup(): bad token %s used for email %s"%(uri, email))
         return render_template("register.html", error_message="Your request was not valid. Please try again or contact us")
+    
     return render_template("form.html", email_address=email, token=uri)
 
 """
@@ -80,14 +88,14 @@ Route: register
 """
 @app.route("/completeregistration", methods=["POST", "GET"])
 def completeregistration():
+    # if they haven't gotten here through POST something has gone wrong
     if request.method != "POST":
         app.logger.debug("completeregistration(): method was not POST: %s"%request.method)
         return render_template("register.html")
 
+    # make sure token is valid
     email = request.form["email"]
     uri = request.form["_token"]
-
-    # make sure token is valid
     if not r.good_token(email, uri):
         app.logger.debug("completeregistration(): invalid token %s for email %s"%(uri, email))
         return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
@@ -97,7 +105,7 @@ def completeregistration():
     success, info = r.add_ldap_user(user)
     if not success:
         app.logger.debug("completeregistration(): failed to add user to LDAP")
-        # clean db of token
+        # clean db of token so they have to start again
         r.remove_token(email)
         return render_template("register.html", error_message="An error occured. Please try again or contact us")
     

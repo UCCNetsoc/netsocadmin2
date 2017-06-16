@@ -28,7 +28,8 @@ Please confirm your account by going to:
 http://%s/signup?t=%s&e=%s 
 
 Yours,
-The UCC Netsoc Sys Admin Team
+
+The UCC Netsoc SysAdmin Team
     """%(server_url, uri, email)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("lowdown@netsoc.co")
@@ -60,10 +61,13 @@ password: %s
 
 To log in, run:
     ssh %s@leela.netsoc.co
-and enter your password when prompted. Please change your password when you first log-in to something you'll remember.
+and enter your password when prompted. If you are using windows, go to http://www.putty.org/ and download the SSH client.
+
+Please change your password when you first log-in to something you'll remember!
 
 Yours,
-The UCC Netsoc Sys Admin Team
+
+The UCC Netsoc SysAdmin Team
     """%(user, password, user)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("lowdown@netsoc.co")
@@ -185,7 +189,8 @@ def add_ldap_user(user:string):
 
         # creates initial password for user. They will be asked to change
         # this when they first log in.
-        password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+        password = "".join(random.choice(
+            string.ascii_letters + string.digits) for _ in range(6))
         crypt_password = "{crypt}" + crypt.crypt(password)
         info["password"] = password
         info["crypt_password"] = crypt_password
@@ -234,7 +239,8 @@ def add_netsoc_database(info:dict):
             sql = \
                 """
                 INSERT INTO users 
-                    (uid, name, password, gid, home_directory, uid_number, student_id, course, graduation_year, email)
+                    (uid, name, password, gid, home_directory, uid_number, 
+                    student_id, course, graduation_year, email)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """
             row = (
@@ -264,7 +270,8 @@ def has_account(email:string):
     Sees if their is already an account on record with this email address.
 
     :param email the in-question email address being used to sign up
-    :returns True if their already as an account with that email, False otherwise.
+    :returns True if their already as an account with that email, 
+        False otherwise.
     """
     conn = pymysql.connect(
         host=p.SQL_HOST,

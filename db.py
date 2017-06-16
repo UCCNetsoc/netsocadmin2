@@ -11,6 +11,11 @@ RESET = "DROP TABLE IF EXISTS uris"
 CREATE = "CREATE TABLE uris(email TEXT, uri INT)"
 
 def print_db():
+    """
+    This prints the currently stored email address, token pairs
+    which are currently in the database. Intended for use
+    within an interactive shell.
+    """
     conn, c, uri = None, None, None
     try:
         conn = sqlite3.connect(p.DBNAME)
@@ -26,8 +31,14 @@ def print_db():
         if conn:
             conn.close()
 
-if __name__ == "__main__":
+def reset_db():
+    """
+    Resets the database to being empty.
+    """
     conn = sqlite3.connect(p.DBNAME)
     c = conn.cursor()
     c.execute(RESET)
     c.execute(CREATE)
+
+if __name__ == "__main__":
+    reset_db()
