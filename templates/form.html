@@ -74,6 +74,7 @@
 	  		} else if (req.responseText !== "Available") {
 	  			err.innerText = "Username not available";
 	  		} else {
+	  			err.innerText = "";
 	  			document.getElementById("register-button").disabled = false;
 	  		}
 	  	});
