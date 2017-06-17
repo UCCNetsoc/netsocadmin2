@@ -6,9 +6,11 @@ then be proxied to this address.
 import string, random, crypt, re
 from flask import Flask, request, render_template, make_response
 import register_tools as r 
+import passwords as p
 
 HOST = "127.0.0.1"
 PORT = "5050"
+DEBUG = True
 
 app = Flask(__name__)
 
@@ -43,14 +45,15 @@ def sendconfirmation():
         return render_template("register.html", error_message="Must be a UCC Umail email address")
     
     # make sure email has not already been used to make an account
-    if r.has_account(email):
+    if email not in p.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
         message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
         app.logger.debug("senconfirmation(): account already exists with email %s"%(email))
         return render_template("message.html", caption=caption, message=message)
     
     # send confirmation link to ensure they own the email account
-    confirmation_sent = r.send_confirmation_email(email, "admin.netsoc.co")
+    out_email = "admin.netsoc.co" if not DEBUG else "%s:%s"%(HOST, PORT)
+    confirmation_sent = r.send_confirmation_email(email, out_email)
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
         return render_template("register.html", error_message="An error occured. Please try again or contact us")
@@ -162,4 +165,5 @@ if __name__ == '__main__':
     app.run(
         host=HOST,
         port=int(PORT),
-        threaded=True,)
+        threaded=True,
+        debug=DEBUG,)

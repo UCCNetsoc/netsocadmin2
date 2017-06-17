@@ -292,6 +292,8 @@ def has_username(uid:string):
     :param uid the uid being queried about
     :returns True if the uid exists, False otherwise
     """
+    if uid in p.BLACKLIST:
+        return True
     conn = pymysql.connect(
         host=p.SQL_HOST,
         user=p.SQL_USER,
