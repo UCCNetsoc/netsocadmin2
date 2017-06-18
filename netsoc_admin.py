@@ -103,8 +103,24 @@ def completeregistration():
         app.logger.debug("completeregistration(): invalid token %s for email %s"%(uri, email))
         return render_template("register.html", error_message="Your token has expired or never existed. Please try again or contact us")
 
-    # add user to ldap db
+    # make sure form is flled out and username is still legit
+    form_fields = (
+        request.form["email"],
+        request.form["_token"],
+        request.form["uid"],
+        request.form["name"],
+        request.form["student_id"],
+        request.form["course"],
+        request.form["graduation_year"],
+    )
+    if not all(form_fields):
+        return render_template("form.html", email_address=email, token=uri, error_message="You must fill out all of the fields")
+
     user = request.form["uid"]
+    if r.has_username(user):
+        return render_template("form.html", email_address=email, token=uri, error_message="The requested username is not available")
+
+    # add user to ldap db
     success, info = r.add_ldap_user(user)
     if not success:
         app.logger.debug("completeregistration(): failed to add user to LDAP")
