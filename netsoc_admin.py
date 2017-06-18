@@ -10,7 +10,7 @@ import passwords as p
 
 HOST = "127.0.0.1"
 PORT = "5050"
-DEBUG = True
+DEBUG = False
 
 app = Flask(__name__)
 
