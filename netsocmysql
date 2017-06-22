@@ -1,0 +1,206 @@
+#!/usr/bin/python3
+import argparse
+import os
+import passwords as p
+import pymysql
+import pwd
+import random
+import string
+
+class DataBaseException(Exception):
+    """
+    DataBaseException should be raised when a DB related operation fails.
+    """
+    pass
+
+
+class UserException(Exception):
+    """
+    UserException should be raised when a user related operation fails.
+    """
+    pass
+
+
+def _mysql_connection():
+    """
+    _db_connection is a helper method which supplies a connection
+    to the MySQL DB logged in as passwords.MYSQL_USER.
+
+    :returns pymysql.connections.Connection
+    """
+    return pymysql.connect(
+        host="localhost",
+        user=p.MYSQL_USER,
+        password=p.MYSQL_PASSWORD,
+        cursorclass=pymysql.cursors.DictCursor)
+
+
+def list_dbs(user:string):
+    """
+    list_dbs lists all of the dbs partaining to "user".
+
+    :returns list of database names as strings or None if the query was
+        unsuccesful.
+    :raises DataBaseException if the operation fails.
+    """
+    con = _mysql_connection()
+    databases = None
+    try:
+        with con.cursor() as cur:
+            sql = "SHOW DATABASES;"
+            cur.execute(sql)
+            is_user_db = lambda row: row.startswith("%s_"%(user))
+            databases = list(
+                filter(is_user_db, map(
+                    lambda row: row["Database"], cur.fetchall())))
+    except Exception as e:
+        raise DataBaseException("failed to list user %s's databases: %s"%(user, e))
+    finally:
+        con.close()
+    return databases
+
+
+def create_user(username:string):
+    """
+    create_user adds a new user to the MySQL DBMS if and only if
+    a user of that name does not already exist.
+    
+    :param username the requested username to create.
+    :raises UserException if the operation fails.
+    :returns string the generated password for the new user
+    """
+    con = _mysql_connection()
+    try:
+        with con.cursor() as cur:
+            # check is username already exists
+            sql = "SELECT User FROM mysql.user WHERE User=%s;"
+            cur.execute(sql, username)
+            if cur.rowcount:
+                raise Exception("username %s already exists"%(username))
+            
+            # create new user
+            chars = string.ascii_letters + string.digits
+            password = "".join(
+                random.choice(chars) for _ in range(random.randint(5, 10)))
+            sql = """CREATE USER %s@'%%' IDENTIFIED BY %s;"""
+            cur.execute(sql, (username, password,))
+            sql = """CREATE USER %s@'localhost' IDENTIFIED BY %s;"""
+            cur.execute(sql, (username, password,))
+
+            # grant the user permissions on all databases of the form
+            # "<username>_something".
+            # Note: the escaping must be done in two parts here becuase
+            # PyMySQL will insert quotation marks around the %s which
+            # makes the pattern `'username'_%`.
+            database_pattern = con.escape_string("%s_%%%%"%(username))
+            sql = """
+                GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
+                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
+                    ON `{pat}`.* TO %s@'localhost';""".format(pat=database_pattern)
+            cur.execute(sql, username)
+            sql = """
+                GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
+                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
+                    ON `{pat}`.* TO %s@'%%';""".format(pat=database_pattern)
+            cur.execute(sql, username)
+            return password
+    except Exception as e:
+        raise UserException("failed to create the new user %s: %s"%(username, e))
+    finally:
+        con.close()
+
+
+def delete_user(username:string):
+    """
+    delete_user removes a username from the MySQL DBMS. If the username does
+    not exist, it does nothing.
+
+    :param username the username being deleted.
+    :raises UserException if the operation fails.
+    """
+    con = _mysql_connection()
+    try:
+        with con.cursor() as cur:
+            # make sure user exists
+            sql = """SELECT * FROM mysql.user WHERE user=%s"""
+            cur.execute(sql, username)
+            if not cur.rowcount:
+                return
+
+            # make sure user isn't an admin user (more checking should be
+            # done at function call as well)
+            sql = """SHOW GRANTS FOR %s@'localhost'"""
+            cur.execute(sql, username)
+            is_grant_all = lambda row: row["Grants for %s@localhost"%(username)].startswith("GRANT ALL")
+            if any(filter(is_grant_all, cur.fetchall())):
+                raise Exception("failed to remove use %s: user is an admin user"%(username))
+            
+            sql = """DROP USER %s@'localhost';"""
+            cur.execute(sql, username)
+            sql = """DROP USER %s@'%%';"""
+            cur.execute(sql, username)
+            con.commit()
+    except Exception as e:
+        raise UserException("failed to delete username (if exists) %s: %s"%(
+            username, e))
+    finally:
+        con.close()
+
+
+def create_database(username:string, dbname:string):
+    """
+    create_database creates a new database for the given user. Note that
+    for a given user-selected name, dbname, the actual database name will
+    be "username_dbname".
+
+    :param username the username of the account which will have permissions
+        on the new database.
+    :param dbname the user-selected name for the database. See above for details.
+    :returns the actual database name which can be used in actual queries 
+        to the database.
+    :raises DataBaseException if the operation fails
+    """
+
+
+def main():
+    """
+    main parses the arguments which the user has provided and runs the
+    correct sub-sommand.
+    """
+    p = argparse.ArgumentParser(
+        description="Manage you Netsoc MySQL databases")
+    p.add_argument("-l", "--listdb",
+        action="store_true",
+        help="Lists all of your DBs")
+    p.add_argument("-n", "--new",
+        action="store_true",
+        help="Creates a new MySQL account name for you. Any existing account is removed")
+
+    args = p.parse_args()
+    if args.listdb:
+        # This lists all of the DBs owned by the currect user
+        # Note: it is assumed that the current user's name is the same as
+        # their MySQL account username. It is also assumed that all 
+        # databases pertaining to this user are prefixed with "<username>_".
+        # e.g: for uid "roger", their MySQL username is "roger" all of their
+        # databases match "roger_*".
+        user = pwd.getpwuid(os.getuid()).pw_name
+        print("\n".join(list_dbs(user)))
+        exit(0)
+
+    if args.new:
+        # This makes a new MySQL account for the current user, giving them a new
+        # password. Note that this doesn't remove any of their old databases
+        # or tables. Security consideration: your login name is the same as your
+        # MySQL account name (by design) so the account which is being reset
+        # must be yours as you can't change your login name without sudo.
+        user = pwd.getpwuid(os.getuid()).pw_name
+        delete_user(user)
+        new_password = create_user(user)
+        print("Username: '%s'"%user)
+        print("Password: '%s'"%new_password)
+        exit(0)
+
+
+if __name__ == "__main__":
+    main()
