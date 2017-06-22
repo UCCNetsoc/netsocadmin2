@@ -179,19 +179,21 @@ def create_database(username:str, password:str, dbname:str):
     finally:
         con.close()
 
+
 def main():
     """
     main parses the arguments which the user has provided and runs the
     correct sub-sommand.
     """
     p = argparse.ArgumentParser(
-        description="Manage you Netsoc MySQL databases")
-    p.add_argument("-c", "--createdb",
+        description="Easily manage your Netsoc MySQL databases")
+    group = p.add_mutually_exclusive_group()
+    group.add_argument("-c", "--createdb",
         help="Create a new database with the specified name. You must provide a password for this.")
-    p.add_argument("-l", "--listdb",
+    group.add_argument("-l", "--listdb",
         action="store_true",
         help="Lists all of your DBs")
-    p.add_argument("-n", "--new",
+    group.add_argument("-n", "--new",
         action="store_true",
         help="Creates a new MySQL account name for you. Any existing account is removed")
 
@@ -208,10 +210,11 @@ def main():
         try:
             dbname = create_database(user, password, args.createdb)
         except Exception as e:
-            print("Failed to create the database:\n\t%s"%(e))
+            print("Failed to create the database:\n%s"%(e))
             exit(1)
         print("The database '%s' has been created"%(dbname))
         exit(0)
+
     if args.listdb:
         # This lists all of the DBs owned by the currect user
         # Note: it is assumed that the current user's name is the same as
