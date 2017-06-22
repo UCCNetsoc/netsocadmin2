@@ -5,6 +5,7 @@ import passwords as p
 import pymysql
 import pwd
 import random
+import re
 import string
 
 class DataBaseException(Exception):
@@ -21,7 +22,7 @@ class UserException(Exception):
     pass
 
 
-def _mysql_connection():
+def _mysql_connection(username:str=p.MYSQL_USER, password:str=p.MYSQL_PASSWORD):
     """
     _db_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.MYSQL_USER.
@@ -30,8 +31,8 @@ def _mysql_connection():
     """
     return pymysql.connect(
         host="localhost",
-        user=p.MYSQL_USER,
-        password=p.MYSQL_PASSWORD,
+        user=username,
+        password=password,
         cursorclass=pymysql.cursors.DictCursor)
 
 
@@ -147,20 +148,36 @@ def delete_user(username:string):
         con.close()
 
 
-def create_database(username:string, dbname:string):
+def create_database(username:str, password:str, dbname:str):
     """
     create_database creates a new database for the given user. Note that
     for a given user-selected name, dbname, the actual database name will
-    be "username_dbname".
+    be "username_dbname". Note that they must create databases as their 
+    own account in order to limit the damage any injections might have
+    to stuff they only they own.
 
     :param username the username of the account which will have permissions
         on the new database.
+    :password the user's MySQL password
     :param dbname the user-selected name for the database. See above for details.
     :returns the actual database name which can be used in actual queries 
         to the database.
+    :returns the name of the new database which they will use to access it.
     :raises DataBaseException if the operation fails
     """
-
+    con = _mysql_connection(username, password)
+    try:
+        with con.cursor() as cur:
+            user_dbname = con.escape_string("%s_%s"%(username, dbname))
+            if not re.match(r"[a-zA-Z]+\_[a-zA-Z]+", user_dbname):
+                raise Exception(
+                    "database %s is not valid, must use lower or uppercase letters"%(user_dbname))
+            cur.execute("CREATE DATABASE {};".format(user_dbname))
+            return user_dbname
+    except Exception as e:
+        raise DataBaseException("failed to create new database: %s"%(e), e)
+    finally:
+        con.close()
 
 def main():
     """
@@ -169,6 +186,8 @@ def main():
     """
     p = argparse.ArgumentParser(
         description="Manage you Netsoc MySQL databases")
+    p.add_argument("-c", "--createdb",
+        help="Create a new database with the specified name. You must provide a password for this.")
     p.add_argument("-l", "--listdb",
         action="store_true",
         help="Lists all of your DBs")
@@ -177,6 +196,22 @@ def main():
         help="Creates a new MySQL account name for you. Any existing account is removed")
 
     args = p.parse_args()
+    if args.createdb:
+        # This allows a user to create a database of the form username_dbname.
+        # Note that they must be logged in as themselves. This is to limit any
+        # damage some SQL magician could do with an injection attack.
+        user = pwd.getpwuid(os.getuid()).pw_name
+        password = input("Enter your MySQL password:\n>> ")
+        if not password:
+            print("You must specify your MySQL password to add a database.")
+            exit(1)
+        try:
+            dbname = create_database(user, password, args.createdb)
+        except Exception as e:
+            print("Failed to create the database:\n\t%s"%(e))
+            exit(1)
+        print("The database '%s' has been created"%(dbname))
+        exit(0)
     if args.listdb:
         # This lists all of the DBs owned by the currect user
         # Note: it is assumed that the current user's name is the same as
