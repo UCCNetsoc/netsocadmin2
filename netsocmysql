@@ -7,6 +7,7 @@ import pwd
 import random
 import re
 import string
+from typing import List
 
 class DataBaseException(Exception):
     """
@@ -22,7 +23,7 @@ class UserException(Exception):
     pass
 
 
-def _mysql_connection(username:str=p.MYSQL_USER, password:str=p.MYSQL_PASSWORD):
+def _mysql_connection(username:str=p.MYSQL_USER, password:str=p.MYSQL_PASSWORD) -> pymysql.connections.Connection:
     """
     _db_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.MYSQL_USER.
@@ -36,7 +37,7 @@ def _mysql_connection(username:str=p.MYSQL_USER, password:str=p.MYSQL_PASSWORD):
         cursorclass=pymysql.cursors.DictCursor)
 
 
-def list_dbs(user:string):
+def list_dbs(user:str) -> List[str]:
     """
     list_dbs lists all of the dbs partaining to "user".
 
@@ -50,7 +51,7 @@ def list_dbs(user:string):
         with con.cursor() as cur:
             sql = "SHOW DATABASES;"
             cur.execute(sql)
-            is_user_db = lambda row: row.startswith("%s_"%(user))
+            is_user_db = lambda dbname: dbname.startswith("%s_"%(user))
             databases = list(
                 filter(is_user_db, map(
                     lambda row: row["Database"], cur.fetchall())))
@@ -61,7 +62,7 @@ def list_dbs(user:string):
     return databases
 
 
-def create_user(username:string):
+def create_user(username:str) -> str:
     """
     create_user adds a new user to the MySQL DBMS if and only if
     a user of that name does not already exist.
@@ -93,7 +94,9 @@ def create_user(username:string):
             # Note: the escaping must be done in two parts here becuase
             # PyMySQL will insert quotation marks around the %s which
             # makes the pattern `'username'_%`.
-            database_pattern = con.escape_string("%s_%%%%"%(username))
+            database_pattern = con.escape("%s_%%%%"%(username))
+            if not re.match(r"[a-zA-Z]+\_%%", database_pattern):
+                raise Exception("invalid username '%s', must be letters only"%(username))
             sql = """
                 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
                 INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
@@ -111,7 +114,7 @@ def create_user(username:string):
         con.close()
 
 
-def delete_user(username:string):
+def delete_user(username:str):
     """
     delete_user removes a username from the MySQL DBMS. If the username does
     not exist, it does nothing.
@@ -148,31 +151,43 @@ def delete_user(username:string):
         con.close()
 
 
-def create_database(username:str, password:str, dbname:str):
+def create_database(username:str, dbname:str, delete:bool=False) -> str:
     """
-    create_database creates a new database for the given user. Note that
+    create_database creates a new database for the given user. If the delete
+    # argument is True, then it will delete the database specified. Note that
     for a given user-selected name, dbname, the actual database name will
-    be "username_dbname". Note that they must create databases as their 
-    own account in order to limit the damage any injections might have
-    to stuff they only they own.
+    be "username_dbname". 
 
     :param username the username of the account which will have permissions
         on the new database.
-    :password the user's MySQL password
     :param dbname the user-selected name for the database. See above for details.
-    :returns the actual database name which can be used in actual queries 
-        to the database.
-    :returns the name of the new database which they will use to access it.
+    :param delete when this argument is true then the database will be deleted 
+        instead of created.
+    :returns the database name which can be used in actual queries to the database.
     :raises DataBaseException if the operation fails
     """
-    con = _mysql_connection(username, password)
+    con = _mysql_connection()
     try:
         with con.cursor() as cur:
-            user_dbname = con.escape_string("%s_%s"%(username, dbname))
-            if not re.match(r"[a-zA-Z]+\_[a-zA-Z]+", user_dbname):
+            # make sure name is legit
+            user_dbname = dbname
+            if not dbname.startswith("%s_"%(username)):
+                user_dbname = "%s_"%(username) + user_dbname
+            if not re.match(r"[a-zA-Z]+\_[a-zA-Z0-9]+", user_dbname):
                 raise Exception(
-                    "database %s is not valid, must use lower or uppercase letters"%(user_dbname))
-            cur.execute("CREATE DATABASE {};".format(user_dbname))
+                    "database %s is not valid, must use digits, lower or upper letters"%(user_dbname))
+            
+            # make sure deleting or creating is a valid thing to do
+            userdbs = list_dbs(username)
+            if user_dbname in userdbs and not delete:
+                raise Exception("cannot create database: database name %s already exists"%(user_dbname))
+            elif user_dbname not in userdbs and delete:
+                raise Exception("cannot delete database: database name %s doesn't exist"%(user_dbname))
+
+            # execute the operation
+            command = "CREATE" if not delete else "DROP"
+            sql ="{command} DATABASE `{name}`;".format(command=command, name=user_dbname)
+            cur.execute(sql)
             return user_dbname
     except Exception as e:
         raise DataBaseException("failed to create new database: %s"%(e), e)
@@ -186,33 +201,36 @@ def main():
     correct sub-sommand.
     """
     p = argparse.ArgumentParser(
-        description="Easily manage your Netsoc MySQL databases")
+        description="Easily manage your Netsoc MySQL databases.")
     group = p.add_mutually_exclusive_group()
     group.add_argument("-c", "--createdb",
-        help="Create a new database with the specified name. You must provide a password for this.")
+        help="Create a new database with the specified name.")
+    group.add_argument("-d", "--deletedb",
+        help="Delete a database with the specified name.")
     group.add_argument("-l", "--listdb",
         action="store_true",
-        help="Lists all of your DBs")
+        help="Lists all of your Netsoc MySQL Databases.")
     group.add_argument("-n", "--new",
         action="store_true",
-        help="Creates a new MySQL account name for you. Any existing account is removed")
+        help="Creates a new MySQL account name for you. Any existing accounts are removed completely.")
 
     args = p.parse_args()
     if args.createdb:
-        # This allows a user to create a database of the form username_dbname.
-        # Note that they must be logged in as themselves. This is to limit any
-        # damage some SQL magician could do with an injection attack.
+        # This allows a user to create a database of the form "username_dbname".
+        # Whatever name the user gives will therefore be prepended with their
+        # username and an underscore.
         user = pwd.getpwuid(os.getuid()).pw_name
-        password = input("Enter your MySQL password:\n>> ")
-        if not password:
-            print("You must specify your MySQL password to add a database.")
-            exit(1)
-        try:
-            dbname = create_database(user, password, args.createdb)
-        except Exception as e:
-            print("Failed to create the database:\n%s"%(e))
-            exit(1)
+        dbname = create_database(user, args.createdb)
         print("The database '%s' has been created"%(dbname))
+        exit(0)
+
+    if args.deletedb:
+        # This allows a user to delete a database one of their databases. You can
+        # either provide a "user_dbname" name or a "dbname" name and it will still
+        # work correctly.
+        user = pwd.getpwuid(os.getuid()).pw_name
+        dbname = create_database(user, args.deletedb, delete=True)
+        print("The database '%s' has been deleted"%(dbname))
         exit(0)
 
     if args.listdb:
@@ -223,6 +241,7 @@ def main():
         # e.g: for uid "roger", their MySQL username is "roger" all of their
         # databases match "roger_*".
         user = pwd.getpwuid(os.getuid()).pw_name
+        print("Your Netsoc MySQL databases:")
         print("\n".join(list_dbs(user)))
         exit(0)
 
@@ -235,6 +254,7 @@ def main():
         user = pwd.getpwuid(os.getuid()).pw_name
         delete_user(user)
         new_password = create_user(user)
+        print("Your new account details:")
         print("Username: '%s'"%user)
         print("Password: '%s'"%new_password)
         exit(0)
