@@ -8,3 +8,7 @@ __pycache__/
 
 # logging from init conf file
 /*.log
+
+# other stuff
+/plan.txt
+/.mypy_cache
