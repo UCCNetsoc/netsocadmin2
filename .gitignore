@@ -10,5 +10,5 @@ __pycache__/
 /*.log
 
 # other stuff
-/plan.txt
-/.mypy_cache
+/**/plan.txt
+/**/.mypy_cache
