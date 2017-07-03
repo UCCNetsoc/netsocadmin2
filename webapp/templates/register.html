@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="description" content="" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<link rel="shortcut icon" href="/static/favicon.ico">
 
@@ -46,21 +46,12 @@
 	  ga('send', 'pageview');
 	</script>
 
-	<style>
-		main-logo {
-			max-width: 100%;
-			width: 25%;
-			height: auto;
-		}
-	</style>
-
 </head>
 <body class=" valign-wrapper register ">
 	<main class="row container">
 		<section class="card-panel white col l6 offset-l3 s12 valign	">
 			<h3 class="center-align"> Enter Your Student Email </h3>
 			<form method="POST" action="/sendconfirmation" accept-charset="UTF-8" class="row col s12">
-				<input name="_token" type="hidden" value="gFinFVq8N1gvww2Jf4OVzX2hzvC6wS2cqJiFxaEc">
 				<div class="row">
 					<div class="input-field">
 						<label for="email">Student Email</label>
@@ -74,8 +65,30 @@
 			</form>
 
 			<center class="error_message" style="color: red;">
-				{{error_message}}
+				{{ error_message }}
 			</center>
+			<br>
+		</section>
+
+		<section class="card-panel white col l6 offset-l3 s12 valign	">
+			<h3 class="center-align"> Login </h3>
+			<form method="POST" action="/login" accept-charset="UTF-8" class="row col s12">
+				<div class="row">
+					<div class="input-field">
+						<label for="username">Server Username</label>
+						<input autofocus="autofocus" name="username" type="text" id="username">
+					</div>
+
+					<div class="input-field">
+						<label for="password">Server Password</label>
+						<input autofocus="autofocus" name="password" type="password" id="password">
+					</div>
+				</div>
+				<button class="btn waves-effect waves-light" type="submit" name="action">
+					Login
+					<i class="mdi-content-send right"></i>
+				</button>
+			</form>
 			<br>
 		</section>
 	</main>

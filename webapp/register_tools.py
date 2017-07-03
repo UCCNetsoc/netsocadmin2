@@ -2,15 +2,20 @@
 This file contains functions which are used during
 registration by the main netsoc admin file.
 """
-import random, string, hashlib, smtplib, sqlite3, crypt
+import crypt
+import db
+import hashlib
+import ldap3
+import passwords as p
+import pymysql
+import random
 from sendgrid import Email, sendgrid
 from sendgrid.helpers.mail import Content, Mail
-import pymysql
-import ldap3
-import db
-import passwords as p
+import sqlite3
+import string
+import typing
 
-def send_confirmation_email(email:string, server_url:string):
+def send_confirmation_email(email:str, server_url:str) -> bool:
     """
     Sends email containing the link which users use to set up their accounts.
 
@@ -40,7 +45,8 @@ The UCC Netsoc SysAdmin Team
     response = sg.client.mail.send.post(request_body=mail.get())
     return str(response.status_code).startswith("20")
 
-def send_details_email(email:string, user:string, password:string):
+
+def send_details_email(email:str, user:str, password:str) -> bool:
     """
     Sends an email once a user has registered succesfully confirming
     the details they have signed up with.
@@ -78,7 +84,7 @@ The UCC Netsoc SysAdmin Team
     response = sg.client.mail.send.post(request_body=mail.get())
     return str(response.status_code).startswith("20")
 
-def generate_uri(email:string):
+def generate_uri(email:str) -> str:
     """
     Generates a uri token which will identify this user's email address.
     This should be checked when the user signs up to make sure it was the
@@ -87,29 +93,30 @@ def generate_uri(email:string):
     :param email the email used to sign up with
     :returns the generated uri string or None of there was a failure
     """
-    conn, c, uri = None, None, None
     try:
         chars = string.ascii_uppercase + string.digits
         size = 10
         id_ = "".join(random.choice(chars) for _ in range(size))
         uri = hashlib.sha256(id_.encode()).hexdigest()
+
         conn = sqlite3.connect(p.DBNAME)
         c = conn.cursor()
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
+
     except sqlite3.OperationalError:
         c.execute(db.RESET)
         c.execute(db.CREATE)
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
+
     finally:
-        if c:
-            c.close()
-        if conn:
-            conn.close()
+        if conn: conn.close()
+
     return uri
 
-def good_token(email:string, uri:string):
+
+def good_token(email:str, uri:str) -> bool:
     """
     Confirms whether an email and uri pair are valid.
 
@@ -118,40 +125,28 @@ def good_token(email:string, uri:string):
     :returns True if the token is valid (i.e. sent by us to this email),
         False otherwise (including if a DB error occured)
     """
-    conn, c = None, None
-    try:
-        conn = sqlite3.connect(p.DBNAME)
+    with sqlite3.connect(p.DBNAME) as conn:
         c = conn.cursor()
         c.execute("SELECT * FROM uris WHERE uri=?", (uri,))
         row = c.fetchone()
         if not row or row[0] != email:
             return False
-    finally:
-        if c:
-            c.close()
-        if conn:
-            conn.close()
     return True
 
-def remove_token(email:string):
+
+def remove_token(email:str):
     """
     Removes a token from the database for a given email address.
 
     :param email the email address corresponding to the token being removed
     """
-    conn, c = None, None
-    try:
-        conn = sqlite3.connect(p.DBNAME)
+    with sqlite3.connect(p.DBNAME) as conn:
         c = conn.cursor()
         c.execute("DELETE FROM uris WHERE email=?", (email,))
         conn.commit()
-    finally:
-        if c:
-            c.close()
-        if conn:
-            conn.close()
 
-def add_ldap_user(user:string):
+
+def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
     """
     Adds the user to the Netsoc LDAP DB.
 
@@ -172,6 +167,7 @@ def add_ldap_user(user:string):
                         user=p.LDAP_USER,
                         password=p.LDAP_KEY,
                         auto_bind=True) as conn:
+        
         # checks if username exists and also gets next uid number
         success = conn.search(
                     search_base="cn=member,dc=netsoc,dc=co",
@@ -220,7 +216,7 @@ def add_ldap_user(user:string):
             return False, None
     return True, info
 
-def add_netsoc_database(info:dict):
+def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
     """
     Adds a user's details to the Netsoc MySQL database.
 
@@ -228,44 +224,36 @@ def add_netsoc_database(info:dict):
         collected during signup to go in the database.
     :returns Boolean True if the data was succesfully added
     """
-    conn = None
-    try:
-        conn = pymysql.connect(
+    conn = pymysql.connect(
             host=p.SQL_HOST,
             user=p.SQL_USER,
             password=p.SQL_PASS,
             db=p.SQL_DB,)
-        with conn.cursor() as c:
-            sql = \
-                """
-                INSERT INTO users 
-                    (uid, name, password, gid, home_directory, uid_number, 
-                    student_id, course, graduation_year, email)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                """
-            row = (
-                info["uid"],
-                info["name"],
-                info["crypt_password"],
-                info["gid"],
-                info["home_dir"],
-                info["uid_num"],
-                info["student_id"],
-                info["course"],
-                info["grad_year"],
-                info["email"],
-            )
-            c.execute(sql, row)
-        conn.commit()
-    except Exception as e:
-        print(e)
-        return False
-    finally:
-        if conn:
-            conn.close()
+    with conn.cursor() as c:
+        sql = \
+            """
+            INSERT INTO users 
+                (uid, name, password, gid, home_directory, uid_number, 
+                student_id, course, graduation_year, email)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+            """
+        row = (
+            info["uid"],
+            info["name"],
+            info["crypt_password"],
+            info["gid"],
+            info["home_dir"],
+            info["uid_num"],
+            info["student_id"],
+            info["course"],
+            info["grad_year"],
+            info["email"],
+        )
+        c.execute(sql, row)
+    conn.commit()
     return True
 
-def has_account(email:string):
+def has_account(email:str) -> bool:
     """
     Sees if their is already an account on record with this email address.
 
@@ -285,7 +273,7 @@ def has_account(email:string):
             return True
     return False
 
-def has_username(uid:string):
+def has_username(uid:str) -> bool:
     """
     Tells whether or not a uid is already used on the server.
 
