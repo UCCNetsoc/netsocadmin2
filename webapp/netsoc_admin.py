@@ -11,6 +11,7 @@ import os
 import passwords as p
 import random
 import re
+import sys
 import string
 import register_tools as r
 
@@ -261,6 +262,8 @@ def tools():
 
 
 if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == "debug":
+        DEBUG = True
     app.run(
         host=HOST,
         port=int(PORT),
