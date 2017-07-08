@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <title>Netsoc Admin</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">      
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="canonical" href="https://admin.netsoc.co" />
+    
+    <meta property="og:title" content="UCC Netsoc Admin" />
+    <meta property="og:url" content="https://admin.netsoc.co" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="UCC Netsoc Admin" />
+    <meta property="fb:admins" content="1385961037" />
+    <meta property="og:description" content="Manage your webspace and databases in one location." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@UCCNetsoc" />
+    <meta name="twitter:title" content="UCC Netsoc Admin" />
+    <meta name="twitter:description" content="Manage your webspace and databases in one location." />
+    <script type="application/ld+json">
+        {
+            "@context" : "http://schema.org",
+            "@type" : "Organization",
+            "name" : "UCC Netsoc",
+            "url" : "https://admin.netsoc.co",
+            "sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script> 
+    {% endblock %}
+</head>
+<body>
+    {# This is the navbar ontop of every page. All pages will need this. #}
+    <nav>
+        <div class="nav-wrapper teal lighten-2" style="padding-right: 10px;padding-left: 10px">
+            <div class="brand-logo"><img src="/static/banner-icon.svg" class="responsive-img" style="height: 65px;"/></div>
+            
+            {# This is the main navbar for when the screen is big enough #}
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                <li>
+                    <a href="#">Tutorials</a>
+                </li>
+                <li>
+                    <a href="/tools">Admin Tools</a>
+                </li>
+                <li>
+                    <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                </li>
+            </ul>
+
+            {# This one is used when the screen is small like on mobile #}
+            <ul class="side-nav" id="mobile-demo">
+                <li>
+                    <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                </li>
+                <li>
+                    <a href="/tools">Admin Tools</a>
+                </li>
+                <li>
+                    <a href="#">Tutorials</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    {% block body %}{% endblock %}
+</body>
+</html>
+
+{#
+
+An example usage of the template: some-page.html:
+{% extends "page-skeleton.html" %}
+{% block head %}
+    {{ super() }}
+
+    <style>
+        /* some extra style I need for this specific page */
+    </style>
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+    
+    <p> Some dope ass page content </p>
+{% endblock %}
+
+#}
