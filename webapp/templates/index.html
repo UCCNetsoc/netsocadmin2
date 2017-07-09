@@ -1,33 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Netsoc Admin</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">      
-	<link rel="shortcut icon" href="/static/favicon.ico">
-	<link rel="canonical" href="https://admin.netsoc.co" />
-	<meta property="og:title" content="UCC Netsoc Admin" />
-	<meta property="og:url" content="https://admin.netsoc.co" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:site_name" content="UCC Netsoc Admin" />
-	<meta property="fb:admins" content="1385961037" />
-	<meta property="og:description" content="Manage your webspace and databases in one location." />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@UCCNetsoc" />
-	<meta name="twitter:title" content="UCC Netsoc Admin" />
-	<meta name="twitter:description" content="Manage your webspace and databases in one location." />
-	<script type="application/ld+json">
-		{
-			"@context" : "http://schema.org",
-			"@type" : "Organization",
-			"name" : "UCC Netsoc",
-			"url" : "https://admin.netsoc.co",
-			"sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
-		}
-	</script>
+{% extends "page-skeleton.html" %}
+{% block head %}
+    {{ super() }}
 
-	<style>
+    <style>
 		.card-panel {
 			min-height: 470px;
 		}
@@ -35,63 +10,61 @@
 			padding: 5% 15%;
 		}
 	</style>
+{% endblock %}
 
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
-	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script> 
-</head>
-<body class="container">
-	<main class="card-panel row">
-		<img src="/static/banner-icon.svg" class="responsive-img">
-		<!-- Tab headers -->
-		<div class="col s12">
-			<ul class="tabs">
-				<li class="col s6 tab"><a class="active teal-text lighten-2" href="#login"> Log In </a></li>
-				<li class="col s6 tab"><a class="teal-text lighten-2" href="#signup"> Sign Up </a></li>
-				<div class="indicator teal lighten-2" style="z-index:1"></div>
-			</ul>
-		</div>
-		<!-- Tab bodies -->
-		<div id="signup" class="col s12">
-			<form method="POST" action="/sendconfirmation" class="col row s12">
-				<br>
-				<div class="row">
-					<div class="input-field">
-						<label for="email">Student Email</label>
-						<input autocomplete="off" name="email" type="text" id="email">
+{% block body %}
+    {{ super() }}
+    <main class="container">
+	    <div class="card-panel row">
+			<img src="/static/banner-icon.svg" class="responsive-img">
+			<!-- Tab headers -->
+			<div class="col s12">
+				<ul class="tabs">
+					<li class="col s6 tab"><a class="active teal-text lighten-2" href="#login"> Log In </a></li>
+					<li class="col s6 tab"><a class="teal-text lighten-2" href="#signup"> Sign Up </a></li>
+					<div class="indicator teal lighten-2" style="z-index:1"></div>
+				</ul>
+			</div>
+			<!-- Tab bodies -->
+			<div id="signup" class="col s12">
+				<form method="POST" action="/sendconfirmation" class="col row s12">
+					<br>
+					<div class="row">
+						<div class="input-field">
+							<label for="email">Student Email</label>
+							<input autocomplete="off" name="email" type="text" id="email">
+						</div>
 					</div>
-				</div>
-				<button class="btn waves-effect waves-light" type="submit">
-					Send Verification
-					<i class="mdi-content-send right"></i>
-				</button>
-			</form>
+					<button class="btn waves-effect waves-light" type="submit">
+						Send Verification
+						<i class="mdi-content-send right"></i>
+					</button>
+				</form>
 
-			<div class="error-message red-text row s6">
-				{{ error_message }}
+				<div class="error-message red-text row s6">
+					{{ error_message }}
+				</div>
+			</div>
+			<div id="login" class="col s12">
+				<form method="POST" action="/login" class="col row s12">
+					<br>
+					<div class="row">
+						<div class="input-field">
+							<label for="username">Server Username</label>
+							<input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
+						</div>
+
+						<div class="input-field">
+							<label for="password">Server Password</label>
+							<input autocomplete="off" name="password" type="password" id="password">
+						</div>
+					</div>
+					<button class="btn waves-effect waves-light" type="submit">
+						Login
+						<i class="mdi-content-send right"></i>
+					</button>
+				</form>
 			</div>
 		</div>
-		<div id="login" class="col s12">
-			<form method="POST" action="/login" class="col row s12">
-				<br>
-				<div class="row">
-					<div class="input-field">
-						<label for="username">Server Username</label>
-						<input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
-					</div>
-
-					<div class="input-field">
-						<label for="password">Server Password</label>
-						<input autocomplete="off" name="password" type="password" id="password">
-					</div>
-				</div>
-				<button class="btn waves-effect waves-light" type="submit">
-					Login
-					<i class="mdi-content-send right"></i>
-				</button>
-			</form>
-		</div>
-	</main>
-</body>
-</html>
+    </main>
+{% endblock %}

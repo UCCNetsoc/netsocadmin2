@@ -1,52 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Netsoc Admin</title>
-	<meta charset="utf-8">
-	<meta name="description" content="" />
+{% extends "page-skeleton.html" %}
+{% block head %}
+    {{ super() }}
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<link rel="shortcut icon" href="/static/favicon.ico">
-
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/css/materialize.min.css">
-
-	
-	<link rel="canonical" href="https://admin.netsoc.co" />
-	<meta property="og:title" content="UCC Netsoc Admin" />
-	<meta property="og:url" content="https://admin.netsoc.co" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:site_name" content="UCC Netsoc Admin" />
-	<meta property="fb:admins" content="1385961037" />
-	<meta property="og:description" content="Manage your webspace and databases in one location." />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@UCCNetsoc" />
-	<meta name="twitter:title" content="UCC Netsoc Admin" />
-	<meta name="twitter:description" content="Manage your webspace and databases in one location." />
-	
-	<script type="application/ld+json">
-		{
-			"@context" : "http://schema.org",
-			"@type" : "Organization",
-			"name" : "UCC Netsoc",
-			"url" : "https://admin.netsoc.co",
-			"sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
-		}
-	</script>
-
-	<script>
-	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	  ga('create', 'UA-71411325-3', 'auto');
-	  ga('send', 'pageview');
-	</script>
-
-	<script>
+    <script>
 		function checkUsername() {
 	  	// disable until good uid has been found
 	  	document.getElementById("register-button").disabled = true;
@@ -93,36 +49,46 @@
 		}
 	</style>
 
-	</head>
-<body class=" valign-wrapper register ">
+	<style>
+        .container {
+            padding: 0 15%;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+	{{ super() }}
+
 	<main class="row container">
-		<section class="card-panel white col l6 offset-l3 s12 valign	">
+		<div class="card-panel col s12">
+			<img src="/static/banner-icon.svg" class="responsive-img">
 			<h3 class="center-align"> Register </h3>
 			<form method="POST" action="/completeregistration" accept-charset="UTF-8" class="row col s12">
 				<input id="_token" name="_token" type="hidden" value="{{ token }}">
 
 				<div class="row">
 					<div class="input-field">
+						<label for="email">Student Email</label>
 						<input disabled="disabled" name="email" type="text" value="{{ email_address }}">
-						<input id="email" name="email" type="hidden" value="{{ email_address }}">
+						<input autocomplete="off" id="email" name="email" type="hidden" value="{{ email_address }}">
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-field">
 						<label for="name">Full Name</label>
-						<input class="example" autofocus="autofocus" name="name" type="text" id="name">
+						<input autocomplete="off" class="example" autofocus="autofocus" name="name" type="text" id="name">
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-field">
 						<label for="student_id">Student Number</label>
-						<input class="example" name="student_id" type="text" id="student_id">
+						<input autocomplete="off" class="example" name="student_id" type="text" id="student_id">
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-field">
 						<label for="uid">Username (lowercase-only)</label>
-						<input class="example" name="uid" type="text" id="uid">
+						<input autocomplete="off" class="example" name="uid" type="text" id="uid">
 					</div>
 					<button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>
 					<span id="taken-error" class="error"> </span><span id="good-name" class="good"> </span>
@@ -131,14 +97,14 @@
 				<div class="row">
 					<div class="input-field">
 						<label for="course">Your Course</label>
-						<input class="example" name="course" type="text" id="course">
+						<input autocomplete="off" class="example" name="course" type="text" id="course">
 					</div>
 				</div>
 
 				<div class="row">
 					<div class="input-field">
 						<label for="graduation_year">Your (Predicted) Graduation Year</label>
-						<input class="example" name="graduation_year" type="text" id="graduation_year">
+						<input autocomplete="off" class="example" name="graduation_year" type="text" id="graduation_year">
 					</div>
 				</div>
 				<button id="register-button" class="btn waves-effect waves-light" type="submit" name="action" disabled> Register
@@ -149,11 +115,6 @@
 			</form>
 			<br>
 			<div class="error"> {{ error_message }} </div>
-		</section>
-
+		</div>
 	</main>
-
-	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.5/js/materialize.min.js"></script>
-</body>
-</html>
+{% endblock %}

@@ -34,17 +34,47 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script> 
+
+    {# makes the mobile button only appear when you are logged in.#}
+    <script>
+    $(document).ready(() => {
+        const cookies = document.cookie.split(";");
+        let loggedIn = false;
+        cookies.forEach((keyValuePair) => {
+            const c = keyValuePair.split("=")
+            if (c[0].trim(" ") === "i" && c[1] === "t") {
+                loggedIn = true;
+            }
+        })
+        const bs = document.querySelectorAll("nav a.btn-large");
+        for (var i = 0; i < bs.length; i++) {
+            if (!loggedIn) {
+                bs[i].style.display = "none";
+            }
+        }
+    });
+    </script>
+
+    {# makes the mobile menu appear #}
+    <script>
+        $( document ).ready(function(){
+            $(".button-collapse").sideNav();
+        })
+    </script>
     {% endblock %}
 </head>
 <body>
     {# This is the navbar ontop of every page. All pages will need this. #}
     <nav>
-        <div class="nav-wrapper teal lighten-2" style="padding-right: 10px;padding-left: 10px">
-            <div class="brand-logo"><img src="/static/banner-icon.svg" class="responsive-img" style="height: 65px;"/></div>
+        <div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
+            <div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
             
             {# This is the main navbar for when the screen is big enough #}
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
             <ul class="right hide-on-med-and-down">
+                <li>
+                    <a href="https://netsoc.co/">Netsoc Home</a>
+                </li>
                 <li>
                     <a href="#">Tutorials</a>
                 </li>
@@ -66,6 +96,9 @@
                 </li>
                 <li>
                     <a href="#">Tutorials</a>
+                </li>
+                <li>
+                    <a href="https://netsoc.co/">Netsoc Home</a>
                 </li>
             </ul>
         </div>
