@@ -253,7 +253,7 @@ def logout():
 
 
 @app.route("/tools", methods=["POST", "GET"])
-@l.protected_page(flask.session)
+@l.protected_page
 def tools():
     """
     Route: tools

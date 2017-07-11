@@ -10,22 +10,19 @@ import pymysql
 import typing
 
 
-def protected_page(session:flask.session) -> typing.Callable[
-    [typing.Callable[[], None]], typing.Callable[[], None]]:
+def protected_page(view_func:typing.Callable[[], None]) -> typing.Callable[[], None]:
     """
     protected_page is a route function decorator which will check that a user
     is logged in before allowing the decorated view function to be shown. If the
     user is not logged in, it will redirect them to the index page.
     """
-    def decorater(view_func:typing.Callable[[], None]) -> typing.Callable[[], None]:
-        @functools.wraps(view_func)
-        def protected_view_func():
-            if p.LOGGED_IN_KEY not in session or not session[p.LOGGED_IN_KEY]:
-                return flask.redirect("/")
-            return view_func()
-        return protected_view_func
-    return decorater
-
+    @functools.wraps(view_func)
+    def protected_view_func():
+        if p.LOGGED_IN_KEY not in flask.session or not flask.session[p.LOGGED_IN_KEY]:
+            return flask.redirect("/")
+        return view_func()
+    return protected_view_func
+    
 
 def is_correct_password(username:str, password:str) -> bool:
     """
