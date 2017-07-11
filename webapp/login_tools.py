@@ -19,7 +19,9 @@ def protected_page(view_func:typing.Callable[[], None]) -> typing.Callable[[], N
     @functools.wraps(view_func)
     def protected_view_func():
         if p.LOGGED_IN_KEY not in flask.session or not flask.session[p.LOGGED_IN_KEY]:
-            return flask.redirect("/signinup")
+            res = flask.redirect("/signinup")
+            res.set_cookie("i", "f")
+            return res
         return view_func()
     return protected_view_func
     
