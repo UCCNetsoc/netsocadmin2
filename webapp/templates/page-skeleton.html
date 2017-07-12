@@ -61,48 +61,56 @@
             $(".button-collapse").sideNav();
         })
     </script>
+
+    <style>
+        body {
+            background-color: #eee;
+        }
+    </style>
     {% endblock %}
 </head>
 <body>
     {# This is the navbar ontop of every page. All pages will need this. #}
-    <nav>
-        <div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
-            <div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
-            
-            {# This is the main navbar for when the screen is big enough #}
-            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-            <ul class="right hide-on-med-and-down">
-                <li>
-                    <a href="https://netsoc.co/">Netsoc Home</a>
-                </li>
-                <li>
-                    <a href="#">Tutorials</a>
-                </li>
-                <li>
-                    <a href="/">Admin Tools</a>
-                </li>
-                <li>
-                    <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-                </li>
-            </ul>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
+                <div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
+                
+                {# This is the main navbar for when the screen is big enough #}
+                <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li>
+                        <a href="https://netsoc.co/">Netsoc Home</a>
+                    </li>
+                    <li>
+                        <a href="#">Tutorials</a>
+                    </li>
+                    <li>
+                        <a href="/">Admin Tools</a>
+                    </li>
+                    <li>
+                        <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                    </li>
+                </ul>
 
-            {# This one is used when the screen is small like on mobile #}
-            <ul class="side-nav" id="mobile-demo">
-                <li>
-                    <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-                </li>
-                <li>
-                    <a href="/">Admin Tools</a>
-                </li>
-                <li>
-                    <a href="#">Tutorials</a>
-                </li>
-                <li>
-                    <a href="https://netsoc.co/">Netsoc Home</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+                {# This one is used when the screen is small like on mobile #}
+                <ul class="side-nav" id="mobile-demo">
+                    <li>
+                        <a class="btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                    </li>
+                    <li>
+                        <a href="/">Admin Tools</a>
+                    </li>
+                    <li>
+                        <a href="#">Tutorials</a>
+                    </li>
+                    <li>
+                        <a href="https://netsoc.co/">Netsoc Home</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
 
     {% block body %}{% endblock %}
 </body>
