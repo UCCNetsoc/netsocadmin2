@@ -27,8 +27,8 @@ app.config["SESSION_COOKIE_HTTPONLY"] = False
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
 
 
-@app.route('/')
-def register():
+@app.route('/signinup')
+def signinup():
     """
     Route: /
         This route is for the index directory.
@@ -53,7 +53,7 @@ def sendconfirmation() -> str:
     # if they got here through GET, something done fucked up
     if flask.request.method != "POST":
         app.logger.debug("sendconfirmation(): method not POST: %s"%flask.request.method)
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
     
     # make sure is ucc email           
     email = flask.request.form['email']         
@@ -94,7 +94,7 @@ def signup() -> str:
     # this check isn't vital but better safe than sorry
     if flask.request.method != "GET":
         app.logger.debug("signup(): method was not GET: %s"%flask.request.method)
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
     
     # make sure they haven't forged the URI
     email = flask.request.args.get('e')
@@ -118,7 +118,7 @@ def completeregistration():
     # if they haven't gotten here through POST something has gone wrong
     if flask.request.method != "POST":
         app.logger.debug("completeregistration(): method was not POST: %s"%flask.request.method)
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
 
     # make sure token is valid
     email = flask.request.form["email"]
@@ -226,11 +226,11 @@ def login():
     a POST request.
     """
     if flask.request.method != "POST":
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
     flask.session[p.LOGGED_IN_KEY] = True
-    res = flask.redirect("/tools")
+    res = flask.redirect("/")
     res.set_cookie("i", "t")
     return res
 
@@ -242,9 +242,9 @@ def logout():
         This route logs a user out an redirects them back to the index page.
     """
     if flask.request.method != "GET":
-        return flask.redirect("/")
+        return flask.redirect("/signinup")
     flask.session.pop(p.LOGGED_IN_KEY, None)
-    res = flask.redirect("/")
+    res = flask.redirect("/signinup")
     res.set_cookie("i", "f")
     return res
     
@@ -252,8 +252,8 @@ def logout():
 #-------------------------------Server Tools Routes-----------------------------#
 
 
-@app.route("/tools", methods=["POST", "GET"])
-@l.protected_page(flask.session)
+@app.route("/", methods=["POST", "GET"])
+@l.protected_page
 def tools():
     """
     Route: tools
@@ -264,8 +264,10 @@ def tools():
     app.logger.debug("tools(): received tools page request")
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
-        return flask.redirect("/")
-    return flask.render_template("tools.html")
+        return flask.redirect("/signinup")
+    
+    dbs = ["db1", "db2", "db3", "db4", "db5", "db6"]
+    return flask.render_template("tools.html", databases=dbs)
 
 
 if __name__ == '__main__':
