@@ -1,8 +1,55 @@
 {% extends "page-skeleton.html" %}
+
+{% block head %}
+	{{ super() }}
+	<script>
+		let originalTitle, originalButtonText;
+		$(document).ready(() => {
+			originalTitle = document.querySelector("#database-form-title").innerText;
+			originalButtonText = document.querySelector("#database-form-button-text").innerText
+		})
+
+		// switches between the create database and delete database forms. If the database name db
+		// is specified, then it will pick the delete database form. Otherwise, it will pick the
+		// create database form.
+		function databaseForm(db) {
+			const formTitle = document.querySelector("#database-form-title");
+			const formButton = document.querySelector("#database-form-button-text");
+			const dbnameInput = document.querySelector("#dbname");
+			if (db) {
+				formTitle.innerText = "Delete Database:";
+				formButton.innerText = "Remove";
+				dbnameInput.value = db;
+				dbnameInput.disabled = true;
+				Materialize.updateTextFields();
+			} else {
+				formTitle.innerText = originalTitle;
+				formButton.innerText = originalButtonText;
+				dbnameInput.value = "";
+				dbnameInput.disabled = false;
+				Materialize.updateTextFields();
+			}
+		}
+
+		// replaces the database changing form. If resetCard is true, then it changes it back
+		function passwordReset(resetCard) {
+			const formChange = document.querySelector("#database-change-form");
+			const formReset = document.querySelector("#password-reset-form");
+			if (!resetCard) {
+				formReset.style.display = "block";
+				formChange.style.display = "none";
+			} else {
+				formReset.style.display = "none";
+				formChange.style.display = "block";
+			}
+		}
+	</script>
+{% endblock %}
+
 {% block body %}
 	{{ super() }}
-
-	<!-- Tab headers -->
+	{# these are the tab headers just under the navbar. Each header must have a corresponding
+	div.col.s12 below #}
 	<div class="col s12">
 		<ul class="tabs">
 			<div class="indicator teal lighten-2" style="z-index:1"><!--changes tab colors --></div>
@@ -21,16 +68,92 @@
 		</ul>
 	</div>
 
-	<!-- Tab bodies -->
+	{# This stuff is the MySQL tab #}
 	<div id="mysql" class="col s12">
-		<p> Do cool shit with your MySQL databases </p>
+		<div class="card z-depth-3" style="min-height: 400px;width:60%;margin-left:auto;margin-right:auto;margin-top:2%;padding-bottom: 3%;">
+			<div class="card-content">
+				<span class="card-title">MySQL Databases</span>
+				{% if databases|length > 0 %}
+					<ul class="collection">
+						{% for db in databases %}
+							<li class="collection-item">
+								<div>
+									{{ db }}
+									<div onclick="databaseForm('{{ db }}')" class="activator secondary-content">
+										<i class="material-icons">delete</i>
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p> No Databases to show &nbsp;&nbsp; O_o </p><br>
+				{% endif %}
+				
+				<a class="activator left btn waves-effect waves-light" onclick="passwordReset(false)">Reset MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></a>
+				<a class="activator right btn-floating halfway-fab waves-effect waves-light teal"><i class="material-icons">add</i></a>
+			</div>
+			{# card reveals are what come up when you click something with class "activator".
+			The Javascript in the header does the necessary things to pick the correct form
+			and change the form as need be. Normally, there is only one "card-reveal" so this
+			is a bit of a hack #}
+			<div class="card-reveal" style="overflow: hidden;">
+				<div id="database-change-form">
+					<span class="card-title" onclick="databaseForm('')">
+						<span id="database-form-title">New Database:</span>
+						<i class="material-icons right">close</i>
+					</span>
+					<form>
+						<div class="input-field">
+							<input id="username" type="text" class="validate">
+							<label for="username">Server username</label>
+						</div>
+						<div class="input-field">
+							<input id="password" type="password" class="validate">
+							<label for="password">Server password</label>
+						</div>
+						<div class="input-field">
+							<input id="dbname" type="text" class="validate">
+							<label for="dbname">Database name</label>
+						</div>
+						<button class="btn waves-effect waves-light" type="submit">
+							<span id="database-form-button-text"> Create </span>
+							<i class="mdi-content-send right"></i>
+						</button>
+					</form>
+				</div>
+				<div id="password-reset-form" style="display: none;">
+					<span class="card-title" onclick="passwordReset(true)">
+						<span>Reset MySQL Password:</span>
+						<i class="material-icons right">close</i>
+					</span>
+					<form>
+						<div class="input-field">
+							<input id="username" type="text" class="validate">
+							<label for="username">Server username</label>
+						</div>
+						<div class="input-field">
+							<input id="password" type="password" class="validate">
+							<label for="password">Server password</label>
+						</div>
+						<button class="btn waves-effect waves-light" type="submit">
+							<span id="database-form-button-text"> Reset </span>
+							<i class="mdi-content-send right"></i>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
+
 	<div id="backups" class="col s12">
 		<p> Need backs of your home directory? Here you go brah </p>
 	</div>
+
 	<div id="wordpress" class="col s12">
 		<p> Some wordpress info I guess and maybe a tasty buton to install it </p>
 	</div>
+
 	<div id="help" class="col s12">
 		<p> Generic section where users can contact a sys admin with their problems </p>
 	</div> 

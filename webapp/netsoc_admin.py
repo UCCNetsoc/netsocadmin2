@@ -265,7 +265,9 @@ def tools():
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
         return flask.redirect("/signinup")
-    return flask.render_template("tools.html")
+    
+    dbs = ["db1", "db2", "db3", "db4", "db5", "db6"]
+    return flask.render_template("tools.html", databases=dbs)
 
 
 if __name__ == '__main__':
