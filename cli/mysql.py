@@ -31,15 +31,15 @@ class UserError(Exception):
     pass
 
 
-def _mysql_connection(username:str=p.MYSQL_USER, password:str=p.MYSQL_PASSWORD) -> pymysql.connections.Connection:
+def _mysql_connection(username:str=p.SQL_USER, password:str=p.SQL_PASS) -> pymysql.connections.Connection:
     """
     _db_connection is a helper method which supplies a connection
-    to the MySQL DB logged in as passwords.MYSQL_USER.
+    to the MySQL DB logged in as passwords.SQL_USER.
 
     :returns pymysql.connections.Connection
     """
     return pymysql.connect(
-        host="localhost",
+        host=p.SQL_HOST,
         user=username,
         password=password,
         cursorclass=pymysql.cursors.DictCursor)

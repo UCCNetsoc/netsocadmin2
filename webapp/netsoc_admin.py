@@ -7,6 +7,7 @@ import crypt
 import flask
 import functools
 import login_tools as l 
+import mysql_tools as m
 import os
 import passwords as p
 import random
@@ -230,6 +231,7 @@ def login():
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.redirect("/signinup")
     flask.session[p.LOGGED_IN_KEY] = True
+    flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
 
 
@@ -261,9 +263,9 @@ def tools():
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
         return flask.redirect("/signinup")
-    
-    dbs = ["db1", "db2", "db3", "db4", "db5", "db6"]
-    return flask.render_template("tools.html", databases=dbs)
+        
+    return flask.render_template("tools.html",
+            databases=m.list_dbs(flask.session["username"]))
 
 
 if __name__ == '__main__':
