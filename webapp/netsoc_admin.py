@@ -23,7 +23,7 @@ DEBUG = False
 app = flask.Flask(__name__)
 app.secret_key = p.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
-app.config["SESSION_COOKIE_HTTPONLY"] = False
+app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
 
 
@@ -230,9 +230,7 @@ def login():
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.redirect("/signinup")
     flask.session[p.LOGGED_IN_KEY] = True
-    res = flask.redirect("/")
-    res.set_cookie("i", "t")
-    return res
+    return flask.redirect("/")
 
 
 @app.route("/logout", methods=["GET", "POST"])
@@ -244,9 +242,7 @@ def logout():
     if flask.request.method != "GET":
         return flask.redirect("/signinup")
     flask.session.pop(p.LOGGED_IN_KEY, None)
-    res = flask.redirect("/signinup")
-    res.set_cookie("i", "f")
-    return res
+    return flask.redirect("/signinup")
     
 
 #-------------------------------Server Tools Routes-----------------------------#
