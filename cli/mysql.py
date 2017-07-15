@@ -9,9 +9,9 @@ import re
 import string
 from typing import List
 
-class DatabseAccessError(Exception):
+class DatabaseAccessError(Exception):
     """
-    DatabseAccessError should be raised when a DB related operation fails.
+    DatabaseAccessError should be raised when a DB related operation fails.
     """
     pass
     
@@ -51,7 +51,7 @@ def list_dbs(user:str) -> List[str]:
 
     :returns list of database names as strings or None if the query was
         unsuccesful.
-    :raises DatabseAccessError if the operation fails.
+    :raises DatabaseAccessError if the operation fails.
     """
     databases = None
     try:
@@ -64,7 +64,7 @@ def list_dbs(user:str) -> List[str]:
                 filter(is_user_db, map(
                     lambda row: row["Database"], cur.fetchall())))
     except Exception as e:
-        raise DatabseAccessError("failed to list databases for user '%s'"%(user)) from e
+        raise DatabaseAccessError("failed to list databases for user '%s'"%(user)) from e
     finally:
         con.close()
     return databases
@@ -175,7 +175,7 @@ def create_database(username:str, dbname:str, delete:bool=False) -> str:
     :param delete when this argument is true then the database will be deleted 
         instead of created.
     :returns the database name which can be used in actual queries to the database.
-    :raises DatabseAccessError if the operation fails
+    :raises DatabaseAccessError if the operation fails
     """
     try:
         con = _mysql_connection()
@@ -201,7 +201,7 @@ def create_database(username:str, dbname:str, delete:bool=False) -> str:
             cur.execute(sql)
             return user_dbname
     except Exception as e:
-        raise DatabseAccessError("failed to create new database '%s'"%(dbname)) from e
+        raise DatabaseAccessError("failed to create new database '%s'"%(dbname)) from e
     finally:
         con.close()
 

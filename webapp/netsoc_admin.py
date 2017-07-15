@@ -263,9 +263,52 @@ def tools():
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
         return flask.redirect("/signinup")
-        
+
     return flask.render_template("tools.html",
             databases=m.list_dbs(flask.session["username"]))
+
+
+@app.route("/deletedb", methods=["POST", "GET"])
+@l.protected_page
+def deletedb():
+    """
+    Route: deletedb
+        This route must be accessed via post. It is used to delete the database
+        contained in the request.form. This can only be reached if you are
+        logged in.
+    """
+    if flask.request.method != "POST":
+        return flask.render_template(
+                "tools.html",
+                mysql_error="Incorrect request method. Please use POST.")
+
+    app.logger.debug("Form: %s", flask.request.form)
+    username = flask.request.form["username"]
+    password = flask.request.form["password"]
+    dbname = flask.request.form["dbname"]
+
+    # make sure each value is non-empty
+    if not all([username, password, dbname]):
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Please specify all fields")
+
+    # if password is correct, do database removal
+    if l.is_correct_password(username, password):
+        try:
+            m.create_database(username, dbname, True)
+        except m.DatabaseAccessError as e:
+            return flask.render_template(
+                    "tools.html",
+                    databases=m.list_dbs(flask.session["username"]),
+                    mysql_error=e.__cause__)
+    else:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Wrong username or password")
+    return flask.redirect("/")
 
 
 if __name__ == '__main__':

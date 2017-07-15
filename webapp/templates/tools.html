@@ -6,7 +6,8 @@
 		let originalTitle, originalButtonText;
 		$(document).ready(() => {
 			originalTitle = document.querySelector("#database-form-title").innerText;
-			originalButtonText = document.querySelector("#database-form-button-text").innerText
+			originalButtonText = document.querySelector("#database-form-button-text").innerText;
+			originalAction = document.querySelector("#database-change-form form").action;
 		})
 
 		// switches between the create database and delete database forms. If the database name db
@@ -15,18 +16,20 @@
 		function databaseForm(db) {
 			const formTitle = document.querySelector("#database-form-title");
 			const formButton = document.querySelector("#database-form-button-text");
+			const form = document.querySelector("#database-change-form form");
 			const dbnameInput = document.querySelector("#dbname");
 			if (db) {
+				form.action = "/deletedb";
+				console.log(form.action);
 				formTitle.innerText = "Delete Database:";
 				formButton.innerText = "Remove";
 				dbnameInput.value = db;
-				dbnameInput.disabled = true;
 				Materialize.updateTextFields();
 			} else {
+				form.action = originalAction;
 				formTitle.innerText = originalTitle;
 				formButton.innerText = originalButtonText;
 				dbnameInput.value = "";
-				dbnameInput.disabled = false;
 				Materialize.updateTextFields();
 			}
 		}
@@ -97,7 +100,10 @@
 				
 				<a class="activator left btn waves-effect waves-light" onclick="passwordReset(false)">Reset MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></a>
 				<a class="activator right btn-floating halfway-fab waves-effect waves-light teal"><i class="material-icons">add</i></a>
+				<br><br>
+				<span style="display:block;" class="error-msg">{{ mysql_error }}</span>
 			</div>
+
 			{# card reveals are what come up when you click something with class "activator".
 			The Javascript in the header does the necessary things to pick the correct form
 			and change the form as need be. Normally, there is only one "card-reveal" so this
@@ -108,17 +114,17 @@
 						<span id="database-form-title">New Database:</span>
 						<i class="material-icons right">close</i>
 					</span>
-					<form>
+					<form action="/createdb" method="POST">
 						<div class="input-field">
-							<input id="username" type="text" class="validate">
+							<input id="username" type="text" name="username">
 							<label for="username">Server username</label>
 						</div>
 						<div class="input-field">
-							<input id="password" type="password" class="validate">
+							<input id="password" type="password" name="password">
 							<label for="password">Server password</label>
 						</div>
 						<div class="input-field">
-							<input id="dbname" type="text" class="validate">
+							<input id="dbname" type="text" name="dbname">
 							<label for="dbname">Database name</label>
 						</div>
 						<button class="btn waves-effect waves-light" type="submit">
