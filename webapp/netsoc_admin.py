@@ -268,6 +268,49 @@ def tools():
             databases=m.list_dbs(flask.session["username"]))
 
 
+@app.route("/createdb", methods=["POST", "GET"])
+@l.protected_page
+def createdb():
+    """
+    Route: createdb
+        This route must be accessed via post. It is used to create a new
+        database with the name in the request.form.
+        This can only be reached if you are logged in.
+    """
+    if flask.request.method != "POST":
+        return flask.render_template(
+                "tools.html",
+                mysql_error="Incorrect request method. Please use POST.")
+
+    app.logger.debug("Form: %s", flask.request.form)
+    username = flask.request.form["username"]
+    password = flask.request.form["password"]
+    dbname = flask.request.form["dbname"]
+
+    # make sure each value is non-empty
+    if not all([username, password, dbname]):
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Please specify all fields")
+
+    # if password is correct, create the new database
+    if l.is_correct_password(username, password):
+        try:
+            m.create_database(username, dbname, False)
+        except m.DatabaseAccessError as e:
+            return flask.render_template(
+                    "tools.html",
+                    databases=m.list_dbs(flask.session["username"]),
+                    mysql_error=e.__cause__)
+    else:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Wrong username or password")
+    return flask.redirect("/")
+
+
 @app.route("/deletedb", methods=["POST", "GET"])
 @l.protected_page
 def deletedb():
