@@ -102,6 +102,9 @@
 				<a class="activator right btn-floating halfway-fab waves-effect waves-light teal"><i class="material-icons">add</i></a>
 				<br><br>
 				<span style="display:block;" class="error-msg">{{ mysql_error }}</span>
+				{% if new_mysql_password %}
+				<p style="color:green;">Your new MySQL password: {{ new_mysql_password }}</p>
+				{% endif %}
 			</div>
 
 			{# card reveals are what come up when you click something with class "activator".
@@ -116,15 +119,15 @@
 					</span>
 					<form action="/createdb" method="POST">
 						<div class="input-field">
-							<input id="username" type="text" name="username">
+							<input autocomplete="off" id="username" type="text" name="username">
 							<label for="username">Server username</label>
 						</div>
 						<div class="input-field">
-							<input id="password" type="password" name="password">
+							<input autocomplete="off" id="password" type="password" name="password">
 							<label for="password">Server password</label>
 						</div>
 						<div class="input-field">
-							<input id="dbname" type="text" name="dbname">
+							<input autocomplete="off" id="dbname" type="text" name="dbname">
 							<label for="dbname">Database name</label>
 						</div>
 						<button class="btn waves-effect waves-light" type="submit">
@@ -138,13 +141,13 @@
 						<span>Reset MySQL Password:</span>
 						<i class="material-icons right">close</i>
 					</span>
-					<form>
-						<div class="input-field">
-							<input id="username" type="text" class="validate">
+					<form action="/resetpw" method="POST">
+						<div class="input-field" method="POST">
+							<input autocomplete="off" id="username" type="text" name="username">
 							<label for="username">Server username</label>
 						</div>
 						<div class="input-field">
-							<input id="password" type="password" class="validate">
+							<input autocomplete="off" id="password" type="password" name="password">
 							<label for="password">Server password</label>
 						</div>
 						<button class="btn waves-effect waves-light" type="submit">

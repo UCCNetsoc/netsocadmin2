@@ -278,9 +278,7 @@ def createdb():
         This can only be reached if you are logged in.
     """
     if flask.request.method != "POST":
-        return flask.render_template(
-                "tools.html",
-                mysql_error="Incorrect request method. Please use POST.")
+        return flask.redirect("/")
 
     app.logger.debug("Form: %s", flask.request.form)
     username = flask.request.form["username"]
@@ -321,9 +319,7 @@ def deletedb():
         logged in.
     """
     if flask.request.method != "POST":
-        return flask.render_template(
-                "tools.html",
-                mysql_error="Incorrect request method. Please use POST.")
+        return flask.redirect("/")
 
     app.logger.debug("Form: %s", flask.request.form)
     username = flask.request.form["username"]
@@ -342,6 +338,51 @@ def deletedb():
         try:
             m.create_database(username, dbname, True)
         except m.DatabaseAccessError as e:
+            return flask.render_template(
+                    "tools.html",
+                    databases=m.list_dbs(flask.session["username"]),
+                    mysql_error=e.__cause__)
+    else:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Wrong username or password")
+    return flask.redirect("/")
+
+
+@app.route("/resetpw", methods=["POST", "GET"])
+@l.protected_page
+def resetpw():
+    """
+    Route: resetpw
+        This route must be accessed via post. It is used to reset the user's
+        MySQL account password.
+        This can only be reached if you are logged in.
+    """
+    if flask.request.method != "POST":
+        return flask.redirect("/")
+
+    app.logger.debug("Form: %s", flask.request.form)
+    username = flask.request.form["username"]
+    password = flask.request.form["password"]
+
+    # make sure each value is non-empty
+    if not all([username, password]):
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                mysql_error="Please specify all fields")
+
+    # if password is correct, reset password
+    if l.is_correct_password(username, password):
+        try:
+            m.delete_user(username)
+            new_password = m.create_user(username)
+            return flask.render_template(
+                    "tools.html",
+                    databases=m.list_dbs(flask.session["username"]),
+                    new_mysql_password=new_password)
+        except m.UserError as e:
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),

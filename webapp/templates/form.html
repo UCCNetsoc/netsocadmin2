@@ -91,7 +91,7 @@
 						<input autocomplete="off" class="example" name="uid" type="text" id="uid">
 					</div>
 					<button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>
-					<span id="taken-error" class="error"> </span><span id="good-name" class="good"> </span>
+					<span id="taken-error" class="error-msg"> </span><span id="good-name" class="good"> </span>
 				</div>
 
 				<div class="row">
@@ -114,7 +114,7 @@
 				<input name="token" type="hidden" value="{{ token }}">
 			</form>
 			<br>
-			<div class="error"> {{ error_message }} </div>
+			<div class="error-msg"> {{ error_message }} </div>
 		</div>
 	</main>
 {% endblock %}

@@ -80,7 +80,7 @@ def create_user(username:str) -> str:
     :returns string the generated password for the new user
     """
     # make sure username is valid
-    if not re.match(r"[a-z]", username):
+    if not re.match(r"^[a-zA-Z0-9]+$", username):
         raise BadUsernameError("invalid username '%s', must be lowercase letters only"%(username))
     try:
         con = _mysql_connection()
@@ -105,7 +105,8 @@ def create_user(username:str) -> str:
             # Note: the escaping must be done in two parts here becuase
             # PyMySQL will insert quotation marks around the %s which
             # makes the pattern `'username'_%`.
-            database_pattern = con.escape("%s_%%%%"%(username))
+            username_pattern = con.escape("%s"%(username)).strip("'")
+            database_pattern = username_pattern + "%%%%"
             sql = """
                 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
                 INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
@@ -184,7 +185,7 @@ def create_database(username:str, dbname:str, delete:bool=False) -> str:
             user_dbname = dbname
             if not dbname.startswith("%s_"%(username)):
                 user_dbname = "%s_"%(username) + user_dbname
-            if not re.match(r"[a-zA-Z]+\_[a-zA-Z0-9]+", user_dbname):
+            if not re.match(r"[a-zA-Z0-9]+\_[a-zA-Z0-9]+", user_dbname):
                 raise Exception(
                     "database %s is not valid, must use digits, lower or upper letters"%(user_dbname))
             
