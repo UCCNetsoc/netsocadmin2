@@ -1,0 +1,3 @@
+wordpress_installer.egg-info/
+wordpress_installer/config.py
+wordpress_installer/__pycache__/
