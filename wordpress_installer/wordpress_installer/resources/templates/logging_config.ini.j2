@@ -1,8 +1,8 @@
 [loggers]
-keys=root,simpleExample
+keys=root,wordpress_installer
 
 [handlers]
-keys=consoleHandler
+keys=fileHandler,consoleHandler
 
 [formatters]
 keys=simpleFormatter
@@ -11,11 +11,15 @@ keys=simpleFormatter
 level=DEBUG
 handlers=consoleHandler
 
-[logger_simpleExample]
-level=DEBUG
-handlers=consoleHandler
-qualname=simpleExample
-propagate=0
+[logger_wordpress_installer]
+level=NOTSET
+handlers=fileHandler
+qualname=wordpress_installer
+
+[handler_fileHandler]
+class=FileHandler
+formatter=simpleFormatter
+args=('{{ LOG_LOCATION }}', 'a')
 
 [handler_consoleHandler]
 class=StreamHandler

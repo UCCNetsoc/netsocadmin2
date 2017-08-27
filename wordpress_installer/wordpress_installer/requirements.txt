@@ -1,5 +1,0 @@
-wget
-subprocess.run
-jinja2
-requests
-pymysql

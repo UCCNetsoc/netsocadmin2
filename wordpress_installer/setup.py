@@ -8,4 +8,11 @@ setup(name='wordpress_installer',
       author_email='~',
       license='open',
       packages=['wordpress_installer'],
-      zip_safe=False)
+      zip_safe=False,
+      install_requires=['wget',
+      			'subprocess.run',
+      			'jinja2',
+      			'requests',
+      			'pymysql',
+      			'wordpress_installer'],
+      			)
