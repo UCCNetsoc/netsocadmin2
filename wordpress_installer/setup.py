@@ -14,5 +14,6 @@ setup(name='wordpress_installer',
       			'jinja2',
       			'requests',
       			'pymysql',
+                        'pytest',
       			'wordpress_installer'],
       			)

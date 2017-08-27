@@ -14,14 +14,22 @@ def get_wordpress(user_dir, username):
 	logger.debug("Installing for %s complete" % (username))
 
 	def download(user_dir):
-		wordpress_latest_url = "https://wordpress.org/latest.tar.gz"
-		filename = download_to(wordpress_latest_url, user_dir)
-		extract_from_tar(filename, user_dir + "/public_html")
-		delete_file(filename)
+		try:
+			wordpress_latest_url = "https://wordpress.org/latest.tar.gz"
+			filename = download_to(wordpress_latest_url, user_dir)
+			extract_from_tar(filename, user_dir + "/public_html")
+			delete_file(filename)
+		except Exception as e:
+			logger.warning("An issue has occured while trying to download wordpress\n" + str(e))
+			raise Exception("An issue has occured while trying to download wordpress")
 
 	def configure(user_dir, username):
-		new_db_conf = create_wordpress_database(username)
-		create_wordpress_conf(user_dir, new_db_conf)
+		try:
+			new_db_conf = create_wordpress_database(username)
+			create_wordpress_conf(user_dir, new_db_conf)
+		except Exception as e:
+			logger.warning("An issue has occured while trying to configure wordpress\n" + str(e))
+			raise Exception("An issue has occured while trying to configure wordpress")
 
 	download(user_dir)
 	configure(user_dir, username)
@@ -29,4 +37,4 @@ def get_wordpress(user_dir, username):
 
 
 if __name__=="__main__":
-	pass
+	get_wordpress("/home/hassassin", "hassassin")

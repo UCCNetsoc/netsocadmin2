@@ -14,10 +14,9 @@ logger = logging.getLogger(__name__)
 def _gen_random_password(size=10, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-def _db_user_exists
 
 def create_wordpress_database(username):
-	logging.debug("Creating wordpress database and user for %s" % (username))
+	logger.debug("Creating wordpress database and user for %s" % (username))
 
 	database_connection = pymysql.connect(**config.db)
 	cursor = database_connection.cursor(pymysql.cursors.DictCursor)
@@ -25,11 +24,24 @@ def create_wordpress_database(username):
 	db_user = 'wp_' + username
 
 	if len(username) > 16:
-
 		db_user = db_user[:15]
+		logger.debug("Username too long, shortned to %s" % (db_user))
 
-	def _db_user_exists
-	
+
+	def _drop_user_if_exists():
+		logger.debug("Checking if %s already exists in database" % (db_user))
+		query = """SELECT USER FROM mysql.user WHERE USER = '{username}';""".format(username=db_user)
+		cursor.execute(query)
+		database_connection.commit()
+		if len(cursor.fetchall()) > 0:
+			logger.debug("%s already exists in database, dropping user" % (db_user))
+			query = """DROP USER '{username}';""".format(username=db_user)
+			cursor.execute(query)
+			database_connection.commit()
+
+
+	_drop_user_if_exists()
+
 	password = _gen_random_password()
 
 	cursor.execute("""DROP DATABASE IF EXISTS {db_name}; CREATE DATABASE {db_name};""".format(db_name=db_user))
@@ -63,7 +75,7 @@ def create_wordpress_conf(user_dir, db_conf):
 	template = env.get_template('wp-config.php.j2')     
 
 	def get_wordpress_conf_keys():
-		logging.debug("Fetching wordpress configuration")
+		logger.debug("Fetching wordpress configuration")
 		response = requests.get("https://api.wordpress.org/secret-key/1.1/salt/")
 		return response.text
 
