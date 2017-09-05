@@ -396,12 +396,12 @@ def resetpw():
     return flask.redirect("/")
 
 
-@app.route("/backups/<string:username>/<string:timeframe>/<string:backup_date>",
+@app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
         methods=["POST", "GET"])
 @l.protected_page
-def backups(username:str, timeframe:str, backup_date:str):
+def backup(username:str, timeframe:str, backup_date:str):
     """
-    Route: /backups
+    Route: /backup/username/timeframe/backup_date
         This route returns the requested backup.
 
     :param username the server username of the user needing their backup.
@@ -425,9 +425,38 @@ def backups(username:str, timeframe:str, backup_date:str):
     return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
 
 
+@app.route("/backups/<string:username>/<string:timeframe>",
+        methods=["POST", "GET"])
+@l.protected_page
+def backups(username:str, timeframe:str):
+    """
+    Route: /backups/username
+        This route returns a list of all the available bacups for the user.
+    
+    :param timeframe the timeframe of the requested backup. Can be either
+        "weekly", or "monthly".
+    :param username the server username of the user needing their backups.
+    """
+    if flask.request.method != "GET":
+        return flask.abort(400)
+
+    # make sure the username is valid
+    if not re.match(r"^[a-z]+$", username) or \
+            timeframe not in ["weekly", "monthly"]:
+        app.logger.debug("list_backups(%s, %s): invalid arguments"%(
+                username, timeframe))
+        return flask.abort(400)
+
+    backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
+    all_backups = os.listdir(backups_base_dir)
+    return flask.jsonify(all_backups)
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
+        user = os.getenv("USER")
+        BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
     app.run(
         host=HOST,
         port=int(PORT),
