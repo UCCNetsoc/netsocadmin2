@@ -18,10 +18,10 @@ def protected_page(view_func:typing.Callable[[], None]) -> typing.Callable[[], N
     user is not logged in, it will redirect them to the index page.
     """
     @functools.wraps(view_func)
-    def protected_view_func():
+    def protected_view_func(*args, **kwargs):
         if p.LOGGED_IN_KEY not in flask.session or not flask.session[p.LOGGED_IN_KEY]:
             return flask.redirect("/signinup")
-        return view_func()
+        return view_func(*args, **kwargs)
     return protected_view_func
     
 

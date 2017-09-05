@@ -19,6 +19,7 @@ import register_tools as r
 HOST = "127.0.0.1"
 PORT = "5050"
 DEBUG = False
+BACKUPS_DIR = "/media/odin/admin.netsoc.co/storage/backups/"
 
 
 app = flask.Flask(__name__)
@@ -393,6 +394,35 @@ def resetpw():
                 databases=m.list_dbs(flask.session["username"]),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
+
+
+@app.route("/backups/<string:username>/<string:timeframe>/<string:backup_date>",
+        methods=["POST", "GET"])
+@l.protected_page
+def backups(username:str, timeframe:str, backup_date:str):
+    """
+    Route: /backups
+        This route returns the requested backup.
+
+    :param username the server username of the user needing their backup.
+    :param timeframe the timeframe of the requested backup. Can be either
+        "weekly", or "monthly".
+    :param backup_date the backup-date of the requested backup. Must be in the
+        form YYYY-MM-DD.
+    """
+    if flask.request.method != "GET":
+        return flask.abort(400)
+
+    # make sure the arguments are valid
+    if not re.match(r"^[a-z]+$", username) or \
+            not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
+            timeframe not in ["weekly", "monthly"]:
+        app.logger.debug("backups(%s, %s, %s): invalid arguments"%(
+                username, timeframe, backup_date))
+        return flask.abort(400)
+
+    backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
+    return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
 
 
 if __name__ == '__main__':
