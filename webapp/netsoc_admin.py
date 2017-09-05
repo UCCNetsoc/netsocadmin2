@@ -3,6 +3,7 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
+import backup_tools as b
 import crypt
 import flask
 import functools
@@ -19,7 +20,7 @@ import register_tools as r
 HOST = "127.0.0.1"
 PORT = "5050"
 DEBUG = False
-BACKUPS_DIR = "/media/odin/admin.netsoc.co/storage/backups/"
+
 
 
 app = flask.Flask(__name__)
@@ -266,7 +267,9 @@ def tools():
         return flask.redirect("/signinup")
 
     return flask.render_template("tools.html",
-            databases=m.list_dbs(flask.session["username"]))
+            databases=m.list_dbs(flask.session["username"]),
+            backups=b.list_backups(flask.session["username"], "weekly"), 
+            username=flask.session["username"])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -421,43 +424,15 @@ def backup(username:str, timeframe:str, backup_date:str):
                 username, timeframe, backup_date))
         return flask.abort(400)
 
-    backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
+    backups_base_dir = os.path.join(b.BACKUPS_DIR, username, timeframe)
     return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
-
-
-@app.route("/backups/<string:username>/<string:timeframe>",
-        methods=["POST", "GET"])
-@l.protected_page
-def backups(username:str, timeframe:str):
-    """
-    Route: /backups/username
-        This route returns a list of all the available bacups for the user.
-    
-    :param timeframe the timeframe of the requested backup. Can be either
-        "weekly", or "monthly".
-    :param username the server username of the user needing their backups.
-    """
-    if flask.request.method != "GET":
-        return flask.abort(400)
-
-    # make sure the username is valid
-    if not re.match(r"^[a-z]+$", username) or \
-            timeframe not in ["weekly", "monthly"]:
-        app.logger.debug("list_backups(%s, %s): invalid arguments"%(
-                username, timeframe))
-        return flask.abort(400)
-
-    backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
-    all_backups = [b for b in os.listdir(backups_base_dir) if 
-            re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}\.tgz", b)]
-    return flask.jsonify(all_backups)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
         user = os.getenv("USER")
-        BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
+        b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
     app.run(
         host=HOST,
         port=int(PORT),
