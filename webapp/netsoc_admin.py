@@ -448,7 +448,8 @@ def backups(username:str, timeframe:str):
         return flask.abort(400)
 
     backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
-    all_backups = os.listdir(backups_base_dir)
+    all_backups = [b for b in os.listdir(backups_base_dir) if 
+            re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}\.tgz", b)]
     return flask.jsonify(all_backups)
 
 
