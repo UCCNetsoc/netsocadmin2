@@ -156,7 +156,7 @@ def completeregistration():
     # add user to ldap db
     success, info = r.add_ldap_user(user)
     if not success:
-        app.logger.debug("completeregistration(): failed to add user to LDAP")
+        app.logger.debug("completeregistration(): failed to add user to LDAP: %s"%(info))
         # clean db of token so they have to start again
         r.remove_token(email)
         return flask.render_template("index.html",
