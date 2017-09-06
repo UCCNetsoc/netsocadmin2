@@ -59,7 +59,7 @@
 	{# these are the tab headers just under the navbar. Each header must have a corresponding
 	div.col.s12 below #}
 	<div class="col s12">
-		<ul class="tabs">
+		<ul class="tabs z-depth-1">
 			<div class="indicator teal lighten-2" style="z-index:1">{# this changes the tab colors #}</div>
 			<li class="tab">
 				<a class="active teal-text lighten-2" href="#mysql">MySQL</a>
@@ -165,22 +165,55 @@
 		<div class="card z-depth-3" style="min-height: 400px;width:60%;margin-left:auto;margin-right:auto;margin-top:2%;padding-bottom: 3%;">
 			<div class="card-content">
 				<span class="card-title">Home Directory Backups</span>
-				{% if backups|length > 0 %}
-					<ul class="collection" style="max-height: 20em; overflow-y:scroll;">
-						{% for b in backups %}
-							<li class="collection-item">
-								<div>
-									{{ b }}
-									<a class="activator secondary-content" href="/backup/{{ username }}/weekly/{{ b }}">
-										<i class="material-icons">cloud_download</i>
-									</a>
-								</div>
-							</li>
-						{% endfor %}
+
+				{# Tab headers #}
+				<div class="col s12">
+					<ul class="tabs">
+						<li class="col s6 tab"><a class="active teal-text lighten-2" href="#weekly-backups"> Weekly </a></li>
+						<li class="col s6 tab"><a class="teal-text lighten-2" href="#monthly-backups"> Monthly </a></li>
+						<div class="indicator teal lighten-2" style="z-index:1"></div>
 					</ul>
-				{% else %}
-					<p> No backups were found. Please contact us.</p><br>
-				{% endif %}
+				</div>
+
+				{# Weekly body #}
+				<div id="weekly-backups" class="col s12">
+					{% if weekly_backups|length > 0 %}
+						<ul class="collection" style="max-height: 20em; overflow-y:scroll;">
+							{% for b in weekly_backups %}
+								<li class="collection-item">
+									<div>
+										{{ b }}
+										<a class="activator secondary-content" href="/backup/{{ username }}/weekly/{{ b }}">
+											<i class="material-icons">cloud_download</i>
+										</a>
+									</div>
+								</li>
+							{% endfor %}
+						</ul>
+					{% else %}
+						<p> No backups were found. Please contact us.</p><br>
+					{% endif %}
+				</div>
+
+				{# Monthly body #}
+				<div id="monthly-backups" class="col s12">
+					{% if monthly_backups|length > 0 %}
+						<ul class="collection" style="max-height: 20em; overflow-y:scroll;">
+							{% for b in monthly_backups %}
+								<li class="collection-item">
+									<div>
+										{{ b }}
+										<a class="activator secondary-content" href="/backup/{{ username }}/monthly/{{ b }}">
+											<i class="material-icons">cloud_download</i>
+										</a>
+									</div>
+								</li>
+							{% endfor %}
+						</ul>
+					{% else %}
+						<p> No backups were found. Please contact us.</p><br>
+					{% endif %}
+				</div>
 			</div>
 		</div>
 	</div>
