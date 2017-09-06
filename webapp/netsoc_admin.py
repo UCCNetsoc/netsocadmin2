@@ -27,7 +27,7 @@ app = flask.Flask(__name__)
 app.secret_key = p.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 1000 # seconds
+app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
 
 
 @app.route('/signinup')
