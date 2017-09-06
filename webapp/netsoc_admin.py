@@ -294,7 +294,8 @@ def createdb():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
-                mysql_error="Please specify all fields")
+                mysql_error="Please specify all fields",
+                backups=b.list_backups(flask.session["username"], "weekly"))
 
     # if password is correct, create the new database
     if l.is_correct_password(username, password):
@@ -304,11 +305,13 @@ def createdb():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
-                    mysql_error=e.__cause__)
+                    mysql_error=e.__cause__,
+                    backups=b.list_backups(flask.session["username"], "weekly"))
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                backups=b.list_backups(flask.session["username"], "weekly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
@@ -335,6 +338,7 @@ def deletedb():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                backups=b.list_backups(flask.session["username"], "weekly"),
                 mysql_error="Please specify all fields")
 
     # if password is correct, do database removal
@@ -345,11 +349,13 @@ def deletedb():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    backups=b.list_backups(flask.session["username"], "weekly"),
                     mysql_error=e.__cause__)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                backups=b.list_backups(flask.session["username"], "weekly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
@@ -375,6 +381,7 @@ def resetpw():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                backups=b.list_backups(flask.session["username"], "weekly"),
                 mysql_error="Please specify all fields")
 
     # if password is correct, reset password
@@ -385,16 +392,19 @@ def resetpw():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    backups=b.list_backups(flask.session["username"], "weekly"),
                     new_mysql_password=new_password)
         except m.UserError as e:
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    backups=b.list_backups(flask.session["username"], "weekly"),
                     mysql_error=e.__cause__)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                backups=b.list_backups(flask.session["username"], "weekly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
