@@ -395,8 +395,14 @@ def resetpw():
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
-@app.route("/help-email", methods=["POST", "GET"])
+@app.route("/help", methods=["POST", "GET"])
 def help():
+    """
+    Route: help
+        This takes care of the help section, sending the data off
+        to the relevant functions. 
+        This can only be reached if you are logged in.
+    """
     email = flask.request.form['email']
     subject = flask.request.form['subject']
     message = flask.request.form['message']
