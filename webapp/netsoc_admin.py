@@ -15,17 +15,19 @@ import re
 import sys
 import string
 import register_tools as r
+import help_post as h
+
 
 HOST = "127.0.0.1"
 PORT = "5050"
-DEBUG = False
+DEBUG = True
 
 
 app = flask.Flask(__name__)
 app.secret_key = p.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
+app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 1000 # seconds
 
 
 @app.route('/signinup')
@@ -186,7 +188,6 @@ def completeregistration():
     caption = "Thank you!"
     message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
     return flask.render_template("message.html", caption=caption, message=message)
-
 
 
 @app.route("/username", methods=["POST", "GET"])
@@ -394,6 +395,29 @@ def resetpw():
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
+@app.route("/help-email", methods=["POST", "GET"])
+def help():
+    email = flask.request.form['email']
+    subject = flask.request.form['subject']
+    message = flask.request.form['message']
+
+    success = h.send_help_email(flask.session['username'], email, subject, message)
+    if not success:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_error="There was a problem :( Please email netsoc@uccsocieties.ie",
+                show_error=True,
+                help_active=True)
+
+    out = h.send_help_bot(flask.session['username'], email, subject, message)
+    app.logger.debug(out)           
+    return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_success="Help is on the way!",
+                show_success=True,
+                help_active=True)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
