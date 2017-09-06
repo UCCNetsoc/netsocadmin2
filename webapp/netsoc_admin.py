@@ -20,7 +20,7 @@ import help_post as h
 
 HOST = "127.0.0.1"
 PORT = "5050"
-DEBUG = True
+DEBUG = False
 
 
 app = flask.Flask(__name__)
