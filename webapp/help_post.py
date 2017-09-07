@@ -10,8 +10,9 @@ from sendgrid.helpers.mail import Content, Mail
 import string
 import typing
 
-DISCORD_BOT_HELP_ADDRESS = p.DISCORD_BOT_HELP_ADDRESS
 
+DISCORD_BOT_HELP_ADDRESS = p.DISCORD_BOT_HELP_ADDRESS
+SYSADMIN_EMAILS = p.SYSADMIN_EMAILS
 
 
 def send_help_email(username:str, email:str, subject_in:str, message:str) -> bool:
@@ -27,15 +28,17 @@ Email: %s
 %s"""%(username, email, message)
 
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("help@netsoc.co")
-    to_email = Email("noah@santschi-cooney.ch")
+    from_email = Email("netsocadmin@netsoc.co")
     subject = "[Netsoc Help] "+subject_in
     content = Content("text/plain", message_body)
 
-    mail = Mail(from_email, subject, to_email, content)
-
-    response = sg.client.mail.send.post(request_body=mail.get())
-    return str(response.status_code).startswith("20")
+    success = False
+    for addr in SYSADMIN_EMAILS:
+        to_email = Email(addr)
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+        success = success or str(response.status_code).startswith("20")
+    return success
 
 
 def send_help_bot(username:str, email:str, subject:str, message:str) -> bool:
