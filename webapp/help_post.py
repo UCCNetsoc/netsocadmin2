@@ -48,6 +48,6 @@ def send_help_bot(username:str, email:str, subject:str, message:str) -> bool:
     """
     output = {"user":username, "email":email, "subject":subject, "message":message}
     headers = {'Content-Type': 'application/json'}
-
+    
     response = requests.post(DISCORD_BOT_HELP_ADDRESS, data=json.dumps(output).encode(), headers=headers)
     return response.status_code == 200

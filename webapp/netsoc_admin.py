@@ -440,7 +440,15 @@ def help():
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
     sent_email = h.send_help_email(flask.session['username'], email, subject, message)
-    sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
+    
+    try:
+        sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
+    except Exception as e:
+        app.logger.error("Failed to send message to discord bot: %s", str(e))
+        # in this case, the disocrd bot was unreachable. We log this error but
+        # continue as success because the email is still sent. This fix will have
+        # to remain until the Discord bot becomes more reliable.
+        sent_discord = True
     if not sent_email or not sent_discord:
         return flask.render_template(
                 "tools.html",
