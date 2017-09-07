@@ -11,7 +11,7 @@ import pymysql
 import typing
 
 
-def protected_page(view_func:typing.Callable[[], None]) -> typing.Callable[[], None]:
+def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[..., None]:
     """
     protected_page is a route function decorator which will check that a user
     is logged in before allowing the decorated view function to be shown. If the
