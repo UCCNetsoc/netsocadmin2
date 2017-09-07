@@ -37,7 +37,7 @@ Yours,
 The UCC Netsoc SysAdmin Team
     """%(server_url, uri, email)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("lowdown@netsoc.co")
+    from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
     content = Content("text/plain", message_body)
@@ -76,7 +76,7 @@ Yours,
 The UCC Netsoc SysAdmin Team
     """%(user, password, user)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("lowdown@netsoc.co")
+    from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
     content = Content("text/plain", message_body)
