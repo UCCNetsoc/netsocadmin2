@@ -16,6 +16,8 @@ import re
 import sys
 import string
 import register_tools as r
+import help_post as h
+
 
 HOST = "127.0.0.1"
 PORT = "5050"
@@ -188,7 +190,6 @@ def completeregistration():
     caption = "Thank you!"
     message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
     return flask.render_template("message.html", caption=caption, message=message)
-
 
 
 @app.route("/username", methods=["POST", "GET"])
@@ -417,6 +418,35 @@ def resetpw():
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
+@app.route("/help", methods=["POST", "GET"])
+def help():
+    """
+    Route: help
+        This takes care of the help section, sending the data off
+        to the relevant functions. 
+        This can only be reached if you are logged in.
+    """
+    email = flask.request.form['email']
+    subject = flask.request.form['subject']
+    message = flask.request.form['message']
+
+    success = h.send_help_email(flask.session['username'], email, subject, message)
+    if not success:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_error="There was a problem :( Please email netsoc@uccsocieties.ie",
+                show_error=True,
+                help_active=True)
+
+    out = h.send_help_bot(flask.session['username'], email, subject, message)
+    app.logger.debug(out)           
+    return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_success="Help is on the way!",
+                show_success=True,
+                help_active=True)
 
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
         methods=["POST", "GET"])
