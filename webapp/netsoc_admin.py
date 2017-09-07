@@ -419,6 +419,7 @@ def resetpw():
     return flask.redirect("/")
 
 @app.route("/help", methods=["POST", "GET"])
+@l.protected_page
 def help():
     """
     Route: help
@@ -429,24 +430,33 @@ def help():
     email = flask.request.form['email']
     subject = flask.request.form['subject']
     message = flask.request.form['message']
-
-    success = h.send_help_email(flask.session['username'], email, subject, message)
-    if not success:
+    if not all([email, subject, message]):
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
-                help_error="There was a problem :( Please email netsoc@uccsocieties.ie",
-                show_error=True,
-                help_active=True)
+                help_error="Please enter all fields",
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
-    out = h.send_help_bot(flask.session['username'], email, subject, message)
-    app.logger.debug(out)           
+    sent_email = h.send_help_email(flask.session['username'], email, subject, message)
+    sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
+    if not sent_email or not sent_discord:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+
     return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
-                help_success="Help is on the way!",
-                show_success=True,
-                help_active=True)
+                help_success=True,
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
         methods=["POST", "GET"])
