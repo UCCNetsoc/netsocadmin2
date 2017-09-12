@@ -25,7 +25,7 @@ def create_wordpress_database(username):
 
 	if len(username) > 16:
 		db_user = db_user[:15]
-		logger.debug("Username too long, shortned to %s" % (db_user))
+		logger.debug("Username too long, shortened to %s" % (db_user))
 
 
 	def _drop_user_if_exists():

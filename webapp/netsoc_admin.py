@@ -16,9 +16,9 @@ import sys
 import string
 import register_tools as r
 
-HOST = "127.0.0.1"
-PORT = "5050"
-DEBUG = False
+HOST = "0.0.0.0"
+PORT = "5051"
+DEBUG = True
 
 
 app = flask.Flask(__name__)

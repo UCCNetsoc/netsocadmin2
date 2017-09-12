@@ -1,5 +1,6 @@
 import logging
 from logging.config import fileConfig
+import sys
 
 from wordpress_installer import config
 
@@ -37,4 +38,6 @@ def get_wordpress(user_dir, username):
 
 
 if __name__=="__main__":
-	get_wordpress("/home/hassassin", "hassassin")
+	print("1: ", sys.argv[1])
+	get_wordpress(sys.argv[1], sys.argv[2])
+
