@@ -12,3 +12,6 @@ __pycache__/
 # other stuff
 /**/plan.txt
 /**/.mypy_cache
+
+# PyCharm
+.idea/
