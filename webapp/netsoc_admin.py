@@ -230,9 +230,9 @@ def login():
     a POST request.
     """
     if flask.request.method != "POST":
-        return flask.redirect("/signinup")
+        return flask.render_template("index.html", error_message="Bad request")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
-        return flask.redirect("/signinup")
+        return flask.render_template("index.html", error_message="Username or password was incorrect")
     flask.session[p.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
