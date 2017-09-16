@@ -2,3 +2,4 @@ ldap3
 PyMySQL
 sendgrid
 flask
+markdown
