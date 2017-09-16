@@ -15,7 +15,7 @@ With your account, comes a MySQL account. This database will not be reset after 
 
 Your MySQL databases can be found at `mysql.netsoc.co`. Your MySQL username will be your server username. To create new databases, remove databases or reset your MySQL password, please see the `MYSQL` tab in your admin tools.
 
-Please note, the name of your database will be prefixed with your username and an underscore. So if your username is `jhon`, your database names will be of the form `"john_<rest of name here>"`.
+Please note, the name of your database will be prefixed with your username and an underscore. So if your username is `john`, your database names will be of the form `"john_<rest of name here>"`.
 
 #### Home Directory Backups
 We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. 
