@@ -510,7 +510,22 @@ def tutorials():
         return flask.abort(400)
     if len(TUTORIALS) == 0:
         return flask.render_template("tutorials.html", error="No tutorials to show")
+    if DEBUG:
+        global TUTORIALS
+        TUTORIALS = []
+        populate_tutorials()
     return flask.render_template("tutorials.html", tutorials=TUTORIALS)
+
+
+def populate_tutorials():
+    """
+    Opens the tutorials folder and parses all of the markdown tutorials
+    contained within.
+    """
+    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(TUTORIAL_FOLDER)):
+        with open(os.path.join(TUTORIAL_FOLDER, tut_file)) as f: 
+            tutorial = markdown.markdown(f.read())
+            TUTORIALS.append(flask.Markup(tutorial))
 
 
 if __name__ == '__main__':
@@ -519,10 +534,7 @@ if __name__ == '__main__':
         user = os.getenv("USER")
         b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
 
-    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(TUTORIAL_FOLDER)):
-        with open(os.path.join(TUTORIAL_FOLDER, tut_file)) as f: 
-            tutorial = markdown.markdown(f.read())
-            TUTORIALS.append(flask.Markup(tutorial))
+    populate_tutorials()
 
     app.run(
         host=HOST,
