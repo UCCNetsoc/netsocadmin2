@@ -1,8 +1,10 @@
-import os
-logging_config = os.path.dirname(__file__) + '/resources/logging_config.ini'
+"""
+Sample configuration for wordpress installer
+"""
 
-
-#Fill in database details
+"""
+Database config
+"""
 
 db = {
 	"user" 			: "",
@@ -10,6 +12,10 @@ db = {
 	"host"			: ""
 }
 
+"""
+package config:
+	contains logging configuration location (Make this an absolute path)
+"""
 package = {
-	"logging_config" : logging_config
+	"logging_config" : ""
 }

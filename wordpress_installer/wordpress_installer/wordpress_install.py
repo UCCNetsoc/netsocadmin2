@@ -8,14 +8,29 @@ from logging.config import fileConfig
 
 from wordpress_installer import config
 
+
+"""
+This file contains all the functions for setting up wordpress and configuring it.
+"""
+
 fileConfig(config.package["logging_config"])
 logger = logging.getLogger(__name__)
 
 def _gen_random_password(size=10, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for _ in range(size))
+	"""
+	Generates a random 10 character password for a database user.
+	"""
+	return ''.join(random.choice(chars) for _ in range(size))
 
 
 def create_wordpress_database(username):
+	"""
+	Creates a wordpress user, and database.
+	Wordpress databases and users all start with wp_ (wordpress databases and users have the same name)
+	Drops a user and database if either already exists.
+	Creates the database, creates the user, and assigns the user privilages for the database.
+	Returns the database configuration for the newly created user and database.
+	"""
 	logger.debug("Creating wordpress database and user for %s" % (username))
 
 	database_connection = pymysql.connect(**config.db)
@@ -69,6 +84,12 @@ def create_wordpress_database(username):
 	return new_db_conf
 
 def create_wordpress_conf(user_dir, db_conf):
+	"""
+	Used to generate a new wordpress configuration file from a jinja2 template.
+	Pulls the configuration keys from the wordpress API and injects them into the template.
+	Injects the database configuration returned from create_wordpress_database into database details of the template.
+	Writes the newly templated configuration file into the wordpress directory.
+	"""
 	logger.debug("Generating wordpress configuration")
 
 	env = Environment(loader=PackageLoader('wordpress_installer', '/resources/templates'))
@@ -89,3 +110,45 @@ def create_wordpress_conf(user_dir, db_conf):
 
 	with open(user_dir + "/public_html/wordpress/wp-config.php", "w") as fh:
 		fh.write(wordpress_config)
+
+def get_wordpress(user_dir, username):
+	"""
+	Abstracted method for general wordpress installation. 
+	Installs wordpress to the public_html directory of a user, given the user's directory and username.
+	Compromises of two stages: download stage, and configurations stage.
+	Download:
+		Downloads the latest wordpress version as a tar compressed file to the users home directory.
+		Extracts files from the tar compress and moves them to the ~/<username>/public_html/wordpress
+		Deletes the tar compressed wordpress install from the user's home directory.
+	Configuration:
+		Creates new database and user for wordpress.
+		Generates a new wordpress cofiguration, and places it in the wordpress directory created in the download phase.
+		Changes owner and group of wordpress directory and child files/directories to the username given, and 'member'
+		relatively.
+	"""
+	from wordpress_installer.file_download_operations import download_to, extract_from_tar, delete_file, chown_dir_and_children
+
+	logger.debug("Installing WordPress for %s" % (username))
+
+	def download(user_dir):
+		try:
+			wordpress_latest_url = "https://wordpress.org/latest.tar.gz"
+			filename = download_to(wordpress_latest_url, user_dir)
+			extract_from_tar(filename, user_dir + "/public_html")
+			delete_file(filename)
+		except Exception as e:
+			logger.warning("An issue has occured while trying to download wordpress\n" + str(e))
+			raise Exception("An issue has occured while trying to download wordpress")
+
+	def configure(user_dir, username):
+		try:
+			new_db_conf = create_wordpress_database(username)
+			create_wordpress_conf(user_dir, new_db_conf)
+			chown_dir_and_children(user_dir + "/public_html/wordpress", username)
+		except Exception as e:
+			logger.warning("An issue has occured while trying to configure wordpress\n" + str(e))
+			raise Exception("An issue has occured while trying to configure wordpress")
+
+	download(user_dir)
+	configure(user_dir, username)
+	logger.debug("Installation for %s complete" % (username))
