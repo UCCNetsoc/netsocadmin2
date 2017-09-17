@@ -15,10 +15,11 @@ import re
 import sys
 import string
 import register_tools as r
+from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
 
-HOST = "0.0.0.0"
-PORT = "5051"
-DEBUG = True
+HOST = "127.0.0.1"
+PORT = "5050"
+DEBUG = False
 
 
 app = flask.Flask(__name__)
@@ -264,8 +265,13 @@ def tools():
         app.logger.debug("tools(): bad request method")
         return flask.redirect("/signinup")
 
+    #The wordpress variables are used by the WordPress card in the rendered HTML 
+    wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin" % (flask.session["username"])
+
     return flask.render_template("tools.html",
-            databases=m.list_dbs(flask.session["username"]))
+            databases=m.list_dbs(flask.session["username"]),
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])), 
+            WORDPRESS_LINK=wordpress_link)
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -393,6 +399,20 @@ def resetpw():
                 databases=m.list_dbs(flask.session["username"]),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
+
+@app.route("/wordpressinstall", methods=["GET"])
+@l.protected_page
+def wordpressinstall():
+    """
+    Route: wordpressinstall
+        This endpoint only allows a GET method.
+        If a user is authenticated and accessed this endpoint, then wordpress is installed to their public_html directory.
+        This endpoint is pinged via an AJAX request on the clients' side.
+    """
+    username = flask.session["username"]
+    home_dir = "/home/users/" + username
+    get_wordpress(home_dir, username)
+    return username, 200
 
 
 if __name__ == '__main__':

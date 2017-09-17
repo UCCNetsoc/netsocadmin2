@@ -2,51 +2,9 @@
 
 {% block head %}
 	{{ super() }}
-	<script>
-		let originalTitle, originalButtonText;
-		$(document).ready(() => {
-			originalTitle = document.querySelector("#database-form-title").innerText;
-			originalButtonText = document.querySelector("#database-form-button-text").innerText;
-			originalAction = document.querySelector("#database-change-form form").action;
-		})
-
-		// switches between the create database and delete database forms. If the database name db
-		// is specified, then it will pick the delete database form. Otherwise, it will pick the
-		// create database form.
-		function databaseForm(db) {
-			const formTitle = document.querySelector("#database-form-title");
-			const formButton = document.querySelector("#database-form-button-text");
-			const form = document.querySelector("#database-change-form form");
-			const dbnameInput = document.querySelector("#dbname");
-			if (db) {
-				form.action = "/deletedb";
-				console.log(form.action);
-				formTitle.innerText = "Delete Database:";
-				formButton.innerText = "Remove";
-				dbnameInput.value = db;
-				Materialize.updateTextFields();
-			} else {
-				form.action = originalAction;
-				formTitle.innerText = originalTitle;
-				formButton.innerText = originalButtonText;
-				dbnameInput.value = "";
-				Materialize.updateTextFields();
-			}
-		}
-
-		// replaces the database changing form. If resetCard is true, then it changes it back
-		function passwordReset(resetCard) {
-			const formChange = document.querySelector("#database-change-form");
-			const formReset = document.querySelector("#password-reset-form");
-			if (!resetCard) {
-				formReset.style.display = "block";
-				formChange.style.display = "none";
-			} else {
-				formReset.style.display = "none";
-				formChange.style.display = "block";
-			}
-		}
-	</script>
+	<script type="text/javascript" src="static/javascript/wordpressInstall.js"></script>
+	<script type="text/javascript" src="static/javascript/databaseTools.js"></script>
+	<link rel="stylesheet" href="static/css/wordpress.css"></link>
 	<style>
 		li a.logout-button {
 			display: inline-block;
@@ -160,13 +118,48 @@
 		</div>
 	</div>
 
+
 	<div id="backups" class="col s12">
 		<p> Need backs of your home directory? Here you go brah </p>
 	</div>
 
+	{# This stuff is the Wordpress tab #}
 	<div id="wordpress" class="col s12">
-		<p> Some wordpress info I guess and maybe a tasty buton to install it </p>
+		<div class="card z-depth-3" id="wordpress-install-container">
+			<div class="card-content">
+				<span class="card-title">Manage Your WordPress Site</span>
+				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/> 
+
+				{% if WORDPRESS_EXISTS %}
+
+				<p id="wordpress-link">WordPress is installed.
+					<b>Visit your WordPress site 
+					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
+				</p>
+
+				{% else %}
+
+				<p id="wordpress-install-description">Would you like to install wordpress to your web space?</p>
+
+				<button class="btn waves-effect waves-light" id="wordpress-install-button" onclick="installWordpress()">
+					<span>Install</span>
+					<i class="mdi-content-send right"></i>
+				</button>
+
+				<p id="wordpress-setup-link">WordPress is installed.
+					<b>Visit your WordPress site 
+					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
+				</p>
+
+				<div class="progress" id="wordpress-progress">
+						<div class="indeterminate"></div>
+				</div>
+
+				{% endif %}
+			</div>
+		</div>	
 	</div>
+
 
 	<div id="help" class="col s12">
 		<p> Generic section where users can contact a sys admin with their problems </p>

@@ -7,7 +7,7 @@ import logging
 from logging.config import fileConfig
 
 from wordpress_installer import config
-
+from wordpress_installer.file_download_operations import *
 
 """
 This file contains all the functions for setting up wordpress and configuring it.
@@ -126,7 +126,6 @@ def get_wordpress(user_dir, username):
 		Changes owner and group of wordpress directory and child files/directories to the username given, and 'member'
 		relatively.
 	"""
-	from wordpress_installer.file_download_operations import download_to, extract_from_tar, delete_file, chown_dir_and_children
 
 	logger.debug("Installing WordPress for %s" % (username))
 
@@ -152,3 +151,10 @@ def get_wordpress(user_dir, username):
 	download(user_dir)
 	configure(user_dir, username)
 	logger.debug("Installation for %s complete" % (username))
+
+def wordpress_exists(user_dir):
+	"""
+	Returns true if WordPress is installed to a user's public_html/wordpress directory.
+	Checks to see if WordPress exists, by checking to see if the configuration file exists.
+	"""
+	return file_exists(user_dir + "/public_html/wordpress/wp-config.php")

@@ -3,6 +3,7 @@ import subprocess
 import os
 import logging
 from logging.config import fileConfig
+from pathlib import Path
 
 from wordpress_installer import config
 
@@ -47,6 +48,14 @@ def chown_dir_and_children(path_to_dir, username):
 	logger.debug("changing owner and group of directory %s and children" % (path_to_dir)) 
 	split_command = ["chown", "-R", username + ":member", path_to_dir]
 	completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
+
+def file_exists(path_to_file):
+	"""
+	Checks to see if a file exists.
+	Returns true if the given file exists.
+	"""
+	return Path(path_to_file).is_file()
+
 
 
 
