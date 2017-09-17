@@ -17,5 +17,5 @@ package config:
 	contains logging configuration location (Make this an absolute path)
 """
 package = {
-	"logging_config" : ""
+	"logging_config" : "<location-of-netsocadmin>/netsocadmin/wordpress_installer/wordpress_installer/resources/logging_config.ini"
 }
