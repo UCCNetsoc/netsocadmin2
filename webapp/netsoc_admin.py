@@ -3,6 +3,7 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
+import backup_tools as b
 import crypt
 import flask
 import functools
@@ -16,10 +17,12 @@ import sys
 import string
 import register_tools as r
 from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
+import help_post as h
 
 HOST = "127.0.0.1"
 PORT = "5050"
 DEBUG = False
+
 
 
 app = flask.Flask(__name__)
@@ -157,7 +160,7 @@ def completeregistration():
     # add user to ldap db
     success, info = r.add_ldap_user(user)
     if not success:
-        app.logger.debug("completeregistration(): failed to add user to LDAP")
+        app.logger.debug("completeregistration(): failed to add user to LDAP: %s"%(info))
         # clean db of token so they have to start again
         r.remove_token(email)
         return flask.render_template("index.html",
@@ -187,7 +190,6 @@ def completeregistration():
     caption = "Thank you!"
     message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
     return flask.render_template("message.html", caption=caption, message=message)
-
 
 
 @app.route("/username", methods=["POST", "GET"])
@@ -228,9 +230,9 @@ def login():
     a POST request.
     """
     if flask.request.method != "POST":
-        return flask.redirect("/signinup")
+        return flask.render_template("index.html", error_message="Bad request")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
-        return flask.redirect("/signinup")
+        return flask.render_template("index.html", error_message="Username or password was incorrect")
     flask.session[p.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
@@ -272,6 +274,9 @@ def tools():
             databases=m.list_dbs(flask.session["username"]),
             WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])), 
             WORDPRESS_LINK=wordpress_link)
+            weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"), 
+            username=flask.session["username"])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -296,7 +301,8 @@ def createdb():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
-                mysql_error="Please specify all fields")
+                mysql_error="Please specify all fields",
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"))
 
     # if password is correct, create the new database
     if l.is_correct_password(username, password):
@@ -306,11 +312,14 @@ def createdb():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
-                    mysql_error=e.__cause__)
+                    mysql_error=e.__cause__,
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"))
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
@@ -337,6 +346,8 @@ def deletedb():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                 mysql_error="Please specify all fields")
 
     # if password is correct, do database removal
@@ -347,11 +358,15 @@ def deletedb():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     mysql_error=e.__cause__)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
@@ -377,6 +392,8 @@ def resetpw():
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                 mysql_error="Please specify all fields")
 
     # if password is correct, reset password
@@ -387,16 +404,22 @@ def resetpw():
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     new_mysql_password=new_password)
         except m.UserError as e:
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     mysql_error=e.__cause__)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
@@ -413,11 +436,89 @@ def wordpressinstall():
     home_dir = "/home/users/" + username
     get_wordpress(home_dir, username)
     return username, 200
+  
+@app.route("/help", methods=["POST", "GET"])
+@l.protected_page
+def help():
+    """
+    Route: help
+        This takes care of the help section, sending the data off
+        to the relevant functions. 
+        This can only be reached if you are logged in.
+    """
+    email = flask.request.form['email']
+    subject = flask.request.form['subject']
+    message = flask.request.form['message']
+    if not all([email, subject, message]):
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_error="Please enter all fields",
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+
+    sent_email = h.send_help_email(flask.session['username'], email, subject, message)
+    
+    try:
+        sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
+    except Exception as e:
+        app.logger.error("Failed to send message to discord bot: %s", str(e))
+        # in this case, the disocrd bot was unreachable. We log this error but
+        # continue as success because the email is still sent. This fix will have
+        # to remain until the Discord bot becomes more reliable.
+        sent_discord = True
+    if not sent_email or not sent_discord:
+        return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+
+    return flask.render_template(
+                "tools.html",
+                databases=m.list_dbs(flask.session["username"]),
+                help_success=True,
+                help_active=True,
+                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+
+@app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
+        methods=["POST", "GET"])
+@l.protected_page
+def backup(username:str, timeframe:str, backup_date:str):
+    """
+    Route: /backup/username/timeframe/backup_date
+        This route returns the requested backup.
+
+    :param username the server username of the user needing their backup.
+    :param timeframe the timeframe of the requested backup. Can be either
+        "weekly", or "monthly".
+    :param backup_date the backup-date of the requested backup. Must be in the
+        form YYYY-MM-DD.
+    """
+    if flask.request.method != "GET":
+        return flask.abort(400)
+
+    # make sure the arguments are valid
+    if not re.match(r"^[a-z]+$", username) or \
+            not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
+            timeframe not in ["weekly", "monthly"]:
+        app.logger.debug("backups(%s, %s, %s): invalid arguments"%(
+                username, timeframe, backup_date))
+        return flask.abort(400)
+
+    backups_base_dir = os.path.join(b.BACKUPS_DIR, username, timeframe)
+    return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
+        user = os.getenv("USER")
+        b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
     app.run(
         host=HOST,
         port=int(PORT),

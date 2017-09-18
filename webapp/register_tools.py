@@ -37,7 +37,7 @@ Yours,
 The UCC Netsoc SysAdmin Team
     """%(server_url, uri, email)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("lowdown@netsoc.co")
+    from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
     content = Content("text/plain", message_body)
@@ -76,7 +76,7 @@ Yours,
 The UCC Netsoc SysAdmin Team
     """%(user, password, user)
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("lowdown@netsoc.co")
+    from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
     content = Content("text/plain", message_body)
@@ -174,11 +174,11 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
                     search_filter="(objectClass=account)",
                     attributes=["uidNumber", "uid"],)
         if not success:
-            return False, None
+            return False, conn.last_error
         last = None
         for account in conn.entries:
             if account["uid"] == user:
-                return False, None
+                return False, conn.last_error
             last = account["uidNumber"]
         next_uid = int(str(last)) + 1
         info["uid_num"] = next_uid
@@ -186,8 +186,9 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         # creates initial password for user. They will be asked to change
         # this when they first log in.
         password = "".join(random.choice(
-            string.ascii_letters + string.digits) for _ in range(6))
-        crypt_password = "{crypt}" + crypt.crypt(password)
+            string.ascii_letters + string.digits) for _ in range(12))
+        crypt_password = "{crypt}" + \
+                crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         info["password"] = password
         info["crypt_password"] = crypt_password
 
@@ -213,7 +214,7 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             object_class, 
             attributes)
         if not success:
-            return False, None
+            return False, conn.last_error
     return True, info
 
 def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
@@ -282,14 +283,16 @@ def has_username(uid:str) -> bool:
     """
     if uid in p.BLACKLIST:
         return True
-    conn = pymysql.connect(
-        host=p.SQL_HOST,
-        user=p.SQL_USER,
-        password=p.SQL_PASS,
-        db=p.SQL_DB,)
-    with conn.cursor() as c:
-        sql = "SELECT * FROM users WHERE uid=%s;"
-        c.execute(sql, (uid,))
-        if c.fetchone():
-            return True
-    return False
+    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
+    with ldap3.Connection(
+                        ldap_server,
+                        user=p.LDAP_USER,
+                        password=p.LDAP_KEY,
+                        auto_bind=True) as conn:
+    
+        return conn.search(
+                    search_base="dc=netsoc,dc=co",
+                    search_filter="(&(objectClass=account)(uid=%s))"%(
+                            ldap3.utils.conv.escape_filter_chars(uid)),
+                    attributes=["uid"],)
+    return True

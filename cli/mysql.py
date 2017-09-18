@@ -143,14 +143,6 @@ def delete_user(username:str):
             cur.execute(sql, username)
             if not cur.rowcount:
                 return
-
-            # make sure user isn't an admin user (more checking should be
-            # done at function call as well)
-            sql = """SHOW GRANTS FOR %s@'localhost'"""
-            cur.execute(sql, username)
-            is_grant_all = lambda row: row["Grants for %s@localhost"%(username)].startswith("GRANT ALL")
-            if any(filter(is_grant_all, cur.fetchall())):
-                raise Exception("user '%s' is an admin user"%(username))
             
             sql = """DROP USER %s@'localhost';"""
             cur.execute(sql, username)

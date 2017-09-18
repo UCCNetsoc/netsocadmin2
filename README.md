@@ -10,8 +10,10 @@ Our current feature list is small but is intended to grow quickly.
 
 ### We have:
 * Automated user account creation
-
-### We will have:
 * MySQL database managment
 * Backup managment
-* A portal to get in touch with SysAdmins for feature requests and general help
+* Facility to contact a sysadmin
+
+### We will have:
+* WordPress installer
+* Tutorials
