@@ -273,7 +273,7 @@ def tools():
     return flask.render_template("tools.html",
             databases=m.list_dbs(flask.session["username"]),
             WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])), 
-            WORDPRESS_LINK=wordpress_link)
+            WORDPRESS_LINK=wordpress_link,
             weekly_backups=b.list_backups(flask.session["username"], "weekly"),
             monthly_backups=b.list_backups(flask.session["username"], "monthly"), 
             username=flask.session["username"])
