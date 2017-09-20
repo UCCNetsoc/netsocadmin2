@@ -1,0 +1,7 @@
+/**/*.pyc
+wordpress_installer.egg-info/
+wordpress_installer/config.py
+wordpress_installer/__pycache__/
+wordpress_installer/resources/logging_config.ini
+wordpress_installer/resources/wordpress_installer.log
+

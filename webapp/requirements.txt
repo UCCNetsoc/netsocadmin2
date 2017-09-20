@@ -4,3 +4,4 @@ sendgrid
 flask
 markdown
 paramiko
+typing
