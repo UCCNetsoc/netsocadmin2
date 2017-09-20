@@ -3,3 +3,4 @@ PyMySQL
 sendgrid
 flask
 markdown
+paramiko

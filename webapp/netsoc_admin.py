@@ -180,6 +180,9 @@ def completeregistration():
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
 
+    # initialise their user directories
+    r.initialise_directories(user, info["password"])
+
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
         app.logger.debug("completeregistration(): failed to send confirmation email")
@@ -506,12 +509,12 @@ def tutorials():
         This route will render the tutorials page. Note that the markdown tutorial
         files are read when the application starts-up.
     """
+    global TUTORIALS
     if flask.request.method != "GET":
         return flask.abort(400)
     if len(TUTORIALS) == 0:
         return flask.render_template("tutorials.html", error="No tutorials to show")
     if DEBUG:
-        global TUTORIALS
         TUTORIALS = []
         populate_tutorials()
     return flask.render_template("tutorials.html", tutorials=TUTORIALS)

@@ -6,6 +6,7 @@ import crypt
 import db
 import hashlib
 import ldap3
+import paramiko
 import passwords as p
 import pymysql
 import random
@@ -296,3 +297,19 @@ def has_username(uid:str) -> bool:
                             ldap3.utils.conv.escape_filter_chars(uid)),
                     attributes=["uid"],)
     return True
+
+def initialise_directories(username:str, password:str):
+    """
+    Makes an ssh connection to the server which will initialise a 
+    user's home directory. This allows them to not have to ever connect
+    to the server directly and still use netsoc admin.
+
+    :param username the user's UID
+    :param password the user's account password
+    """
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.connect(
+        hostname=p.SERVER_HOSTNAME,
+        username=username,
+        password=password)
