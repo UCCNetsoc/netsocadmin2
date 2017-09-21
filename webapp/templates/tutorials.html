@@ -1,0 +1,11 @@
+{% extends "page-skeleton.html" %}
+{% block body %}
+    <div class="row container">
+        {{ error }}
+        {% for t in tutorials %}
+            <div class="card-panel white">
+                {{ t }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
