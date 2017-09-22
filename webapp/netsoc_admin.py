@@ -268,14 +268,14 @@ def tools():
         return flask.redirect("/signinup")
 
     #The wordpress variables are used by the WordPress card in the rendered HTML 
-    wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin" % (flask.session["username"])
+    wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
 
     return flask.render_template("tools.html",
             databases=m.list_dbs(flask.session["username"]),
-            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])), 
-            WORDPRESS_LINK=wordpress_link)
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+            WORDPRESS_LINK=wordpress_link,
             weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-            monthly_backups=b.list_backups(flask.session["username"], "monthly"), 
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
             username=flask.session["username"])
 
 
