@@ -8,6 +8,7 @@ import crypt
 import flask
 import functools
 import login_tools as l 
+import markdown
 import mysql_tools as m
 import os
 import passwords as p
@@ -22,7 +23,8 @@ import help_post as h
 HOST = "127.0.0.1"
 PORT = "5050"
 DEBUG = False
-
+TUTORIALS = []
+TUTORIAL_FOLDER = "tutorials"
 
 
 app = flask.Flask(__name__)
@@ -177,6 +179,9 @@ def completeregistration():
         app.logger.debug("completeregistration(): failed to add data to mysql db")
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
+
+    # initialise their user directories
+    r.initialise_directories(user, info["password"])
 
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
@@ -423,6 +428,7 @@ def resetpw():
                 mysql_error="Wrong username or password")
     return flask.redirect("/")
 
+
 @app.route("/wordpressinstall", methods=["GET"])
 @l.protected_page
 def wordpressinstall():
@@ -436,6 +442,7 @@ def wordpressinstall():
     home_dir = "/home/users/" + username
     get_wordpress(home_dir, username)
     return username, 200
+  
   
 @app.route("/help", methods=["POST", "GET"])
 @l.protected_page
@@ -485,6 +492,7 @@ def help():
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
+
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
         methods=["POST", "GET"])
 @l.protected_page
@@ -514,11 +522,43 @@ def backup(username:str, timeframe:str, backup_date:str):
     return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
 
 
+@app.route("/tutorials", methods=["POST", "GET"])
+def tutorials():
+    """
+    Route: /tutorials
+        This route will render the tutorials page. Note that the markdown tutorial
+        files are read when the application starts-up.
+    """
+    global TUTORIALS
+    if flask.request.method != "GET":
+        return flask.abort(400)
+    if len(TUTORIALS) == 0:
+        return flask.render_template("tutorials.html", error="No tutorials to show")
+    if DEBUG:
+        TUTORIALS = []
+        populate_tutorials()
+    return flask.render_template("tutorials.html", tutorials=TUTORIALS)
+
+
+def populate_tutorials():
+    """
+    Opens the tutorials folder and parses all of the markdown tutorials
+    contained within.
+    """
+    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(TUTORIAL_FOLDER)):
+        with open(os.path.join(TUTORIAL_FOLDER, tut_file)) as f: 
+            tutorial = markdown.markdown(f.read())
+            TUTORIALS.append(flask.Markup(tutorial))
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
         user = os.getenv("USER")
         b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
+
+    populate_tutorials()
+
     app.run(
         host=HOST,
         port=int(PORT),
