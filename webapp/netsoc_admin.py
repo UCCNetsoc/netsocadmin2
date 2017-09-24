@@ -234,8 +234,17 @@ def login():
     """
     if flask.request.method != "POST":
         return flask.render_template("index.html", error_message="Bad request")
-    if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
+    if not l.is_correct_password(
+            flask.request.form["username"],
+            flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
+    
+    # this is a temporary fix that should be removed when we are satisfied
+    # all users' home directories have been initialised.
+    r.initialise_directories(
+        flask.request.form["username"],
+        flask.request.form["password"])
+
     flask.session[p.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
@@ -554,6 +563,7 @@ if __name__ == '__main__':
         DEBUG = True
         user = os.getenv("USER")
         b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
+        p.TUTORIAL_FOLDER = "./tutorials"
 
     populate_tutorials()
 
