@@ -64,7 +64,10 @@ Hello,
 Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
 
 username: %s
+
 password: %s
+
+Please note that you must log into the server at least once before the web portal will work for you. If you need any help on this, contact adamgillessen@gmail.com.
 
 To log in, run:
     ssh %s@leela.netsoc.co
@@ -313,3 +316,4 @@ def initialise_directories(username:str, password:str):
         hostname=p.SERVER_HOSTNAME,
         username=username,
         password=password)
+
