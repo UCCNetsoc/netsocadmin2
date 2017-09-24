@@ -178,9 +178,6 @@ def completeregistration():
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
 
-    # initialise their user directories
-    r.initialise_directories(user, info["password"])
-
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
         app.logger.debug("completeregistration(): failed to send confirmation email")
