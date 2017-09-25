@@ -233,6 +233,7 @@ def login():
         return flask.render_template("index.html", error_message="Bad request")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
+    r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
     flask.session[p.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
