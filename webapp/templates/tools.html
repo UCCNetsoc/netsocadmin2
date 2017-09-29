@@ -9,6 +9,15 @@
 		li a.logout-button {
 			display: inline-block;
 		}
+		.teal-line {
+		  display: block;
+		  height: 1px;
+		  border: 0;
+		  border-top: 1px solid #009688;
+		  margin: 1em 0;
+		  padding: 0;
+		}
+
 	</style>
 {% endblock %}
 
@@ -19,6 +28,9 @@
 	<div class="col s12">
 		<ul class="tabs z-depth-1">
 			<div class="indicator teal lighten-2" style="z-index:1">{# this changes the tab colors #}</div>
+			<li class="tab">
+				<a class="{% if home_active %} active {% endif %}teal-text lighten-2" href="#home">Home</a>
+			</li>
 			<li class="tab">
 				<a class="{% if mysql_active %} active {% endif %}teal-text lighten-2" href="#mysql">MySQL</a>
 			</li>
@@ -32,6 +44,32 @@
 				<a class="{% if help_active %} active {% endif %}teal-text lighten-2" href="#help">Help</a>
 			</li>
 		</ul>
+	</div>
+
+	{# This tab is for the help section that will relay the message to SysAdmins #}
+	<div id="home" class="col s12">
+		<div class='card z-depth-3' style='width: 60%;margin-left:auto;margin-right:auto;margin-top:2%;'>
+			<div id="home" class="card-content">
+				<span class="card-title">What We Offer</span>
+				<hr class="teal-line" />
+				<span class="card-title">Free server space</span>
+				<p>You can create a free account on one of our servers. What you do with it is all up to you!</p><br />
+				<p>Please do read the `ACCEPTABLE_USAGE_POLICY` file in your home directory. If you are found to be in violation of this, we will stop whatever you are doing and possibly remove your account.</p>
+				<hr class="teal-line" />
+				<span class="card-title">Free web hosting</span>
+				<p>Your `public_html` folder in you home-directory will be the root of you website. This website can be found at `"http://&lt;yourusername&gt;.netsoc.co"`.</p><br />
+				<p>Please contact us if you wish to have your own domain name point to this site instead. </p>
+				<hr class="teal-line" />
+				<span class="card-title">MySQL Databases</span>
+				<p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p><br />
+				<p>Your MySQL databases can be found at `mysql.netsoc.co`. Your MySQL username will be your server username. To create new databases, remove databases or reset your MySQL password, please see the `MYSQL` tab in your admin tools.</p><br />
+				<p>Please note, the name of your database will be prefixed with your username and an underscore. So if your username is `john`, your database names will be of the form `"john_&lt;rest of name here&gt;"`.</p>
+				<hr class="teal-line" />
+				<span class="card-title">Home Directory Backups</span>
+				<p>We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. </p><br />
+				<p>If you need to recover a backup, see the `BACKUPS` tab in your admin tools.</p>
+			</div>
+		</div>
 	</div>
 
 	{# This stuff is the MySQL tab #}
@@ -181,12 +219,12 @@
 		<div class="card z-depth-3" id="wordpress-install-container">
 			<div class="card-content">
 				<span class="card-title">Manage Your WordPress Site</span>
-				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/> 
+				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/>
 
 				{% if WORDPRESS_EXISTS %}
 
 				<p id="wordpress-link">WordPress is installed.
-					<b>Visit your WordPress site 
+					<b>Visit your WordPress site
 					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
 				</p>
 
@@ -200,7 +238,7 @@
 				</button>
 
 				<p id="wordpress-setup-link">WordPress is installed.
-					<b>Visit your WordPress site 
+					<b>Visit your WordPress site
 					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
 				</p>
 
@@ -210,7 +248,7 @@
 
 				{% endif %}
 			</div>
-		</div>	
+		</div>
 	</div>
 
 	{# This tab is for the help section that will relay the message to SysAdmins #}

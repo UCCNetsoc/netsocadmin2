@@ -1,4 +1,14 @@
 {% extends "page-skeleton.html" %}
+
+{% block head %}
+  {{ super() }}
+  <style>
+    li a.logout-button {
+      display: inline-block;
+    }
+  </style>
+{% endblock %}
+
 {% block body %}
     <div class="row container">
         {{ error }}
