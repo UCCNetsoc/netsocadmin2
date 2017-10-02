@@ -395,7 +395,8 @@ def resetpw():
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Please specify all fields")
+                mysql_error="Please specify all fields",
+                mysql_active=True)
 
     # if password is correct, reset password
     if l.is_correct_password(username, password):
@@ -407,21 +408,24 @@ def resetpw():
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    new_mysql_password=new_password)
+                    new_mysql_password=new_password,
+                    mysql_active=True)
         except m.UserError as e:
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    mysql_error=e.__cause__)
+                    mysql_error=e.__cause__,
+                    mysql_active=True)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Wrong username or password")
+                mysql_error="Wrong username or password",
+                mysql_active=True)
     return flask.redirect("/")
 
 
@@ -541,9 +545,9 @@ def populate_tutorials():
     Opens the tutorials folder and parses all of the markdown tutorials
     contained within.
     """
-    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(p.TUTORIAL_FOLDER)):
+    for tut_file in filter(lambda f: f.endswith(".html"), os.listdir(p.TUTORIAL_FOLDER)):
         with open(os.path.join(p.TUTORIAL_FOLDER, tut_file)) as f:
-            tutorial = markdown.markdown(f.read())
+            tutorial = f.read()
             TUTORIALS.append(flask.Markup(tutorial))
 
 
@@ -551,7 +555,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
         user = os.getenv("USER")
-        b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
+        b.BACKUPS_DIR = "/Users/%s/Documents/backups/"%(user)
         p.TUTORIAL_FOLDER = "./tutorials"
 
     populate_tutorials()
