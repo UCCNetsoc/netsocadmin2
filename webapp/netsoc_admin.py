@@ -545,9 +545,9 @@ def populate_tutorials():
     Opens the tutorials folder and parses all of the markdown tutorials
     contained within.
     """
-    for tut_file in filter(lambda f: f.endswith(".html"), os.listdir(p.TUTORIAL_FOLDER)):
+    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(p.TUTORIAL_FOLDER)):
         with open(os.path.join(p.TUTORIAL_FOLDER, tut_file)) as f:
-            tutorial = f.read()
+            tutorial = markdown.markdown(f.read())
             TUTORIALS.append(flask.Markup(tutorial))
 
 
