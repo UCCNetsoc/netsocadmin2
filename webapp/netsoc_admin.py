@@ -4,18 +4,14 @@ Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
 import backup_tools as b
-import crypt
 import flask
-import functools
-import login_tools as l 
+import login_tools as l
 import markdown
 import mysql_tools as m
 import os
 import passwords as p
-import random
 import re
 import sys
-import string
 import register_tools as r
 from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
 import help_post as h
@@ -24,8 +20,6 @@ HOST = "127.0.0.1"
 PORT = "5050"
 DEBUG = False
 TUTORIALS = []
-TUTORIAL_FOLDER = "tutorials"
-
 
 app = flask.Flask(__name__)
 app.secret_key = p.SECRET_KEY
@@ -49,7 +43,7 @@ def signinup():
 
 
 @app.route("/sendconfirmation", methods=["POST", "GET"])
-def sendconfirmation() -> str: 
+def sendconfirmation() -> str:
     """
     Route: /sendconfirmation
         Users will be lead to this route when they submit an email for server sign up from route /
@@ -61,15 +55,15 @@ def sendconfirmation() -> str:
     if flask.request.method != "POST":
         app.logger.debug("sendconfirmation(): method not POST: %s"%flask.request.method)
         return flask.redirect("/signinup")
-    
-    # make sure is ucc email           
-    email = flask.request.form['email']         
+
+    # make sure is ucc email
+    email = flask.request.form['email']
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
         app.logger.debug(
             "sendconfirmation(): address %s is not a valid UCC email"%email)
         return flask.render_template("index.html",
             error_message="Must be a UCC Umail email address")
-    
+
     # make sure email has not already been used to make an account
     if email not in p.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
@@ -77,7 +71,7 @@ def sendconfirmation() -> str:
         app.logger.debug(
             "senconfirmation(): account already exists with email %s"%(email))
         return flask.render_template("message.html", caption=caption, message=message)
-    
+
     # send confirmation link to ensure they own the email account
     out_email = "admin.netsoc.co" if not DEBUG else "%s:%s"%(HOST, PORT)
     confirmation_sent = r.send_confirmation_email(email, out_email)
@@ -85,11 +79,11 @@ def sendconfirmation() -> str:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
-    
+
     caption = "Thank you!"
     message = "Your confirmation link has been sent to %s"%(email)
     return flask.render_template("message.html", caption=caption, message=message)
-    
+
 
 @app.route("/signup", methods=["GET"])
 def signup() -> str:
@@ -102,7 +96,7 @@ def signup() -> str:
     if flask.request.method != "GET":
         app.logger.debug("signup(): method was not GET: %s"%flask.request.method)
         return flask.redirect("/signinup")
-    
+
     # make sure they haven't forged the URI
     email = flask.request.args.get('e')
     uri = flask.request.args.get('t')
@@ -110,12 +104,12 @@ def signup() -> str:
         app.logger.debug("signup(): bad token %s used for email %s"%(uri, email))
         return flask.render_template("index.html",
             error_message="Your request was not valid. Please try again or contact us")
-    
+
     return flask.render_template("form.html", email_address=email, token=uri)
 
 
 @app.route("/completeregistration", methods=["POST", "GET"])
-def completeregistration(): 
+def completeregistration():
     """
     Route: register
         This is the route which is run by the registration form
@@ -167,7 +161,7 @@ def completeregistration():
         r.remove_token(email)
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
-    
+
     # add all info to Netsoc MySQL DB
     info["name"] = flask.request.form["name"]
     info["student_id"] = flask.request.form["student_id"]
@@ -180,14 +174,15 @@ def completeregistration():
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
 
-    # initialise their user directories
-    r.initialise_directories(user, info["password"])
-
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
         app.logger.debug("completeregistration(): failed to send confirmation email")
         return flask.render_template("index.html",
             error_message="An error occured. Please try again or contact us")
+
+    # initialise the user's home directories so they can use netsoc admin
+    # without ever having to SSH into the server.
+    r.initialise_directories(user, info["password"])
 
     # registration complete, remove their token
     r.remove_token(email)
@@ -215,7 +210,7 @@ def username():
     token = flask.request.headers["token"]
     if not r.good_token(email, token):
         return flask.abort(403)
-    
+
     # check db for username
     requested_uername = flask.request.headers["uid"]
     if r.has_username(requested_uername):
@@ -231,13 +226,14 @@ def username():
 def login():
     """
     Route: login
-    This route should be reached by a form sending login information to it via 
+    This route should be reached by a form sending login information to it via
     a POST request.
     """
     if flask.request.method != "POST":
         return flask.render_template("index.html", error_message="Bad request")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
+    r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
     flask.session[p.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
@@ -253,7 +249,7 @@ def logout():
         return flask.redirect("/signinup")
     flask.session.pop(p.LOGGED_IN_KEY, None)
     return flask.redirect("/signinup")
-    
+
 
 #-------------------------------Server Tools Routes-----------------------------#
 
@@ -272,15 +268,15 @@ def tools():
         app.logger.debug("tools(): bad request method")
         return flask.redirect("/signinup")
 
-    #The wordpress variables are used by the WordPress card in the rendered HTML 
-    wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin" % (flask.session["username"])
+    #The wordpress variables are used by the WordPress card in the rendered HTML
+    wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
 
     return flask.render_template("tools.html",
             databases=m.list_dbs(flask.session["username"]),
-            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])), 
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
             WORDPRESS_LINK=wordpress_link,
             weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-            monthly_backups=b.list_backups(flask.session["username"], "monthly"), 
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
             username=flask.session["username"])
 
 
@@ -399,7 +395,8 @@ def resetpw():
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Please specify all fields")
+                mysql_error="Please specify all fields",
+                mysql_active=True)
 
     # if password is correct, reset password
     if l.is_correct_password(username, password):
@@ -411,21 +408,24 @@ def resetpw():
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    new_mysql_password=new_password)
+                    new_mysql_password=new_password,
+                    mysql_active=True)
         except m.UserError as e:
             return flask.render_template(
                     "tools.html",
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    mysql_error=e.__cause__)
+                    mysql_error=e.__cause__,
+                    mysql_active=True)
     else:
         return flask.render_template(
                 "tools.html",
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Wrong username or password")
+                mysql_error="Wrong username or password",
+                mysql_active=True)
     return flask.redirect("/")
 
 
@@ -442,15 +442,15 @@ def wordpressinstall():
     home_dir = "/home/users/" + username
     get_wordpress(home_dir, username)
     return username, 200
-  
-  
+
+
 @app.route("/help", methods=["POST", "GET"])
 @l.protected_page
 def help():
     """
     Route: help
         This takes care of the help section, sending the data off
-        to the relevant functions. 
+        to the relevant functions.
         This can only be reached if you are logged in.
     """
     email = flask.request.form['email']
@@ -466,7 +466,7 @@ def help():
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
     sent_email = h.send_help_email(flask.session['username'], email, subject, message)
-    
+
     try:
         sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
     except Exception as e:
@@ -545,8 +545,8 @@ def populate_tutorials():
     Opens the tutorials folder and parses all of the markdown tutorials
     contained within.
     """
-    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(TUTORIAL_FOLDER)):
-        with open(os.path.join(TUTORIAL_FOLDER, tut_file)) as f: 
+    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(p.TUTORIAL_FOLDER)):
+        with open(os.path.join(p.TUTORIAL_FOLDER, tut_file)) as f:
             tutorial = markdown.markdown(f.read())
             TUTORIALS.append(flask.Markup(tutorial))
 
@@ -555,7 +555,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
         user = os.getenv("USER")
-        b.BACKUPS_DIR = "/home/%s/Desktop/backups/"%(user)
+        b.BACKUPS_DIR = "/Users/%s/Documents/backups/"%(user)
+        p.TUTORIAL_FOLDER = "./tutorials"
 
     populate_tutorials()
 

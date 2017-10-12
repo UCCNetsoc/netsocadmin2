@@ -23,7 +23,7 @@ def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[...,
             return flask.redirect("/signinup")
         return view_func(*args, **kwargs)
     return protected_view_func
-    
+
 
 def is_correct_password(username:str, password:str) -> bool:
     """
@@ -46,7 +46,7 @@ def is_correct_password(username:str, password:str) -> bool:
             return False
 
         hashed_password = conn.entries[0]["userPassword"].value.decode()
-        if hashed_password.startswith("{crypt}"):
+        if hashed_password.startswith("{crypt}") or hashed_password.startswith("{CRYPT}"):
             # strips off the "{crypt}" prefix
             hashed_password = hashed_password[len("{crypt}"):]
         return hmac.compare_digest(
