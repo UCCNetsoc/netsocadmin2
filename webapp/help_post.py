@@ -75,7 +75,7 @@ PS: Please "Reply All" to the emails so that you get a quicker response.
     msg = EmailMessage()
     msg.set_content(message_body)
     msg["From"] = p.NETSOC_ADMIN_EMAIL_ADDRESS
-    msg["To"] = "adamgillessen@gmail.com"# p.NETSOC_EMAIL_ADDRESS
+    msg["To"] = p.NETSOC_EMAIL_ADDRESS
     msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
         user=username)
     msg["Cc"] = tuple(p.SYSADMIN_EMAILS + [user_email])
