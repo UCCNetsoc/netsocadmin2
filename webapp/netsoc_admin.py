@@ -28,13 +28,16 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
 
 
-@app.route('/signinup')
+@app.route('/')
 def signinup():
     """
     Route: /
-        This route is for the index directory.
-        If the user goes to this, it will load the index.html template.
+        This route is for the index page. If a user is already logged in, it will
+        redirect to the server tools page.
     """
+    if l.is_logged_in():
+        return flask.redirect("/tools")
+
     app.logger.debug("Received index page request")
     return flask.render_template("index.html")
 
@@ -54,7 +57,7 @@ def sendconfirmation() -> str:
     # if they got here through GET, something done fucked up
     if flask.request.method != "POST":
         app.logger.debug("sendconfirmation(): method not POST: %s"%flask.request.method)
-        return flask.redirect("/signinup")
+        return flask.redirect("/")
 
     # make sure is ucc email
     email = flask.request.form['email']
@@ -95,7 +98,7 @@ def signup() -> str:
     # this check isn't vital but better safe than sorry
     if flask.request.method != "GET":
         app.logger.debug("signup(): method was not GET: %s"%flask.request.method)
-        return flask.redirect("/signinup")
+        return flask.redirect("/")
 
     # make sure they haven't forged the URI
     email = flask.request.args.get('e')
@@ -119,7 +122,7 @@ def completeregistration():
     # if they haven't gotten here through POST something has gone wrong
     if flask.request.method != "POST":
         app.logger.debug("completeregistration(): method was not POST: %s"%flask.request.method)
-        return flask.redirect("/signinup")
+        return flask.redirect("/")
 
     # make sure token is valid
     email = flask.request.form["email"]
@@ -246,15 +249,15 @@ def logout():
         This route logs a user out an redirects them back to the index page.
     """
     if flask.request.method != "GET":
-        return flask.redirect("/signinup")
+        return flask.redirect("/")
     flask.session.pop(p.LOGGED_IN_KEY, None)
-    return flask.redirect("/signinup")
+    return flask.redirect("/")
 
 
 #-------------------------------Server Tools Routes-----------------------------#
 
 
-@app.route("/", methods=["POST", "GET"])
+@app.route("/tools", methods=["POST", "GET"])
 @l.protected_page
 def tools():
     """
@@ -266,9 +269,9 @@ def tools():
     app.logger.debug("tools(): received tools page request")
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
-        return flask.redirect("/signinup")
+        return flask.redirect("/") 
 
-    #The wordpress variables are used by the WordPress card in the rendered HTML
+    # The wordpress variables are used by the WordPress card in the rendered HTML
     wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
 
     return flask.render_template("tools.html",
