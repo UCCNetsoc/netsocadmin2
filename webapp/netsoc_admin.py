@@ -275,6 +275,7 @@ def tools():
     wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
 
     return flask.render_template("tools.html",
+            show_logout_button=l.is_logged_in(),
             databases=m.list_dbs(flask.session["username"]),
             WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
             WORDPRESS_LINK=wordpress_link,
@@ -302,8 +303,8 @@ def createdb():
 
     # make sure each value is non-empty
     if not all([username, password, dbname]):
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 mysql_error="Please specify all fields",
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"))
@@ -313,14 +314,14 @@ def createdb():
         try:
             m.create_database(username, dbname, False)
         except m.DatabaseAccessError as e:
-            return flask.render_template(
-                    "tools.html",
+            return flask.render_template("tools.html",
+                    show_logout_button=l.is_logged_in(),
                     databases=m.list_dbs(flask.session["username"]),
                     mysql_error=e.__cause__,
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"))
     else:
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
@@ -347,8 +348,8 @@ def deletedb():
 
     # make sure each value is non-empty
     if not all([username, password, dbname]):
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),    
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
@@ -359,15 +360,15 @@ def deletedb():
         try:
             m.create_database(username, dbname, True)
         except m.DatabaseAccessError as e:
-            return flask.render_template(
-                    "tools.html",
+            return flask.render_template("tools.html",
+                    show_logout_button=l.is_logged_in(),
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     mysql_error=e.__cause__)
     else:
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
@@ -393,8 +394,8 @@ def resetpw():
 
     # make sure each value is non-empty
     if not all([username, password]):
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
@@ -406,24 +407,24 @@ def resetpw():
         try:
             m.delete_user(username)
             new_password = m.create_user(username)
-            return flask.render_template(
-                    "tools.html",
+            return flask.render_template("tools.html",
+                    show_logout_button=l.is_logged_in(),
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     new_mysql_password=new_password,
                     mysql_active=True)
         except m.UserError as e:
-            return flask.render_template(
-                    "tools.html",
+            return flask.render_template("tools.html",
+                    show_logout_button=l.is_logged_in(),
                     databases=m.list_dbs(flask.session["username"]),
                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                     mysql_error=e.__cause__,
                     mysql_active=True)
     else:
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
@@ -460,8 +461,8 @@ def help():
     subject = flask.request.form['subject']
     message = flask.request.form['message']
     if not all([email, subject, message]):
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 help_error="Please enter all fields",
                 help_active=True,
@@ -479,16 +480,16 @@ def help():
         # to remain until the Discord bot becomes more reliable.
         sent_discord = True
     if not sent_email or not sent_discord:
-        return flask.render_template(
-                "tools.html",
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
                 help_active=True,
                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
 
-    return flask.render_template(
-                "tools.html",
+    return flask.render_template("tools.html",
+            show_logout_button=l.is_logged_in(),
                 databases=m.list_dbs(flask.session["username"]),
                 help_success=True,
                 help_active=True,
@@ -536,11 +537,15 @@ def tutorials():
     if flask.request.method != "GET":
         return flask.abort(400)
     if len(TUTORIALS) == 0:
-        return flask.render_template("tutorials.html", error="No tutorials to show")
+        return flask.render_template("tutorials.html",
+                show_logout_button=l.is_logged_in(),
+                error="No tutorials to show")
     if DEBUG:
         TUTORIALS = []
         populate_tutorials()
-    return flask.render_template("tutorials.html", tutorials=TUTORIALS)
+    return flask.render_template("tutorials.html",
+            show_logout_button=l.is_logged_in(),
+            tutorials=TUTORIALS)
 
 @app.route("/sudo", methods=["POST", "GET"])
 @l.protected_page
@@ -551,7 +556,9 @@ def sudo():
     """
     if flask.request.method != "GET":
         return flask.abort(400)
-    return flask.render_template("sudo.html", username=flask.session["username"])
+    return flask.render_template("sudo.html",
+            show_logout_button=l.is_logged_in(),
+            username=flask.session["username"])
 
 
 def populate_tutorials():

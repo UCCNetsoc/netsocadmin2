@@ -47,9 +47,17 @@
 		body {
 			background-color: #eee;
 		}
+
+		{% if show_logout_button %}
+		li a.logout-button {
+			display: inline-block;
+		}
+		{% else %}
 		li a.logout-button {
 			display: none;
 		}
+		{% endif %}
+
 		.error-msg {
 			color: red;
 		}
