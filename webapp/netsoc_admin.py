@@ -555,7 +555,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
         user = os.getenv("USER")
-        b.BACKUPS_DIR = "/Users/%s/Documents/backups/"%(user)
+        b.BACKUPS_DIR = "./backups"
         p.TUTORIAL_FOLDER = "./tutorials"
 
     populate_tutorials()
