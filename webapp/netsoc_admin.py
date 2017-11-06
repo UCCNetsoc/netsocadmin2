@@ -560,6 +560,49 @@ def sudo():
             show_logout_button=l.is_logged_in(),
             username=flask.session["username"])
 
+@app.route("/completesudoapplication", methods=["POST", "GET"])
+@l.protected_page
+def completesudoapplication():
+    """
+    Route: /completesudoapplication
+        This is run by the sudo-signup form in sudo.html. It will send an
+        email to the SysAdmin team as well as to the discord server
+        notifying us that a request for sudo on feynman has been made.
+    """
+    if flask.request.method != "POST":
+        return flask.abort(400)
+
+    email = flask.request.form["email"]
+    username = flask.session['username']
+
+    email_failed, discord_failed = False, False
+    try:
+        h.send_sudo_request_email(username, email)
+    except Exception as e:
+        email_failed = True
+        app.logger.error("Failed to send email: %s", str(e))
+
+    try:
+        h.send_help_bot(username,
+                        email,
+                        "Feynman Account Request",
+                        "This user wants an account on feynman pls.")
+    except Exception as e:
+        discord_failed = True
+        app.logger.error("Failed to send message to discord bot: %s", str(e))
+    
+    if email_failed and discord_failed:
+        return flask.render_template("tools.html",
+                show_logout_button=l.is_logged_in(),
+                caption="There was a problem :(",
+                message="Please email netsoc@uccsocieties.ie instead")
+
+    return flask.render_template("message.html",
+            show_logout_button=l.is_logged_in(),
+            caption="Success!",
+            message="A confirmation email has been sent to you. We will be in touch shortly.")
+
+
 
 def populate_tutorials():
     """

@@ -30,7 +30,10 @@ def send_help_email(username:str, user_email:str, subject:str, message:str) -> b
 From: %s\n
 Email: %s
 
-%s"""%(username, user_email, message)
+%s
+
+PS: Please "Reply All" to the emails so that you get a quicker response."""%(
+        username, user_email, message)
     
     msg = EmailMessage()
     msg.set_content(message_body)
@@ -46,6 +49,41 @@ Email: %s
         return False
     return True
 
+def send_sudo_request_email(username:str, user_email:str):
+    """
+    Sends an email notifying SysAdmins that a user has requested an account on feynman.
+
+    :param username the server username of the user who made the request.
+    :param user_email the email address of that user to contact them for vetting.
+    """
+    message_body = \
+    """
+Hi {username},
+
+Thank you for making a request for an account with sudo privileges on feynman.netsoc.co.
+
+We will be in touch shortly. 
+
+Best,
+
+The UCC Netsoc SysAdmin Team.
+
+PS: Please "Reply All" to the emails so that you get a quicker response.
+
+""".format(username=username)
+    
+    msg = EmailMessage()
+    msg.set_content(message_body)
+    msg["From"] = p.NETSOC_ADMIN_EMAIL_ADDRESS
+    msg["To"] = "adamgillessen@gmail.com"# p.NETSOC_EMAIL_ADDRESS
+    msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
+        user=username)
+    msg["Cc"] = tuple(p.SYSADMIN_EMAILS + [user_email])
+    
+    with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
+        s.login(p.SENDGRID_USERNAME, p.SENDGRID_PASSWORD)
+        s.send_message(msg)
+    
 
 def send_help_bot(username:str, email:str, subject:str, message:str) -> bool:
     """
