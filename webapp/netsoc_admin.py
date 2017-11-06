@@ -539,6 +539,17 @@ def tutorials():
         populate_tutorials()
     return flask.render_template("tutorials.html", tutorials=TUTORIALS)
 
+@app.route("/sudo", methods=["POST", "GET"])
+@l.protected_page
+def sudo():
+    """
+    Route: /sudo
+        This route will render the page for applying for sudo privilages.
+    """
+    if flask.request.method != "GET":
+        return flask.abort(400)
+    return flask.render_template("sudo.html", username=flask.session["username"])
+
 
 def populate_tutorials():
     """
