@@ -20,9 +20,15 @@ def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[...,
     @functools.wraps(view_func)
     def protected_view_func(*args, **kwargs):
         if p.LOGGED_IN_KEY not in flask.session or not flask.session[p.LOGGED_IN_KEY]:
-            return flask.redirect("/signinup")
+            return flask.render_template("index.html", error_message="Please log in to view this page")
         return view_func(*args, **kwargs)
     return protected_view_func
+
+def is_logged_in():
+    """
+    Returns True if the user is currently logged in.
+    """
+    return p.LOGGED_IN_KEY in flask.session and flask.session[p.LOGGED_IN_KEY]
 
 
 def is_correct_password(username:str, password:str) -> bool:
