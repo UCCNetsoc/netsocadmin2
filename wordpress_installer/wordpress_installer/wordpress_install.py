@@ -39,7 +39,7 @@ def create_wordpress_database(username):
 	db_user = 'wp_' + username
 
 	if len(username) > 16:
-		db_user = db_user[:15]
+		db_user = db_user[:13]
 		logger.debug("Username too long, shortened to %s" % (db_user))
 
 

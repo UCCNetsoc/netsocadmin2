@@ -3,11 +3,22 @@
     {{ super() }}
 
     <style>
+	    	nav {
+			background-color: rgba(0,0,0,0);	
+	    	}	
+		
 		.card-panel {
 			min-height: 470px;
 		}
+
 		.container {
-			padding: 5% 15%;
+			padding: 5% 0%;
+		}
+		
+		@media only screen and (min-width: 601px) {
+			.container {
+				padding: 5% 15%;
+			}
 		}
 	</style>
 {% endblock %}

@@ -3,43 +3,87 @@ This file takes care of sending off the data from the help section to multiple a
 currently Discord and email of SysAdmins and the main Netsoc email
 '''
 import json
+from email.message import EmailMessage
 import passwords as p
 import requests
-from sendgrid import Email, sendgrid
-from sendgrid.helpers.mail import Content, Mail
-import string
-import typing
+import smtplib
 
 
 DISCORD_BOT_HELP_ADDRESS = p.DISCORD_BOT_HELP_ADDRESS
-SYSADMIN_EMAILS = p.SYSADMIN_EMAILS
 
 
-def send_help_email(username:str, email:str, subject_in:str, message:str) -> bool:
+
+def send_help_email(username:str, user_email:str, subject:str, message:str) -> bool:
     """
-    Sends an email containing the help data to the various emails of SysAdmins etc
-    Will add more emails soon:tm:
+    Sends an email to the netsoc email address containing the help data, 
+    CC'ing all the SysAdmins and the user requesting help.
+    This enables us to reply to the email directly instead of copypasting the
+    from address and disconnecting history.
+
+    :param username the user requesting help
+    :param user_email the user's email address
+    :param subject the subject of the user's help requests
+    :param message the user's actual message
     """
     message_body = \
     """
 From: %s\n
 Email: %s
 
-%s"""%(username, email, message)
+%s
 
-    sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
-    from_email = Email("netsocadmin@netsoc.co")
-    subject = "[Netsoc Help] "+subject_in
-    content = Content("text/plain", message_body)
+PS: Please "Reply All" to the emails so that you get a quicker response."""%(
+        username, user_email, message)
+    
+    msg = EmailMessage()
+    msg.set_content(message_body)
+    msg["From"] = p.NETSOC_ADMIN_EMAIL_ADDRESS
+    msg["To"] = p.NETSOC_EMAIL_ADDRESS
+    msg["Subject"] = "[Netsoc Help] " + subject
+    msg["Cc"] = tuple(p.SYSADMIN_EMAILS + [user_email])
+    try:
+        with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
+            s.login(p.SENDGRID_USERNAME, p.SENDGRID_PASSWORD)
+            s.send_message(msg)
+    except:
+        return False
+    return True
 
-    success = False
-    for addr in SYSADMIN_EMAILS:
-        to_email = Email(addr)
-        mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
-        success = success or str(response.status_code).startswith("20")
-    return success
+def send_sudo_request_email(username:str, user_email:str):
+    """
+    Sends an email notifying SysAdmins that a user has requested an account on feynman.
 
+    :param username the server username of the user who made the request.
+    :param user_email the email address of that user to contact them for vetting.
+    """
+    message_body = \
+    """
+Hi {username},
+
+Thank you for making a request for an account with sudo privileges on feynman.netsoc.co.
+
+We will be in touch shortly. 
+
+Best,
+
+The UCC Netsoc SysAdmin Team.
+
+PS: Please "Reply All" to the emails so that you get a quicker response.
+
+""".format(username=username)
+    
+    msg = EmailMessage()
+    msg.set_content(message_body)
+    msg["From"] = p.NETSOC_ADMIN_EMAIL_ADDRESS
+    msg["To"] = p.NETSOC_EMAIL_ADDRESS
+    msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
+        user=username)
+    msg["Cc"] = tuple(p.SYSADMIN_EMAILS + [user_email])
+    
+    with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
+        s.login(p.SENDGRID_USERNAME, p.SENDGRID_PASSWORD)
+        s.send_message(msg)
+    
 
 def send_help_bot(username:str, email:str, subject:str, message:str) -> bool:
     """

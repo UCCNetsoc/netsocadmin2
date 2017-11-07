@@ -6,8 +6,22 @@
 	<script type="text/javascript" src="static/javascript/databaseTools.js"></script>
 	<link rel="stylesheet" href="static/css/wordpress.css"></link>
 	<style>
-		li a.logout-button {
-			display: inline-block;
+		.teal-line {
+		  display: block;
+		  height: 1px;
+		  border: 0;
+		  border-top: 1px solid #009688;
+		  margin: 1em 0;
+		  padding: 0;
+		}
+		.teal-title {
+			background: #4db6ac;
+			width: 100%;
+			display: block;
+			padding: 0.1em;
+			color: white;
+			border: 1px solid #44a299;
+			text-align: center;
 		}
 	</style>
 {% endblock %}
@@ -19,6 +33,9 @@
 	<div class="col s12">
 		<ul class="tabs z-depth-1">
 			<div class="indicator teal lighten-2" style="z-index:1">{# this changes the tab colors #}</div>
+			<li class="tab">
+				<a class="{% if home_active %} active {% endif %}teal-text lighten-2" href="#home">Home</a>
+			</li>
 			<li class="tab">
 				<a class="{% if mysql_active %} active {% endif %}teal-text lighten-2" href="#mysql">MySQL</a>
 			</li>
@@ -34,11 +51,38 @@
 		</ul>
 	</div>
 
+	{# This tab is for the landing page section of the site which displays services offered #}
+	<div id="home" class="col s12">
+		<div class='card z-depth-3' style='width: 60%;margin-left:auto;margin-right:auto;margin-top:2%;'>
+			<div id="home" class="card-content">
+				<span class="card-title teal-title">What We Offer</span>
+				<hr class="teal-line" />
+				<span class="card-title">Free server space</span>
+				<p>You can create a free account on one of our servers. What you do with it is all up to you!</p><br />
+				<p>Please do read the <code>ACCEPTABLE_USAGE_POLICY</code> file in your home directory. If you are found to be in violation of this, we will stop whatever you are doing and possibly remove your account.</p>
+				<hr class="teal-line" />
+				<span class="card-title">Free web hosting</span>
+				<p>Your <code>public_html</code> folder in you home-directory will be the root of you website. This website can be found at <code>"http://&lt;yourusername&gt;.netsoc.co"</code>.</p><br />
+				<p>Please contact us if you wish to have your own domain name point to this site instead. </p>
+				<hr class="teal-line" />
+				<span class="card-title">MySQL Databases</span>
+				<p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p><br />
+				<p>Your MySQL databases can be found at <code>mysql.netsoc.co</code>. Your MySQL username will be your server username. To create new databases, remove databases or reset your MySQL password, please see the MYSQL tab in your admin tools.</p><br />
+				<p>Please note, the name of your database will be prefixed with your username and an underscore. So if your username is <code>john</code>, your database names will be of the form "john_&lt;rest of name here&gt;".</p>
+				<hr class="teal-line" />
+				<span class="card-title">Home Directory Backups</span>
+				<p>We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. </p><br />
+				<p>If you need to recover a backup, see the <code>BACKUPS</code> tab in your admin tools.</p>
+				<hr class="teal-line" />
+			</div>
+		</div>
+	</div>
+
 	{# This stuff is the MySQL tab #}
 	<div id="mysql" class="col s12">
 		<div class="card z-depth-3" style="min-height: 400px;width:60%;margin-left:auto;margin-right:auto;margin-top:2%;padding-bottom: 3%;">
 			<div class="card-content">
-				<span class="card-title">MySQL Databases</span>
+				<span class="card-title teal-title">MySQL Databases</span>
 				{% if databases|length > 0 %}
 					<ul class="collection">
 						{% for db in databases %}
@@ -53,6 +97,7 @@
 						{% endfor %}
 					</ul>
 				{% else %}
+					<br />
 					<p> No Databases to show &nbsp;&nbsp; O_o </p><br>
 				{% endif %}
 
@@ -71,7 +116,7 @@
 			is a bit of a hack #}
 			<div class="card-reveal" style="overflow: hidden;">
 				<div id="database-change-form">
-					<span class="card-title" onclick="databaseForm('')">
+					<span class="card-title teal-title" onclick="databaseForm('')">
 						<span id="database-form-title">New Database:</span>
 						<i class="material-icons right">close</i>
 					</span>
@@ -95,7 +140,7 @@
 					</form>
 				</div>
 				<div id="password-reset-form" style="display: none;">
-					<span class="card-title" onclick="passwordReset(true)">
+					<span class="card-title teal-title" onclick="passwordReset(true)">
 						<span>Reset MySQL Password:</span>
 						<i class="material-icons right">close</i>
 					</span>
@@ -122,7 +167,7 @@
 	<div id="backups" class="col s12">
 		<div class="card z-depth-3" style="min-height: 400px;width:60%;margin-left:auto;margin-right:auto;margin-top:2%;padding-bottom: 3%;">
 			<div class="card-content">
-				<span class="card-title">Home Directory Backups</span>
+				<span class="card-title teal-title">Home Directory Backups</span>
 
 				{# Tab headers #}
 				<div class="col s12">
@@ -149,6 +194,7 @@
 							{% endfor %}
 						</ul>
 					{% else %}
+						<br />
 						<p> No backups were found. If you have had your account for over a week, please contact us.</p><br>
 					{% endif %}
 				</div>
@@ -169,6 +215,7 @@
 							{% endfor %}
 						</ul>
 					{% else %}
+						<br />
 						<p> No backups were found. If you have had your account for over a month, please contact us.</p><br>
 					{% endif %}
 				</div>
@@ -180,14 +227,14 @@
 	<div id="wordpress" class="col s12">
 		<div class="card z-depth-3" id="wordpress-install-container">
 			<div class="card-content">
-				<span class="card-title">Manage Your WordPress Site</span>
-				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/> 
+				<span class="card-title teal-title">Manage Your WordPress Site</span>
+				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/>
 
 				{% if WORDPRESS_EXISTS %}
 
 				<p id="wordpress-link">WordPress is installed.
-					<b>Visit your WordPress site 
-					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
+					<b>Visit your WordPress site
+					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a></b>
 				</p>
 
 				{% else %}
@@ -200,8 +247,8 @@
 				</button>
 
 				<p id="wordpress-setup-link">WordPress is installed.
-					<b>Visit your WordPress site 
-					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a><b>
+					<b>Visit your WordPress site
+					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a></b>
 				</p>
 
 				<div class="progress" id="wordpress-progress">
@@ -210,15 +257,15 @@
 
 				{% endif %}
 			</div>
-		</div>	
+		</div>
 	</div>
 
 	{# This tab is for the help section that will relay the message to SysAdmins #}
 	<div id="help" class="col s12">
 		<div class='card z-depth-3' style='width: 60%;margin-left:auto;margin-right:auto;margin-top:2%;'>
 			<div id="help" class="card-content">
-				<span class="card-title">Got an issue? Need help?</span>
-
+				<span class="card-title teal-title">Got an issue? Need help?</span>
+				<br />
 				{% if help_error %}
 					<p class='red-text'>{{ help_error }}</p>
 				{% endif %}
@@ -226,7 +273,7 @@
 				{% if help_success %}
 					<p class='teal-text'>Help is on the way!</p>
 				{% else %}
-					<p class='flow-text'>Fill in the form below and one of the awesome Netsoc SysAdmins will get back to you ASAP!</p>
+					<p>Fill in the form below and one of the awesome Netsoc SysAdmins will get back to you ASAP!</p>
 				{% endif %}
 				<form action='/help' method='post'>
 					<div class='input-field row'>

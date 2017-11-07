@@ -47,9 +47,17 @@
 		body {
 			background-color: #eee;
 		}
+
+		{% if show_logout_button %}
+		li a.logout-button {
+			display: inline-block;
+		}
+		{% else %}
 		li a.logout-button {
 			display: none;
 		}
+		{% endif %}
+
 		.error-msg {
 			color: red;
 		}
@@ -70,10 +78,13 @@
 						<a href="https://netsoc.co/">Netsoc Home</a>
 					</li>
 					<li>
+						<a href="/sudo">Get Sudo</a>
+					</li>
+					<li>
 						<a href="/tutorials">Tutorials</a>
 					</li>
 					<li>
-						<a href="/">Admin Tools</a>
+						<a href="/tools">Admin Tools</a>
 					</li>
 					<li>
 						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
@@ -86,10 +97,13 @@
 						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
 					<li>
-						<a href="/">Admin Tools</a>
+						<a href="/tools">Admin Tools</a>
 					</li>
 					<li>
 						<a href="/tutorials">Tutorials</a>
+					</li>
+					<li>
+						<a href="/sudo">Get Sudo</a>
 					</li>
 					<li>
 						<a href="https://netsoc.co/">Netsoc Home</a>
