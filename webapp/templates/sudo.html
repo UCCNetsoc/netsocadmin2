@@ -1,11 +1,23 @@
 {% extends "page-skeleton.html" %}
 
+{% block head %}
+    {{ super() }}
+
+    <style>
+        .header-text {
+            font-size: 2em;
+            font-weight: 100;
+        }
+    </style>
+
+{% endblock %}
+
 {% block body %}
     {{ super() }}
     
     <main class="row container">
         <article class="card-panel col s12">
-            <h1 class="center-align"> Apply for <code> sudo</code> privileges on a netsoc server </h3>
+            <h1 class="header-text"> Apply for <code> sudo</code> privileges on a netsoc server </h3>
             
             <p>
                 We have decided to open up one of our servers to the public. "But wait, Netsoc already do that".
@@ -15,14 +27,14 @@
                 While we give free server space and web-hosting to all UCC students, we don't allow students to have <code> sudo</code> privileges on the server. If they did, they could break the whole server in an instant.
             </p>
             
-            <h2>Enter <code> feynman</code></h2>
+            <h2 class="header-text">Enter <code> feynman</code></h2>
             
             <p>
                 We are giving <code> sudo</code> priviliges to all those who wish it (and we deem responsible enough to have it).  
             </p>
 
             <ul class="collection with-header">
-                <li class="collection-header"> <h3>Things to remember:</h3> </li>
+                <li style="background-color: #f6f6f6;" class="collection-header"> <h3 class="header-text">Things to remember:</h3> </li>
                 <li class="collection-item">
                     Other people using the server have <code> sudo</code> as well. They might break stuff; you might break stuff.
                 </li>
