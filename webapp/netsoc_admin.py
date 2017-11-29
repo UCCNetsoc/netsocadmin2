@@ -573,6 +573,7 @@ def completesudoapplication():
         return flask.abort(400)
 
     email = flask.request.form["email"]
+    reason = flask.request.form["reason"]
     username = flask.session['username']
 
     email_failed, discord_failed = False, False
@@ -586,7 +587,7 @@ def completesudoapplication():
         h.send_help_bot(username,
                         email,
                         "Feynman Account Request",
-                        "This user wants an account on feynman pls.")
+                        "This user wants an account on feynman pls.\nReason: "+reason)
     except Exception as e:
         discord_failed = True
         app.logger.error("Failed to send message to discord bot: %s", str(e))
