@@ -13,7 +13,7 @@ import passwords as p
 import re
 import sys
 import register_tools as r
-#from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
+from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
 import help_post as h
 
 HOST = "127.0.0.1"
@@ -277,10 +277,10 @@ def tools():
     return flask.render_template("tools.html",
             show_logout_button=l.is_logged_in(),
             databases=m.list_dbs(flask.session["username"]),
-            #WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
-            #WORDPRESS_LINK=wordpress_link,
-            #weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-            #monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+            WORDPRESS_LINK=wordpress_link,
+            weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
             username=flask.session["username"])
 
 
