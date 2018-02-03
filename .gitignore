@@ -15,3 +15,6 @@ __pycache__/
 
 # PyCharm
 .idea/
+
+# wordpress installer config
+wordpress_installer_config.py
