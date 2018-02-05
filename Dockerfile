@@ -1,9 +1,6 @@
 FROM python:latest
 MAINTAINER "broderickciaran@gmail.com"
 
-ARG mode="notdebug"
-
-
 COPY . /netsocadmin
 
 # install all python requirements
@@ -28,6 +25,4 @@ WORKDIR /netsocadmin/webapp
 
 # not actually used, just for documentaion
 EXPOSE 5050
-
-ENV runtimemode $mode
-ENTRYPOINT python3 /netsocadmin/webapp/netsoc_admin.py $runtimemode
+ENTRYPOINT ["python3", "/netsocadmin/webapp/netsoc_admin.py"]

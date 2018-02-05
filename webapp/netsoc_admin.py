@@ -618,6 +618,9 @@ def populate_tutorials():
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
+
+    if os.getenv("NETSOCADMINDEBUG"):
+        DEBUG = True        
         
     populate_tutorials()
 
