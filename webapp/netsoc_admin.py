@@ -444,7 +444,7 @@ def wordpressinstall():
     """
     username = flask.session["username"]
     home_dir = "/home/users/" + username
-    get_wordpress(home_dir, username)
+    get_wordpress(home_dir, username, DEBUG)
     return username, 200
 
 
@@ -618,10 +618,7 @@ def populate_tutorials():
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
-        user = os.getenv("USER")
-        b.BACKUPS_DIR = "./backups"
-        p.TUTORIAL_FOLDER = "./tutorials"
-
+        
     populate_tutorials()
 
     app.run(
