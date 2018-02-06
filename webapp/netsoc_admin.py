@@ -16,7 +16,7 @@ import register_tools as r
 from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
 import help_post as h
 
-HOST = "127.0.0.1"
+HOST = "0.0.0.0"
 PORT = "5050"
 DEBUG = False
 TUTORIALS = []
