@@ -33,7 +33,7 @@ class UserError(Exception):
 
 def _mysql_connection(username:str=p.SQL_USER, password:str=p.SQL_PASS) -> pymysql.connections.Connection:
     """
-    _db_connection is a helper method which supplies a connection
+    _mysql_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.SQL_USER.
 
     :returns pymysql.connections.Connection
