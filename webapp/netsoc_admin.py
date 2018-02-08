@@ -16,7 +16,7 @@ import register_tools as r
 from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
 import help_post as h
 
-HOST = "127.0.0.1"
+HOST = "0.0.0.0"
 PORT = "5050"
 DEBUG = False
 TUTORIALS = []
@@ -444,7 +444,7 @@ def wordpressinstall():
     """
     username = flask.session["username"]
     home_dir = "/home/users/" + username
-    get_wordpress(home_dir, username)
+    get_wordpress(home_dir, username, DEBUG)
     return username, 200
 
 
@@ -619,10 +619,10 @@ def populate_tutorials():
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == "debug":
         DEBUG = True
-        user = os.getenv("USER")
-        b.BACKUPS_DIR = "./backups"
-        p.TUTORIAL_FOLDER = "./tutorials"
 
+    if os.getenv("NETSOCADMINDEBUG"):
+        DEBUG = True        
+        
     populate_tutorials()
 
     app.run(

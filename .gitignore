@@ -15,3 +15,10 @@ __pycache__/
 
 # PyCharm
 .idea/
+
+# configuration files
+wordpress_installer_config.py
+admin_passwords.py
+
+# old backups of files
+/**/old.*

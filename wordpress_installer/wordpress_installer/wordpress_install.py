@@ -23,7 +23,7 @@ def _gen_random_password(size=10, chars=string.ascii_uppercase + string.digits):
 	return ''.join(random.choice(chars) for _ in range(size))
 
 
-def create_wordpress_database(username):
+def create_wordpress_database(username, is_debug_mode):
 	"""
 	Creates a wordpress user, and database.
 	Wordpress databases and users all start with wp_ (wordpress databases and users have the same name)
@@ -37,6 +37,9 @@ def create_wordpress_database(username):
 	cursor = database_connection.cursor(pymysql.cursors.DictCursor)
 
 	db_user = 'wp_' + username
+
+	if is_debug_mode:
+		db_user = db_user + "_test"
 
 	if len(username) > 16:
 		db_user = db_user[:13]
@@ -59,7 +62,9 @@ def create_wordpress_database(username):
 
 	password = _gen_random_password()
 
-	cursor.execute("""DROP DATABASE IF EXISTS {db_name}; CREATE DATABASE {db_name};""".format(db_name=db_user))
+	cursor.execute("""DROP DATABASE IF EXISTS {db_name};""".format(db_name=db_user))
+	cursor.execute("""CREATE DATABASE {db_name};""".format(db_name=db_user))
+	
 	database_connection.commit()
 	logger.debug("Created database")
 
@@ -111,7 +116,7 @@ def create_wordpress_conf(user_dir, db_conf):
 	with open(user_dir + "/public_html/wordpress/wp-config.php", "w") as fh:
 		fh.write(wordpress_config)
 
-def get_wordpress(user_dir, username):
+def get_wordpress(user_dir, username, is_debug_mode):
 	"""
 	Abstracted method for general wordpress installation. 
 	Installs wordpress to the public_html directory of a user, given the user's directory and username.
@@ -141,7 +146,7 @@ def get_wordpress(user_dir, username):
 
 	def configure(user_dir, username):
 		try:
-			new_db_conf = create_wordpress_database(username)
+			new_db_conf = create_wordpress_database(username, is_debug_mode)
 			create_wordpress_conf(user_dir, new_db_conf)
 			chown_dir_and_children(user_dir + "/public_html/wordpress", username)
 		except Exception as e:
