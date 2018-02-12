@@ -5,6 +5,7 @@ then be proxied to this address.
 """
 import backup_tools as b
 import flask
+import ldap3
 import login_tools as l
 import markdown
 import mysql_tools as m
@@ -20,6 +21,14 @@ HOST = "0.0.0.0"
 PORT = "5050"
 DEBUG = False
 TUTORIALS = []
+
+SHELL_PATHS = {
+    "bash": "/bin/bash",
+    "csh": "/bin/csh",
+    "fish": "/usr/bin/fish",
+    "ksh": "/usr/bin/ksh",
+    "zsh": "/usr/bin/zsh"
+}
 
 app = flask.Flask(__name__)
 app.secret_key = p.SECRET_KEY
@@ -269,7 +278,7 @@ def tools():
     app.logger.debug("tools(): received tools page request")
     if flask.request.method != "GET":
         app.logger.debug("tools(): bad request method")
-        return flask.redirect("/") 
+        return flask.redirect("/")
 
     # The wordpress variables are used by the WordPress card in the rendered HTML
     wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
@@ -281,7 +290,8 @@ def tools():
             WORDPRESS_LINK=wordpress_link,
             weekly_backups=b.list_backups(flask.session["username"], "weekly"),
             monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-            username=flask.session["username"])
+            username=flask.session["username"],
+            login_shells=[(k, k.capitalize()) for k in SHELL_PATHS])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -524,6 +534,96 @@ def backup(username:str, timeframe:str, backup_date:str):
 
     backups_base_dir = os.path.join(b.BACKUPS_DIR, username, timeframe)
     return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
+
+
+@app.route("/change-shell", methods=["POST", "GET"])
+@l.protected_page
+def change_shell():
+    """
+    Route: /change-shell
+        This route will change the user's shell in the LDAP server to the one
+        that they request from the dropdown
+    """
+    if flask.request.method != "POST":
+        return flask.redirect("/")
+
+    # Ensure the selected shell is in the list of allowed shells
+    shell_path = SHELL_PATHS.get(flask.request.form["shell"], None)
+
+    if shell_path is None:
+        # Return an error message
+        return flask.render_template(
+            "tools.html",
+            show_logout_button=l.is_logged_in(),
+            databases=m.list_dbs(flask.session["username"]),
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+            weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+            username=flask.session["username"],
+            login_shells=[(k, k.capitalize()) for k in SHELL_PATHS],
+            shells_active=True,
+            shells_error="Invalid shell selected")
+    # Attempt to update the LDAP DB for the logged in user and set their loginShell value to be the path
+    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
+    with ldap3.Connection(
+            ldap_server,
+            user=p.LDAP_USER,
+            password=p.LDAP_KEY,
+            auto_bind=True) as conn:
+        # Find the group for the user
+        username = flask.session["username"]
+        groups = ["admins", "committee", "member"]
+        found = False
+        for group in groups:
+            success = conn.search(
+                search_base=f"cn={group},dc=netsoc,dc=co",
+                search_filter=f"(&(uid={username}))"
+            )
+            if success:
+                found = True
+                break
+        if found:
+            # Now that we've found the group, we can modify the value
+
+            success = conn.modify(
+                dn=f"cn={username},cn={group},dc=netsoc,dc=co",
+                changes={'loginShell': [(ldap3.MODIFY_REPLACE, [shell_path])]}
+            )
+            if not success:
+                return flask.render_template(
+                    "tools.html",
+                    show_logout_button=l.is_logged_in(),
+                    databases=m.list_dbs(flask.session["username"]),
+                    WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                    username=flask.session["username"],
+                    login_shells=[(k, k.capitalize()) for k in SHELL_PATHS],
+                    shells_active=True,
+                    shells_error=conn.last_error)
+            else:
+                return flask.render_template(
+                    "tools.html",
+                    show_logout_button=l.is_logged_in(),
+                    databases=m.list_dbs(flask.session["username"]),
+                    WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                    username=flask.session["username"],
+                    login_shells=[(k, k.capitalize()) for k in SHELL_PATHS],
+                    shells_active=True,
+                    shells_success=True)
+        return flask.render_template(
+            "tools.html",
+            show_logout_button=l.is_logged_in(),
+            databases=m.list_dbs(flask.session["username"]),
+            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+            weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+            username=flask.session["username"],
+            login_shells=[(k, k.capitalize()) for k in SHELL_PATHS],
+            shells_active=True,
+            shells_error="User could not be found to modify")
 
 
 @app.route("/tutorials", methods=["POST", "GET"])
