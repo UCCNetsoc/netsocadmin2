@@ -22,3 +22,6 @@ admin_passwords.py
 
 # old backups of files
 /**/old.*
+
+# For those who work on mac
+.DS_Store
