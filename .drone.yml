@@ -1,0 +1,11 @@
+pipeline:
+  build_and_push:
+    image: plugins/docker
+    tag: latest
+    dockerfile: Dockerfile
+    repo: docker.netsoc.co/netsocadmin
+    registry: docker.netsoc.co
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: [push, tag]
+      branch: master

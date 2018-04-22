@@ -1,5 +1,5 @@
 FROM python:latest
-MAINTAINER "broderickciaran@gmail.com"
+MAINTAINER "netsoc@netsoc.co"
 
 COPY . /netsocadmin
 
@@ -7,8 +7,8 @@ COPY . /netsocadmin
 RUN pip3 install -r /netsocadmin/webapp/requirements.txt
 
 # move the configuration files to their relevant directories
-RUN mv /netsocadmin/wordpress_installer_config.py /netsocadmin/wordpress_installer/wordpress_installer/config.py
-RUN mv /netsocadmin/admin_passwords.py /netsocadmin/webapp/passwords.py
+RUN mv /netsocadmin/sample_wordpress_installer_config.py /netsocadmin/wordpress_installer/wordpress_installer/config.py
+RUN mv /netsocadmin/sample_admin_passwords.py /netsocadmin/webapp/passwords.py
 
 # install the wordpress installer package
 RUN pip3 install -e /netsocadmin/wordpress_installer
