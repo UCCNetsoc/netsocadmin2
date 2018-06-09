@@ -25,3 +25,7 @@ admin_passwords.py
 
 # For those who work on mac
 .DS_Store
+config.py
+logging_config.ini
+wordpress_installer.log
+
