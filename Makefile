@@ -1,6 +1,6 @@
 .PHONY: clean-pyc clean-build clean
-package_branch=$(shell echo -n ${CIRCLE_BRANCH} | tr -c '[:alnum:]-' '-')
-package_version=${CIRCLE_BUILD_NUM}+${package_branch}
+package_branch=$(shell echo -n ${DRONE_BRANCH} | tr -c '[:alnum:]-' '-')
+package_version=${DRONE_BUILD_NUMBER}+${package_branch}
 url_package_version=$(shell echo -n ${package_version} | sed "s/+/%2B/g")
 
 help:
@@ -53,10 +53,10 @@ release: clean
 
 
 dist: clean
-	python3.6 setup.py sdist bdist_wheel
+	python3.5 setup.py sdist bdist_wheel
 
 upload: clean
-	python3.6 setup.py sdist bdist_wheel upload -r local
+	python3.5 setup.py sdist bdist_wheel upload -r local
 
 install: clean
 	pip install .

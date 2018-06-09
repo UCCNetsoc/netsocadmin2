@@ -1,4 +1,0 @@
-Template: netsocadmin/install_location
-Type: string
-Default: /opt/venvs/netsocadmin
-Description: The install location for our package's virtualenv

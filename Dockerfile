@@ -23,6 +23,6 @@ RUN ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
 WORKDIR /netsocadmin/webapp
 
-# not actually used, just for documentaion
+# # not actually used, just for documentaion
 EXPOSE 5050
 ENTRYPOINT ["python3", "/netsocadmin/webapp/netsoc_admin.py"]
