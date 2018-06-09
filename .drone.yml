@@ -9,3 +9,15 @@ pipeline:
     when:
       event: [push, tag]
       branch: master
+  test_build:
+    image: hostedgraphite/pythonbuild:3
+    dockerfile: Dockerfile
+    environment:
+      ARTIFACTS: /tmp/artifacts
+    commands:
+      - mkdir -p $ARTIFACTS
+      - make install
+      - make test
+      - make release
+      - cp -r cover $ARTIFACTS
+      - cp ../*.deb $ARTIFACTS

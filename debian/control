@@ -1,0 +1,15 @@
+Source: netsocadmin
+Section: python
+Priority: optional
+Maintainer: UCC Netsoc <admin@netsoc.co>
+Build-Depends:
+    debhelper (>= 6.0.0),
+    python-support (>= 0.90),
+    dh-virtualenv (>= 0.6)
+Standards-Version: 3.9.5
+
+Package: netsocadmin
+Architecture: all
+Pre-Depends: dpkg (>= 1.16.1)
+Depends: ${python:Depends}, ${misc:Depends}
+Description: NetsocAdmin

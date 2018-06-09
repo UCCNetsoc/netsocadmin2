@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+#DH_VERBOSE=1
+
+EXTRA_REQUIREMENTS=--preinstall "setuptools>=34" --preinstall "pip>=9" --preinstall=no-manylinux1 --python "/usr/bin/python3.4"
+DH_VENV_ARGS=--with python-virtualenv --setuptools $(EXTRA_REQUIREMENTS)
+
+# Source debconf library.
+. /usr/share/debconf/confmodule
+
+# Fetching configuration from debconf
+db_get netsocadmin/install_location
+DH_VIRTUALENV_INSTALL_ROOT=$RET
+
+
+%:
+	dh $@ ${DH_VENV_ARGS}
+
+override_dh_virtualenv:
+	dh_virtualenv --setuptools ${EXTRA_REQUIREMENTS}
