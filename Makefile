@@ -46,9 +46,9 @@ coverage:
 
 release: clean
 
-	DEBEMAIL="Metricfire Package Maintainer <packaging@metricfire.com>" dch --newversion "${package_version}" \
-																		--distribution unstable \
-																			"Package for https://circleci.com/gh/metricfire/netsocadmin/${CIRCLE_BUILD_NUM}"
+	DEBEMAIL="UCC Netsoc <admin@netsoc.co>" dch --newversion "${package_version}" \
+		--distribution unstable \
+		"Netsoc Admin package"
 	dpkg-buildpackage -uc -us
 
 
