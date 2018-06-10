@@ -5,6 +5,8 @@ pipeline:
       - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
       - make install
       - make test
+    when:
+      event: push
 
   upload_packages:
     image: hostedgraphite/pythonbuild:xenial_python3
