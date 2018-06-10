@@ -52,10 +52,8 @@ release: clean
 		--distribution unstable \
 		"Netsoc Admin package"
 	dpkg-buildpackage -uc -us
-	cp ../*.deb ${ARTIFACTS}
-	cd ${ARTIFACTS}
-	sudo alien -t -c ${DEB_BASENAME}.deb
-
+	sudo alien -t -c ../${DEB_BASENAME}.deb
+	cp ../${DEB_BASENAME}* ${ARTIFACTS}
 
 dist: clean
 	python3.5 setup.py sdist bdist_wheel
