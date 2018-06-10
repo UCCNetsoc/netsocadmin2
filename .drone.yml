@@ -12,7 +12,6 @@ pipeline:
       - make release
       - cp -r cover $ARTIFACTS
       - cp ../*.deb $ARTIFACTS
-      - make upload
   build_and_push:
     image: plugins/docker
     tag: latest
