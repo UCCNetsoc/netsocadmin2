@@ -17,7 +17,6 @@ pipeline:
       - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
       - mkdir -p $ARTIFACTS
       - make install
-      - make test
       - make release
       - make upload
     when:
