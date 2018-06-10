@@ -60,6 +60,7 @@ install: clean
 
 upload: clean
 	pip install minio
+	ls -alt ./.ci
 	python3.5 ./.ci/object_store_upload.py \
 		--obj-store-location ${CI_OBJ_LOCATION} \
 		--project-name ${DRONE_REPO} \
