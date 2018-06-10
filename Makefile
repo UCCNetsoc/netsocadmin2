@@ -3,6 +3,7 @@ PACKAGE_NAME="netsocadmin"
 package_branch=$(shell echo -n ${DRONE_BRANCH} | tr -c '[:alnum:]-' '-')
 package_version=${DRONE_BUILD_NUMBER}+${package_branch}
 url_package_version=$(shell echo -n ${package_version} | sed "s/+/%2B/g")
+DEB_BASENAME="${PACKAGE_NAME}_${package_version}_all"
 
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
@@ -51,6 +52,9 @@ release: clean
 		--distribution unstable \
 		"Netsoc Admin package"
 	dpkg-buildpackage -uc -us
+	cp ../*.deb ${ARTIFACTS}
+	cd ${ARTIFACTS}
+	sudo alien -t -c "${DEB_BASENAME}.deb"
 
 
 dist: clean
@@ -66,4 +70,4 @@ upload: clean
 		--project-name ${PACKAGE_NAME} \
 		--access-key ${CI_OBJ_ACCESS_KEY} \
 		--secret-key ${CI_OBJ_SECRET_KEY} \
-		--file-location "${ARTIFACTS}/*.deb"
+		--file-location "${ARTIFACTS}/${DEB_BASENAME}*"
