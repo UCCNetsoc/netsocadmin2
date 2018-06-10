@@ -18,7 +18,8 @@ pipeline:
   github_release:
     image: plugins/github-release
     api_key: xxxxxxxx
-    files: dist/*
+    files: /drone/artifacts/*
+    draft: true
     when:
       event: tag
   build_and_push:
