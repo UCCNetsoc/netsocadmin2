@@ -54,7 +54,7 @@ release: clean
 	dpkg-buildpackage -uc -us
 	cp ../*.deb ${ARTIFACTS}
 	cd ${ARTIFACTS}
-	sudo alien -t -c "${DEB_BASENAME}.deb"
+	sudo alien -t -c ${DEB_BASENAME}.deb
 
 
 dist: clean
