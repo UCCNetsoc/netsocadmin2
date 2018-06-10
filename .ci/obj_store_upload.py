@@ -24,6 +24,7 @@ class Uploader(object):
             self.obj_store.make_bucket(self.project_name)
 
         for file in self.files:
+            print("Uploading {}".format(file))
             self.obj_store.fput_object(
                 bucket_name=self.project_name,
                 object_name=Path(file).name,

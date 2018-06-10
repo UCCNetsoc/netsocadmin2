@@ -6,12 +6,12 @@ pipeline:
     secrets: [ ci_obj_access_key, ci_obj_secret_key, ci_obj_location ]
     commands:
       - apt-get -qq install build-essential libssl-dev libffi-dev -y
-      - mkdir -p ARTIFACTS
+      - mkdir -p $ARTIFACTS
       - make install
       - make test
       - make release
-      - cp -r cover ARTIFACTS
-      - cp ../*.deb ARTIFACTS
+      - cp -r cover $ARTIFACTS
+      - cp ../*.deb $ARTIFACTS
       - make upload
   build_and_push:
     image: plugins/docker
