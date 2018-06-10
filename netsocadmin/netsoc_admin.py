@@ -7,17 +7,17 @@ import os
 import re
 import sys
 
-import backup_tools as b
+import netsocadmin.backup_tools as b
 import flask
-import help_post as h
+import netsocadmin.help_post as h
 import ldap3
-import login_tools as l
+import netsocadmin.login_tools as l
 import markdown
-import register_tools as r
-from wordpress_install import get_wordpress, wordpress_exists
+import netsocadmin.register_tools as r
+from netsocadmin.wordpress_install import get_wordpress, wordpress_exists
 
 import netsocadmin.cli.mysql as m
-from netsocadmin import config as p
+from netsocadmin import config
 
 HOST = "0.0.0.0"
 PORT = "5050"
@@ -33,10 +33,10 @@ SHELL_PATHS = {
 }
 
 app = flask.Flask(__name__)
-app.secret_key = p.SECRET_KEY
+app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10 # seconds
+app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
 
 @app.route('/')
@@ -53,7 +53,7 @@ def signinup():
     return flask.render_template("index.html")
 
 
-#------------------------------Server Signup Routes------------------------------#
+# ------------------------------Server Signup Routes------------------------------#
 
 
 @app.route("/sendconfirmation", methods=["POST", "GET"])
@@ -67,35 +67,36 @@ def sendconfirmation() -> str:
     """
     # if they got here through GET, something done fucked up
     if flask.request.method != "POST":
-        app.logger.debug("sendconfirmation(): method not POST: %s"%flask.request.method)
+        app.logger.debug("sendconfirmation(): method not POST: %s" % flask.request.method)
         return flask.redirect("/")
 
     # make sure is ucc email
     email = flask.request.form['email']
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
         app.logger.debug(
-            "sendconfirmation(): address %s is not a valid UCC email"%email)
+            "sendconfirmation(): address %s is not a valid UCC email" % email)
         return flask.render_template("index.html",
-            error_message="Must be a UCC Umail email address")
+                                     error_message="Must be a UCC Umail email address")
 
     # make sure email has not already been used to make an account
-    if email not in p.EMAIL_WHITELIST and r.has_account(email):
+    if email not in config.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
-        message = "There is an existing account with email '%s'. Please contact us if you think this is an error."%(email)
+        message = "There is an existing account with email '%s'. Please contact us if you think this is an error." % (
+        email)
         app.logger.debug(
-            "senconfirmation(): account already exists with email %s"%(email))
+            "senconfirmation(): account already exists with email %s" % (email))
         return flask.render_template("message.html", caption=caption, message=message)
 
     # send confirmation link to ensure they own the email account
-    out_email = "admin.netsoc.co" if not DEBUG else "%s:%s"%(HOST, PORT)
+    out_email = "admin.netsoc.co" if not DEBUG else "%s:%s" % (HOST, PORT)
     confirmation_sent = r.send_confirmation_email(email, out_email)
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
         return flask.render_template("index.html",
-            error_message="An error occured. Please try again or contact us")
+                                     error_message="An error occured. Please try again or contact us")
 
     caption = "Thank you!"
-    message = "Your confirmation link has been sent to %s"%(email)
+    message = "Your confirmation link has been sent to %s" % (email)
     return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -108,16 +109,16 @@ def signup() -> str:
     """
     # this check isn't vital but better safe than sorry
     if flask.request.method != "GET":
-        app.logger.debug("signup(): method was not GET: %s"%flask.request.method)
+        app.logger.debug("signup(): method was not GET: %s" % flask.request.method)
         return flask.redirect("/")
 
     # make sure they haven't forged the URI
     email = flask.request.args.get('e')
     uri = flask.request.args.get('t')
     if not r.good_token(email, uri):
-        app.logger.debug("signup(): bad token %s used for email %s"%(uri, email))
+        app.logger.debug("signup(): bad token %s used for email %s" % (uri, email))
         return flask.render_template("index.html",
-            error_message="Your request was not valid. Please try again or contact us")
+                                     error_message="Your request was not valid. Please try again or contact us")
 
     return flask.render_template("form.html", email_address=email, token=uri)
 
@@ -132,7 +133,7 @@ def completeregistration():
     """
     # if they haven't gotten here through POST something has gone wrong
     if flask.request.method != "POST":
-        app.logger.debug("completeregistration(): method was not POST: %s"%flask.request.method)
+        app.logger.debug("completeregistration(): method was not POST: %s" % flask.request.method)
         return flask.redirect("/")
 
     # make sure token is valid
@@ -140,9 +141,9 @@ def completeregistration():
     uri = flask.request.form["_token"]
     if not r.good_token(email, uri):
         app.logger.debug(
-            "completeregistration(): invalid token %s for email %s"%(uri, email))
+            "completeregistration(): invalid token %s for email %s" % (uri, email))
         return flask.render_template("index.html",
-            error_message="Your token has expired or never existed. Please try again or contact us")
+                                     error_message="Your token has expired or never existed. Please try again or contact us")
 
     # make sure form is flled out and username is still legit
     form_fields = (
@@ -156,25 +157,25 @@ def completeregistration():
     )
     if not all(form_fields):
         return flask.render_template("form.html",
-            email_address=email,
-            token=uri,
-            error_message="You must fill out all of the fields")
+                                     email_address=email,
+                                     token=uri,
+                                     error_message="You must fill out all of the fields")
 
     user = flask.request.form["uid"]
     if r.has_username(user):
         return flask.render_template("form.html",
-            email_address=email,
-            token=uri,
-            error_message="The requested username is not available")
+                                     email_address=email,
+                                     token=uri,
+                                     error_message="The requested username is not available")
 
     # add user to ldap db
     success, info = r.add_ldap_user(user)
     if not success:
-        app.logger.debug("completeregistration(): failed to add user to LDAP: %s"%(info))
+        app.logger.debug("completeregistration(): failed to add user to LDAP: %s" % (info))
         # clean db of token so they have to start again
         r.remove_token(email)
         return flask.render_template("index.html",
-            error_message="An error occured. Please try again or contact us")
+                                     error_message="An error occured. Please try again or contact us")
 
     # add all info to Netsoc MySQL DB
     info["name"] = flask.request.form["name"]
@@ -182,17 +183,17 @@ def completeregistration():
     info["course"] = flask.request.form["course"]
     info["grad_year"] = flask.request.form["graduation_year"]
     info["email"] = email
-    app.logger.debug("info: %s"%(info))
+    app.logger.debug("info: %s" % (info))
     if not r.add_netsoc_database(info):
         app.logger.debug("completeregistration(): failed to add data to mysql db")
         return flask.render_template("index.html",
-            error_message="An error occured. Please try again or contact us")
+                                     error_message="An error occured. Please try again or contact us")
 
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
         app.logger.debug("completeregistration(): failed to send confirmation email")
         return flask.render_template("index.html",
-            error_message="An error occured. Please try again or contact us")
+                                     error_message="An error occured. Please try again or contact us")
 
     # initialise the user's home directories so they can use netsoc admin
     # without ever having to SSH into the server.
@@ -214,9 +215,9 @@ def username():
         to test whether or not a username is already used.
     """
     if flask.request.method != "POST" or \
-            "email" not in flask.request.headers or \
-            "uid" not in flask.request.headers or \
-            "token" not in flask.request.headers:
+                    "email" not in flask.request.headers or \
+                    "uid" not in flask.request.headers or \
+                    "token" not in flask.request.headers:
         return flask.abort(400)
 
     # check if request is legit
@@ -228,12 +229,12 @@ def username():
     # check db for username
     requested_uername = flask.request.headers["uid"]
     if r.has_username(requested_uername):
-        app.logger.debug("username(): uid %s is in use"%(requested_uername))
+        app.logger.debug("username(): uid %s is in use" % (requested_uername))
         return "Not available"
     return "Available"
 
 
-#-------------------------------Login/Logout Routes-----------------------------#
+# -------------------------------Login/Logout Routes-----------------------------#
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -248,7 +249,7 @@ def login():
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
     r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
-    flask.session[p.LOGGED_IN_KEY] = True
+    flask.session[config.LOGGED_IN_KEY] = True
     flask.session["username"] = flask.request.form["username"]
     return flask.redirect("/")
 
@@ -261,11 +262,11 @@ def logout():
     """
     if flask.request.method != "GET":
         return flask.redirect("/")
-    flask.session.pop(p.LOGGED_IN_KEY, None)
+    flask.session.pop(config.LOGGED_IN_KEY, None)
     return flask.redirect("/")
 
 
-#-------------------------------Server Tools Routes-----------------------------#
+# -------------------------------Server Tools Routes-----------------------------#
 
 
 @app.route("/tools", methods=["POST", "GET"])
@@ -286,14 +287,14 @@ def tools():
     wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
 
     return flask.render_template("tools.html",
-            show_logout_button=l.is_logged_in(),
-            databases=m.list_dbs(flask.session["username"]),
-            WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
-            WORDPRESS_LINK=wordpress_link,
-            weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-            monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-            username=flask.session["username"],
-            login_shells=[(k, k.capitalize()) for k in SHELL_PATHS])
+                                 show_logout_button=l.is_logged_in(),
+                                 databases=m.list_dbs(flask.session["username"]),
+                                 WORDPRESS_EXISTS=wordpress_exists("/home/users/" + (flask.session["username"])),
+                                 WORDPRESS_LINK=wordpress_link,
+                                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                 monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                 username=flask.session["username"],
+                                 login_shells=[(k, k.capitalize()) for k in SHELL_PATHS])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -316,10 +317,10 @@ def createdb():
     # make sure each value is non-empty
     if not all([username, password, dbname]):
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                mysql_error="Please specify all fields",
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"))
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     mysql_error="Please specify all fields",
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"))
 
     # if password is correct, create the new database
     if l.is_correct_password(username, password):
@@ -327,17 +328,17 @@ def createdb():
             m.create_database(username, dbname, False)
         except m.DatabaseAccessError as e:
             return flask.render_template("tools.html",
-                    show_logout_button=l.is_logged_in(),
-                    databases=m.list_dbs(flask.session["username"]),
-                    mysql_error=e.__cause__,
-                    weekly_backups=b.list_backups(flask.session["username"], "weekly"))
+                                         show_logout_button=l.is_logged_in(),
+                                         databases=m.list_dbs(flask.session["username"]),
+                                         mysql_error=e.__cause__,
+                                         weekly_backups=b.list_backups(flask.session["username"], "weekly"))
     else:
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Wrong username or password")
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                     mysql_error="Wrong username or password")
     return flask.redirect("/")
 
 
@@ -361,11 +362,11 @@ def deletedb():
     # make sure each value is non-empty
     if not all([username, password, dbname]):
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),    
-                databases=m.list_dbs(flask.session["username"]),
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Please specify all fields")
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                     mysql_error="Please specify all fields")
 
     # if password is correct, do database removal
     if l.is_correct_password(username, password):
@@ -373,18 +374,18 @@ def deletedb():
             m.create_database(username, dbname, True)
         except m.DatabaseAccessError as e:
             return flask.render_template("tools.html",
-                    show_logout_button=l.is_logged_in(),
-                    databases=m.list_dbs(flask.session["username"]),
-                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    mysql_error=e.__cause__)
+                                         show_logout_button=l.is_logged_in(),
+                                         databases=m.list_dbs(flask.session["username"]),
+                                         weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                         monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                         mysql_error=e.__cause__)
     else:
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Wrong username or password")
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                     mysql_error="Wrong username or password")
     return flask.redirect("/")
 
 
@@ -407,12 +408,12 @@ def resetpw():
     # make sure each value is non-empty
     if not all([username, password]):
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Please specify all fields",
-                mysql_active=True)
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                     mysql_error="Please specify all fields",
+                                     mysql_active=True)
 
     # if password is correct, reset password
     if l.is_correct_password(username, password):
@@ -420,28 +421,28 @@ def resetpw():
             m.delete_user(username)
             new_password = m.create_user(username)
             return flask.render_template("tools.html",
-                    show_logout_button=l.is_logged_in(),
-                    databases=m.list_dbs(flask.session["username"]),
-                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    new_mysql_password=new_password,
-                    mysql_active=True)
+                                         show_logout_button=l.is_logged_in(),
+                                         databases=m.list_dbs(flask.session["username"]),
+                                         weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                         monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                         new_mysql_password=new_password,
+                                         mysql_active=True)
         except m.UserError as e:
             return flask.render_template("tools.html",
-                    show_logout_button=l.is_logged_in(),
-                    databases=m.list_dbs(flask.session["username"]),
-                    weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                    monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                    mysql_error=e.__cause__,
-                    mysql_active=True)
+                                         show_logout_button=l.is_logged_in(),
+                                         databases=m.list_dbs(flask.session["username"]),
+                                         weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                         monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                         mysql_error=e.__cause__,
+                                         mysql_active=True)
     else:
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),
-                mysql_error="Wrong username or password",
-                mysql_active=True)
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"),
+                                     mysql_error="Wrong username or password",
+                                     mysql_active=True)
     return flask.redirect("/")
 
 
@@ -474,12 +475,12 @@ def help():
     message = flask.request.form['message']
     if not all([email, subject, message]):
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                help_error="Please enter all fields",
-                help_active=True,
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     help_error="Please enter all fields",
+                                     help_active=True,
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"), )
 
     sent_email = h.send_help_email(flask.session['username'], email, subject, message)
 
@@ -493,26 +494,26 @@ def help():
         sent_discord = True
     if not sent_email or not sent_discord:
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
-                help_active=True,
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+                                     show_logout_button=l.is_logged_in(),
+                                     databases=m.list_dbs(flask.session["username"]),
+                                     help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
+                                     help_active=True,
+                                     weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                     monthly_backups=b.list_backups(flask.session["username"], "monthly"), )
 
     return flask.render_template("tools.html",
-            show_logout_button=l.is_logged_in(),
-                databases=m.list_dbs(flask.session["username"]),
-                help_success=True,
-                help_active=True,
-                weekly_backups=b.list_backups(flask.session["username"], "weekly"),
-                monthly_backups=b.list_backups(flask.session["username"], "monthly"),)
+                                 show_logout_button=l.is_logged_in(),
+                                 databases=m.list_dbs(flask.session["username"]),
+                                 help_success=True,
+                                 help_active=True,
+                                 weekly_backups=b.list_backups(flask.session["username"], "weekly"),
+                                 monthly_backups=b.list_backups(flask.session["username"], "monthly"), )
 
 
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
-        methods=["POST", "GET"])
+           methods=["POST", "GET"])
 @l.protected_page
-def backup(username:str, timeframe:str, backup_date:str):
+def backup(username: str, timeframe: str, backup_date: str):
     """
     Route: /backup/username/timeframe/backup_date
         This route returns the requested backup.
@@ -529,13 +530,13 @@ def backup(username:str, timeframe:str, backup_date:str):
     # make sure the arguments are valid
     if not re.match(r"^[a-z]+$", username) or \
             not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
-            timeframe not in ["weekly", "monthly"]:
-        app.logger.debug("backups(%s, %s, %s): invalid arguments"%(
-                username, timeframe, backup_date))
+                    timeframe not in ["weekly", "monthly"]:
+        app.logger.debug("backups(%s, %s, %s): invalid arguments" % (
+            username, timeframe, backup_date))
         return flask.abort(400)
 
     backups_base_dir = os.path.join(b.BACKUPS_DIR, username, timeframe)
-    return flask.send_from_directory(backups_base_dir, backup_date+".tgz")
+    return flask.send_from_directory(backups_base_dir, backup_date + ".tgz")
 
 
 @app.route("/change-shell", methods=["POST", "GET"])
@@ -566,11 +567,11 @@ def change_shell():
             shells_active=True,
             shells_error="Invalid shell selected")
     # Attempt to update the LDAP DB for the logged in user and set their loginShell value to be the path
-    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
+    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(
             ldap_server,
-            user=p.LDAP_USER,
-            password=p.LDAP_KEY,
+            user=config.LDAP_USER,
+            password=config.LDAP_KEY,
             auto_bind=True) as conn:
         # Find the group for the user
         username = flask.session["username"]
@@ -640,14 +641,15 @@ def tutorials():
         return flask.abort(400)
     if len(TUTORIALS) == 0:
         return flask.render_template("tutorials.html",
-                show_logout_button=l.is_logged_in(),
-                error="No tutorials to show")
+                                     show_logout_button=l.is_logged_in(),
+                                     error="No tutorials to show")
     if DEBUG:
         TUTORIALS = []
         populate_tutorials()
     return flask.render_template("tutorials.html",
-            show_logout_button=l.is_logged_in(),
-            tutorials=TUTORIALS)
+                                 show_logout_button=l.is_logged_in(),
+                                 tutorials=TUTORIALS)
+
 
 @app.route("/sudo", methods=["POST", "GET"])
 @l.protected_page
@@ -659,8 +661,9 @@ def sudo():
     if flask.request.method != "GET":
         return flask.abort(400)
     return flask.render_template("sudo.html",
-            show_logout_button=l.is_logged_in(),
-            username=flask.session["username"])
+                                 show_logout_button=l.is_logged_in(),
+                                 username=flask.session["username"])
+
 
 @app.route("/completesudoapplication", methods=["POST", "GET"])
 @l.protected_page
@@ -689,22 +692,21 @@ def completesudoapplication():
         h.send_help_bot(username,
                         email,
                         "Feynman Account Request",
-                        "This user wants an account on feynman pls.\nReason: "+reason)
+                        "This user wants an account on feynman pls.\nReason: " + reason)
     except Exception as e:
         discord_failed = True
         app.logger.error("Failed to send message to discord bot: %s", str(e))
-    
+
     if email_failed and discord_failed:
         return flask.render_template("tools.html",
-                show_logout_button=l.is_logged_in(),
-                caption="There was a problem :(",
-                message="Please email netsoc@uccsocieties.ie instead")
+                                     show_logout_button=l.is_logged_in(),
+                                     caption="There was a problem :(",
+                                     message="Please email netsoc@uccsocieties.ie instead")
 
     return flask.render_template("message.html",
-            show_logout_button=l.is_logged_in(),
-            caption="Success!",
-            message="A confirmation email has been sent to you. We will be in touch shortly.")
-
+                                 show_logout_button=l.is_logged_in(),
+                                 caption="Success!",
+                                 message="A confirmation email has been sent to you. We will be in touch shortly.")
 
 
 def populate_tutorials():
@@ -712,8 +714,8 @@ def populate_tutorials():
     Opens the tutorials folder and parses all of the markdown tutorials
     contained within.
     """
-    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(p.TUTORIAL_FOLDER)):
-        with open(os.path.join(p.TUTORIAL_FOLDER, tut_file)) as f:
+    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(config.TUTORIAL_FOLDER)):
+        with open(os.path.join(config.TUTORIAL_FOLDER, tut_file)) as f:
             tutorial = markdown.markdown(f.read())
             TUTORIALS.append(flask.Markup(tutorial))
 
@@ -723,12 +725,12 @@ if __name__ == '__main__':
         DEBUG = True
 
     if os.getenv("NETSOCADMINDEBUG"):
-        DEBUG = True        
-        
+        DEBUG = True
+
     populate_tutorials()
 
     app.run(
         host=HOST,
         port=int(PORT),
         threaded=True,
-        debug=DEBUG,)
+        debug=DEBUG, )

@@ -1,13 +1,12 @@
 # Python shit
 __pycache__/
-/**/*.pyc
-# to import passwords
-/netsocadmin/config.py
+
 # db files
 /**/*.db
 
 # logging from init conf file
 /*.log
+logs/wordpress_installer.log
 
 # other stuff
 /**/plan.txt
@@ -18,14 +17,13 @@ __pycache__/
 
 # configuration files
 netsocadmin/config.py
-admin_passwords.py
+netsocadmin/logging_config.ini
+
 
 # old backups of files
 /**/old.*
 
 # For those who work on mac
 .DS_Store
-netsocadmin/config.py
-netsocadmin/logging_config.ini
-logs/wordpress_installer.log
+
 
