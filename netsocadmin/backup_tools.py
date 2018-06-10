@@ -2,12 +2,12 @@
 This file contains funtions which are used to manage a user's backups.
 """
 import os
-import passwords as p
 import re
 import typing
 
+from netsocadmin import config
 
-BACKUPS_DIR = p.BACKUPS_DIR
+BACKUPS_DIR = config.BACKUPS_DIR
 
 
 def list_backups(username:str, timeframe:str) -> typing.List[str]:

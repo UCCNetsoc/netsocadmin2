@@ -2,13 +2,14 @@
 Contains functions which are used during the login and logout process.
 """
 import crypt
-import flask
 import functools
 import hmac
-import ldap3
-import passwords as p
-import pymysql
 import typing
+
+import flask
+import ldap3
+
+from netsocadmin import config as p
 
 
 def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[..., None]:

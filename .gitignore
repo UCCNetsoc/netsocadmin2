@@ -2,7 +2,7 @@
 __pycache__/
 /**/*.pyc
 # to import passwords
-/**/passwords.py
+/netsocadmin/config.py
 # db files
 /**/*.db
 
@@ -17,7 +17,7 @@ __pycache__/
 .idea/
 
 # configuration files
-wordpress_installer_config.py
+netsocadmin/config.py
 admin_passwords.py
 
 # old backups of files
@@ -25,7 +25,7 @@ admin_passwords.py
 
 # For those who work on mac
 .DS_Store
-config.py
-logging_config.ini
-wordpress_installer.log
+netsocadmin/config.py
+netsocadmin/logging_config.ini
+logs/wordpress_installer.log
 

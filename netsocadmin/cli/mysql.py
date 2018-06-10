@@ -1,13 +1,16 @@
 #!/usr/bin/python3
 import argparse
 import os
-import passwords as p
-import pymysql
 import pwd
 import random
 import re
 import string
 from typing import List
+
+import pymysql
+
+from netsocadmin import config as p
+
 
 class DatabaseAccessError(Exception):
     """

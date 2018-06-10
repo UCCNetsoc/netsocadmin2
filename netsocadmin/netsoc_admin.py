@@ -3,19 +3,21 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
+import os
+import re
+import sys
+
 import backup_tools as b
 import flask
+import help_post as h
 import ldap3
 import login_tools as l
 import markdown
-import netsocadmin.cli.mysql as m
-import os
-import passwords as p
-import re
-import sys
 import register_tools as r
-from wordpress_installer.wordpress_install import get_wordpress, wordpress_exists
-import help_post as h
+from wordpress_install import get_wordpress, wordpress_exists
+
+import netsocadmin.cli.mysql as m
+from netsocadmin import config as p
 
 HOST = "0.0.0.0"
 PORT = "5050"
