@@ -55,9 +55,6 @@ release: clean
 dist: clean
 	python3.5 setup.py sdist bdist_wheel
 
-upload: clean
-	python3.5 setup.py sdist bdist_wheel upload -r local
-
 install: clean
 	pip install .
 
