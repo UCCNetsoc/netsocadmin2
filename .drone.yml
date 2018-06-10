@@ -1,16 +1,26 @@
 pipeline:
-  test_build:
+  run_tests:
+    image: hostedgraphite/pythonbuild:xenial_python3
+    commands:
+      - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
+      - make install
+      - make test
+
+  make_release:
     image: hostedgraphite/pythonbuild:xenial_python3
     environment:
-      ARTIFACTS: /tmp/artifacts
+      ARTIFACTS: /drone/artifacts
     secrets: [ ci_obj_access_key, ci_obj_secret_key, ci_obj_location ]
     commands:
       - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
-      - mkdir -p $ARTIFACTS
-      - make install
-      - make test
       - make release
       - make upload
+  github_release:
+    image: plugins/github-release
+    api_key: xxxxxxxx
+    files: dist/*
+    when:
+      event: tag
   build_and_push:
     image: plugins/docker
     tag: latest
