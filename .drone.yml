@@ -11,6 +11,7 @@ pipeline:
       - make release
       - cp -r cover ARTIFACTS
       - cp ../*.deb ARTIFACTS
+      - ls -alt ./.ci
       - make upload
   build_and_push:
     image: plugins/docker
