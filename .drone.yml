@@ -27,7 +27,6 @@ pipeline:
       - source: git_token
         target: github_token
     files: /drone/artifacts/*
-    draft: true
     when:
       event: tag
   build_and_push:
