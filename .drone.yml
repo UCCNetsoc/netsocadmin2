@@ -18,7 +18,7 @@ pipeline:
       - make upload
   github_release:
     image: plugins/github-release
-    api_key: xxxxxxxx
+    secrets: [ github_token ]
     files: /drone/artifacts/*
     draft: true
     when:
