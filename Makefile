@@ -1,4 +1,5 @@
 .PHONY: clean-pyc clean-build clean
+PACKAGE_NAME="netsocadmin"
 package_branch=$(shell echo -n ${DRONE_BRANCH} | tr -c '[:alnum:]-' '-')
 package_version=${DRONE_BUILD_NUMBER}+${package_branch}
 url_package_version=$(shell echo -n ${package_version} | sed "s/+/%2B/g")
@@ -40,7 +41,7 @@ test:
 	tox
 
 coverage:
-	coverage run -m --source netsocadmin tests.test_netsocadmin
+	coverage run -m --source ${PACKAGE_NAME} tests.test_netsocadmin
 	coverage report -m
 	coverage html
 
@@ -62,7 +63,7 @@ upload: clean
 	pip install minio
 	python3.5 ./.ci/obj_store_upload.py \
 		--obj-store-location ${CI_OBJ_LOCATION} \
-		--project-name ${DRONE_REPO} \
+		--project-name ${PACKAGE_NAME} \
 		--access-key ${CI_OBJ_ACCESS_KEY} \
 		--secret-key ${CI_OBJ_SECRET_KEY} \
 		--file-location "${ARTIFACTS}/*.deb"
