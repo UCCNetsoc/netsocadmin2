@@ -13,6 +13,7 @@ pipeline:
     secrets: [ ci_obj_access_key, ci_obj_secret_key, ci_obj_location ]
     commands:
       - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
+      - mkdir -p $ARTIFACTS
       - make release
       - make upload
   github_release:
