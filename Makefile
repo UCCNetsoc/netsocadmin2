@@ -1,9 +1,9 @@
 .PHONY: clean-pyc clean-build clean
-PACKAGE_NAME="netsocadmin"
+PACKAGE_NAME=netsocadmin
 package_branch=$(shell echo -n ${DRONE_BRANCH} | tr -c '[:alnum:]-' '-')
 package_version=${DRONE_BUILD_NUMBER}+${package_branch}
 url_package_version=$(shell echo -n ${package_version} | sed "s/+/%2B/g")
-DEB_BASENAME="${PACKAGE_NAME}_${package_version}_all"
+DEB_BASENAME=${PACKAGE_NAME}_${package_version}_all
 
 help:
 	@echo "clean - remove all build, test, coverage and Python artifacts"
