@@ -3,6 +3,7 @@ pipeline:
     image: hostedgraphite/pythonbuild:xenial_python3
     environment:
       ARTIFACTS: /tmp/artifacts
+    secrets: [ ci_obj_access_key, ci_obj_secret_key, ci_obj_location ]
     commands:
       - apt-get -qq install build-essential libssl-dev libffi-dev -y
       - mkdir -p ARTIFACTS
