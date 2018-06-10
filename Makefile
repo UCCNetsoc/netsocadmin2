@@ -60,9 +60,4 @@ install: clean
 
 upload: clean
 	pip install minio
-	python3.5 ./.ci/obj_store_upload.py \
-		--obj-store-location ${CI_OBJ_LOCATION} \
-		--project-name ${DRONE_REPO} \
-		--access-key ${CI_OBJ_ACCESS_KEY} \
-		--secret-key ${CI_OBJ_SECRET_KEY} \
-		--file-location "${ARTIFACTS}/*.deb"
+	python3.5 ./.ci/obj_store_upload.py --obj-store-location ${CI_OBJ_LOCATION} --project-name ${DRONE_REPO} --access-key ${CI_OBJ_ACCESS_KEY} --secret-key ${CI_OBJ_SECRET_KEY} --file-location "${ARTIFACTS}/*.deb"
