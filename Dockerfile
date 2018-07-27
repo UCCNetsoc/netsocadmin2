@@ -1,5 +1,5 @@
 FROM python:alpine
-MAINTAINER "netsoc@netsoc.co"
+LABEL maintainer="netsoc@netsoc.co"
 
 COPY . /netsocadmin
 
