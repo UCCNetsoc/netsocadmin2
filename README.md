@@ -33,5 +33,12 @@ docker build -t netsocadmin .
 To run the docker image:
 
 ```bash
-docker run --net="host" -v /path/to/backups:/backups -v /path/to/home/dirs:/home/users netsocadmin:latest
+docker run \
+    -d -p 5050:5050 \
+    --name netsocadmin \
+    -v /path/to/backups:/backups \
+    -v /path/to/home/dirs:/home/users \
+    -v /path/to/admin_passwords.py:/netsocadmin/webapp/passwords.py \
+    -v /path/to/wordpress_installer_config.py:/netsocadmin/wordpress_installer/wordpress_installer/config.py \
+    docker.netsoc.co/netsocadmin:latest
 ```
