@@ -20,6 +20,8 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 ## Installation
 
+**NOTE** if this is for production, use Portainer. It provides a `Recreate` button that can automatically pull the latest image and make a new container with the same settings
+
 To build the docker image:
 
 1. Create a file called `wordpress_installer_config.py` following the same format as of that in `sample_wordpress_installer_config.py`. This file configures the wordpress_installer package. 
