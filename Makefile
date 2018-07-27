@@ -35,7 +35,6 @@ clean-test:
 	rm -f .coverage
 	rm -fr htmlcov/
 
-
 test:
 	tox
 
@@ -44,19 +43,11 @@ coverage:
 	coverage report -m
 	coverage html
 
-release: clean
-
-	DEBEMAIL="UCC Netsoc <admin@netsoc.co>" dch --newversion "${package_version}" \
-		--distribution unstable \
-		"Netsoc Admin package"
-	dpkg-buildpackage -uc -us
-
-
 dist: clean
-	python3.5 setup.py sdist bdist_wheel
+	python3.7 setup.py sdist bdist_wheel
 
 upload: clean
-	python3.5 setup.py sdist bdist_wheel upload -r local
+	python3.7 setup.py sdist bdist_wheel upload -r local
 
 install: clean
 	pip install .

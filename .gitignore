@@ -68,7 +68,7 @@ logs/wordpress_installer.log
 # configuration files
 netsocadmin/config.py
 netsocadmin/logging_config.ini
-
+passwords.py
 
 # old backups of files
 /**/old.*
@@ -76,4 +76,4 @@ netsocadmin/logging_config.ini
 # For those who work on mac
 .DS_Store
 
-
+.vscode
