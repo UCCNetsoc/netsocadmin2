@@ -1,17 +1,14 @@
 pipeline:
-  test_build:
+  run_tests:
     image: hostedgraphite/pythonbuild:xenial_python3
-    environment:
-      ARTIFACTS: /tmp/artifacts
     commands:
       - apt-get update
-      - apt-get install build-essential libssl-dev libffi-dev -y
-      - mkdir -p ARTIFACTS
+      - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
       - make install
       - make test
-      - make release
-      - cp -r cover ARTIFACTS
-      - cp ../*.deb ARTIFACTS
+    when:
+      event: push
+
   build_and_push:
     image: plugins/docker
     tag: latest

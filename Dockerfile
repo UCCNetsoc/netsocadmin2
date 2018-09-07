@@ -1,7 +1,11 @@
-FROM python:latest
-MAINTAINER "netsoc@netsoc.co"
+FROM python:alpine
+LABEL maintainer="netsoc@netsoc.co"
 
 COPY . /netsocadmin
+
+RUN apk update && apk upgrade
+
+RUN apk add --no-cache curl pkgconfig python3-dev openssl-dev libffi-dev musl-dev make gcc openssh
 
 # install all python requirements
 RUN pip3 install -r /netsocadmin/webapp/requirements.txt
