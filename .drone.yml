@@ -8,27 +8,6 @@ pipeline:
     when:
       event: push
 
-  upload_packages:
-    image: hostedgraphite/pythonbuild:xenial_python3
-    environment:
-      ARTIFACTS: /drone/artifacts
-    secrets: [ ci_obj_access_key, ci_obj_secret_key, ci_obj_location ]
-    commands:
-      - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
-      - mkdir -p $ARTIFACTS
-      - make install
-      - make release
-      - make upload
-    when:
-      event: tag
-  github_release:
-    image: plugins/github-release
-    secrets:
-      - source: git_token
-        target: github_token
-    files: /drone/artifacts/*
-    when:
-      event: tag
   build_and_push:
     image: plugins/docker
     tag: latest
