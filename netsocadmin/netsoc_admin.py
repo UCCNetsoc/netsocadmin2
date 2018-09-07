@@ -8,7 +8,7 @@ import flask
 import ldap3
 import login_tools as l
 import markdown
-import mysql_tools as m
+import netsocadmin.cli.mysql as m
 import os
 import passwords as p
 import re

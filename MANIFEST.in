@@ -1,0 +1,6 @@
+include README.md
+
+recursive-include tests *
+recursive-include netsocadmin *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

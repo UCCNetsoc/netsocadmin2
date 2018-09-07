@@ -43,4 +43,4 @@ docker run \
     -v /path/to/admin_passwords.py:/netsocadmin/webapp/passwords.py \
     -v /path/to/wordpress_installer_config.py:/netsocadmin/wordpress_installer/wordpress_installer/config.py \
     docker.netsoc.co/netsocadmin:latest
-```
+
