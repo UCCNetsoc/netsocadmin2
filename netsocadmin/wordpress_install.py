@@ -1,20 +1,74 @@
 from jinja2 import Environment, PackageLoader
 import requests
 import pymysql
-import random
-import string
+
+import config
 import logging
 from logging.config import fileConfig
 
-from wordpress_installer import config
-from wordpress_installer.file_download_operations import *
+import random
+import string
+from pathlib import Path
+import wget
+import subprocess
+import os
 
-"""
-This file contains all the functions for setting up wordpress and configuring it.
-"""
-
-fileConfig(config.package["logging_config"])
+fileConfig(config.wordpress_config["package"]["logging_config"])
 logger = logging.getLogger(__name__)
+
+"""
+This section contains all the functions that relate to file operations relating to a wordpress install.
+Most of the functions carry out methods similar to linux commands, or in some cases, actually carry out linux commands
+using the os library.
+Also contains the a random string generator helper function.
+"""
+
+
+def extract_from_tar(path_to_file, target_dir):
+    """
+    Extracts files from a tar compressed file, and places them into a target directory
+    """
+    logger.debug("extracting file %s from tar to %s" %
+                 (path_to_file, target_dir))
+    split_command = ["tar", "-xzf", path_to_file, "-C", target_dir]
+    completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
+
+
+def download_to(url, path_to_dir):
+    """
+    Downloads a file from a given to a target directory.
+    Returns the file name if the downloaded file.
+    """
+    logger.debug("downloading file from %s to %s" % (url, path_to_dir))
+    filename = wget.download(url, out=path_to_dir, bar=None)
+    return filename
+
+
+def delete_file(path_to_file):
+    """
+    Deletes a file from a given file path.
+    """
+    logger.debug("deleting %s" % path_to_file)
+    os.remove(path_to_file)
+
+
+def chown_dir_and_children(path_to_dir, username):
+    """
+    Changes the owner of a given directory, and its children to the given username;
+    Also changes the group of the given directory, and its children to 'member'.
+    """
+    logger.debug(
+        "changing owner and group of directory %s and children" % path_to_dir)
+    split_command = ["chown", "-R", username + ":member", path_to_dir]
+    completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
+
+
+def file_exists(path_to_file):
+    """
+    Checks to see if a file exists.
+    Returns true if the given file exists.
+    """
+    return Path(path_to_file).is_file()
 
 
 def _gen_random_password(size=10, chars=string.ascii_uppercase + string.digits):
@@ -22,6 +76,11 @@ def _gen_random_password(size=10, chars=string.ascii_uppercase + string.digits):
     Generates a random 10 character password for a database user.
     """
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+"""
+This section contains all the functions for setting up wordpress and configuring it.
+"""
 
 
 def create_wordpress_database(username, is_debug_mode):
@@ -81,7 +140,7 @@ def create_wordpress_database(username, is_debug_mode):
     logger.debug("Granting privileges to user")
 
     new_db_conf = {
-        "user" 			: db_user,
+        "user" 	: db_user,
         "password" 		: password,
         "db" 			: db_user,
         "host"			: config.db["host"]
@@ -100,7 +159,7 @@ def create_wordpress_conf(user_dir, db_conf):
     logger.debug("Generating wordpress configuration")
 
     env = Environment(loader=PackageLoader(
-        'wordpress_installer', '/resources/templates'))
+        'wordpress_installer', 'templates'))
     template = env.get_template('wp-config.php.j2')
 
     def get_wordpress_conf_keys():

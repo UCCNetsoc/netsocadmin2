@@ -37,7 +37,6 @@ clean-test:
 	rm -f .coverage
 	rm -fr htmlcov/
 
-
 test:
 	tox
 
@@ -56,7 +55,7 @@ release: clean
 	cp ../${DEB_BASENAME}* ${ARTIFACTS}
 
 dist: clean
-	python3.5 setup.py sdist bdist_wheel
+	python3.7 setup.py sdist bdist_wheel
 
 install: clean
 	pip install .

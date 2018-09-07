@@ -3,18 +3,21 @@ This file contains functions which are used during
 registration by the main netsoc admin file.
 """
 import crypt
-import db
 import hashlib
-import ldap3
-import paramiko
-import passwords as p
-import pymysql
 import random
-from sendgrid import Email, sendgrid
-from sendgrid.helpers.mail import Content, Mail
 import sqlite3
 import string
 import typing
+
+import db
+import ldap3
+import paramiko
+import pymysql
+from sendgrid import Email, sendgrid
+from sendgrid.helpers.mail import Content, Mail
+
+from netsocadmin import config as p
+
 
 def send_confirmation_email(email:str, server_url:str) -> bool:
     """

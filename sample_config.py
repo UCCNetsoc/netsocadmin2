@@ -57,3 +57,20 @@ SERVER_HOSTNAME = "leela.netsoc.co"
 
 # location of the markdown tutorials
 TUTORIAL_FOLDER = "/netsocadmin/webapp/tutorials"
+
+
+wordpress_config = {
+    "db": {
+        "user": "me",
+        "password": "password123",
+        "host": "mysql.mydomain.com",
+    },
+
+
+    # (Make this an absolute path)
+    "package": {
+        "logging_config":
+            "<location-of-netsocadmin>/netsocadmin/logging_config.ini"
+    }
+
+}

@@ -1,13 +1,62 @@
-# Python shit
-__pycache__/
-/**/*.pyc
-# to import passwords
-/**/passwords.py
+.DS_Store
+sftp-config.json
+
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+htmlcov
+
+# Translations
+*.mo
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+docs/_build
+
+# Bot data
+src/data
+*.log
+__pycache__
+config.py
+
+
 # db files
 /**/*.db
 
 # logging from init conf file
 /*.log
+logs/wordpress_installer.log
 
 # other stuff
 /**/plan.txt
@@ -17,16 +66,14 @@ __pycache__/
 .idea/
 
 # configuration files
-wordpress_installer_config.py
-admin_passwords.py
+netsocadmin/config.py
+netsocadmin/logging_config.ini
+passwords.py
 
 # old backups of files
 /**/old.*
 
 # For those who work on mac
 .DS_Store
-config.py
-logging_config.ini
-wordpress_installer.log
 
 .vscode
