@@ -17,7 +17,7 @@ class DatabaseAccessError(Exception):
     DatabaseAccessError should be raised when a DB related operation fails.
     """
     pass
-    
+
 
 class BadUsernameError(Exception):
     """
@@ -62,12 +62,12 @@ def list_dbs(user:str) -> List[str]:
         with con.cursor() as cur:
             sql = "SHOW DATABASES;"
             cur.execute(sql)
-            is_user_db = lambda dbname: dbname.startswith("%s_"%(user))
+            is_user_db = lambda dbname: dbname.startswith(f"{user}_")
             databases = list(
                 filter(is_user_db, map(
                     lambda row: row["Database"], cur.fetchall())))
     except Exception as e:
-        raise DatabaseAccessError("failed to list databases for user '%s'" % (user)) from e
+        raise DatabaseAccessError(f"failed to list databases for user '{user}'") from e
     finally:
         con.close()
     return databases
@@ -77,14 +77,14 @@ def create_user(username:str) -> str:
     """
     create_user adds a new user to the MySQL DBMS if and only if
     a user of that name does not already exist.
-    
+
     :param username the requested username to create.
     :raises UserError if the operation fails.
     :returns string the generated password for the new user
     """
     # make sure username is valid
     if not re.match(r"^[a-zA-Z0-9]+$", username):
-        raise BadUsernameError("invalid username '%s', must be lowercase letters only"%(username))
+        raise BadUsernameError(f"invalid username '{username}', must be lowercase letters only")
     try:
         con = _mysql_connection()
         with con.cursor() as cur:
@@ -92,8 +92,8 @@ def create_user(username:str) -> str:
             sql = "SELECT User FROM mysql.user WHERE User=%s;"
             cur.execute(sql, username)
             if cur.rowcount:
-                raise Exception("username %s already exists"%(username))
-            
+                raise Exception(f"username {username} already exists")
+
             # create new user
             chars = string.ascii_letters + string.digits
             password = "".join(
@@ -108,21 +108,21 @@ def create_user(username:str) -> str:
             # Note: the escaping must be done in two parts here becuase
             # PyMySQL will insert quotation marks around the %s which
             # makes the pattern `'username'_%`.
-            username_pattern = con.escape("%s"%(username)).strip("'")
+            username_pattern = con.escape(f"{username}").strip("'")
             database_pattern = username_pattern + "%%%%"
-            sql = """
+            sql = f"""
                 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
-                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
-                    ON `{pat}`.* TO %s@'localhost';""".format(pat=database_pattern)
+                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE
+                    ON `{database_pattern}`.* TO %s@'localhost';"""
             cur.execute(sql, username)
-            sql = """
+            sql = f"""
                 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
-                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE 
-                    ON `{pat}`.* TO %s@'%%';""".format(pat=database_pattern)
+                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE
+                    ON `{database_pattern}`.* TO %s@'%%';"""
             cur.execute(sql, username)
             return password
     except Exception as e:
-        raise UserError("failed to create the new user %s"%(username)) from e
+        raise UserError(f"failed to create the new user {username}") from e
     finally:
         con.close()
 
@@ -137,7 +137,7 @@ def delete_user(username:str):
     """
     # make sure username is valid
     if not re.match(r"[a-z]", username):
-        raise BadUsernameError("invalid username '%s', must be lowercase letters only"%(username))
+        raise BadUsernameError(f"invalid username '{username}', must be lowercase letters only")
     try:
         con = _mysql_connection()
         with con.cursor() as cur:
@@ -146,14 +146,14 @@ def delete_user(username:str):
             cur.execute(sql, username)
             if not cur.rowcount:
                 return
-            
+
             sql = """DROP USER %s@'localhost';"""
             cur.execute(sql, username)
             sql = """DROP USER %s@'%%';"""
             cur.execute(sql, username)
             con.commit()
     except Exception as e:
-        raise UserError("failed to delete username %s"%(username)) from e
+        raise UserError(f"failed to delete username {username}") from e
     finally:
         con.close()
 
@@ -163,12 +163,12 @@ def create_database(username:str, dbname:str, delete:bool=False) -> str:
     create_database creates a new database for the given user. If the delete
     argument is True, then it will delete the database specified. Note that
     for a given user-selected name, dbname, the actual database name will
-    be "username_dbname". 
+    be "username_dbname".
 
     :param username the username of the account which will have permissions
         on the new database.
     :param dbname the user-selected name for the database. See above for details.
-    :param delete when this argument is true then the database will be deleted 
+    :param delete when this argument is true then the database will be deleted
         instead of created.
     :returns the database name which can be used in actual queries to the database.
     :raises DatabaseAccessError if the operation fails
@@ -178,26 +178,26 @@ def create_database(username:str, dbname:str, delete:bool=False) -> str:
         with con.cursor() as cur:
             # make sure name is legit
             user_dbname = dbname
-            if not dbname.startswith("%s_"%(username)):
-                user_dbname = "%s_"%(username) + user_dbname
+            if not dbname.startswith(f"{username}_"):
+                user_dbname = f"{username}_{user_dbname}"
             if not re.match(r"[a-zA-Z0-9]+\_[a-zA-Z0-9]+", user_dbname):
                 raise Exception(
-                    "database %s is not valid, must use digits, lower or upper letters"%(user_dbname))
-            
+                    f"database {user_dbname} is not valid, must use digits, lower or upper letters")
+
             # make sure deleting or creating is a valid thing to do
             userdbs = list_dbs(username)
             if user_dbname in userdbs and not delete:
-                raise Exception("database name %s already exists"%(user_dbname))
+                raise Exception(f"database name {user_dbname} already exists")
             elif user_dbname not in userdbs and delete:
-                raise Exception("database name %s doesn't exist"%(user_dbname))
+                raise Exception(f"database name {user_dbname} doesn't exist")
 
             # execute the operation
             command = "CREATE" if not delete else "DROP"
-            sql ="{command} DATABASE `{name}`;".format(command=command, name=user_dbname)
+            sql =f"{command} DATABASE `{user_dbname}`;"
             cur.execute(sql)
             return user_dbname
     except Exception as e:
-        raise DatabaseAccessError("failed to create new database '%s'"%(dbname)) from e
+        raise DatabaseAccessError(f"failed to create new database '{username}'") from e
     finally:
         con.close()
 
@@ -228,7 +228,7 @@ def main():
         # username and an underscore.
         user = pwd.getpwuid(os.getuid()).pw_name
         dbname = create_database(user, args.createdb)
-        print("The database '%s' has been created"%(dbname))
+        print(f"The database '{dbname}' has been created")
         exit(0)
 
     if args.deletedb:
@@ -237,13 +237,13 @@ def main():
         # work correctly.
         user = pwd.getpwuid(os.getuid()).pw_name
         dbname = create_database(user, args.deletedb, delete=True)
-        print("The database '%s' has been deleted"%(dbname))
+        print(f"The database '{dbname}' has been deleted")
         exit(0)
 
     if args.listdb:
         # This lists all of the DBs owned by the currect user
         # Note: it is assumed that the current user's name is the same as
-        # their MySQL account username. It is also assumed that all 
+        # their MySQL account username. It is also assumed that all
         # databases pertaining to this user are prefixed with "<username>_".
         # e.g: for uid "roger", their MySQL username is "roger" all of their
         # databases match "roger_*".
@@ -266,8 +266,8 @@ def main():
         delete_user(user)
         new_password = create_user(user)
         print("Your new account details:")
-        print("Username: '%s'"%user)
-        print("Password: '%s'"%new_password)
+        print(f"Username: '{user}'")
+        print("Password: '{new_password}'")
         exit(0)
 
 
