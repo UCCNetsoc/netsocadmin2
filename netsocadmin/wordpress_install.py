@@ -182,7 +182,7 @@ def create_wordpress_conf(user_dir, db_conf):
 
 def get_wordpress(user_dir, username, is_debug_mode):
     """
-    Abstracted method for general wordpress installation. 
+    Abstracted method for general wordpress installation.
     Installs wordpress to the public_html directory of a user, given the user's directory and username.
     Compromises of two stages: download stage, and configurations stage.
     Download:
