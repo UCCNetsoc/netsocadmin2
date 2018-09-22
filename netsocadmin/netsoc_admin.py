@@ -19,9 +19,6 @@ from netsocadmin.wordpress_install import get_wordpress, wordpress_exists
 import netsocadmin.cli.mysql as m
 from netsocadmin import config
 
-HOST = "0.0.0.0"
-PORT = "5050"
-DEBUG = False
 TUTORIALS = []
 
 SHELL_PATHS = {
@@ -730,7 +727,6 @@ if __name__ == '__main__':
     populate_tutorials()
 
     app.run(
-        host=HOST,
-        port=int(PORT),
         threaded=True,
-        debug=DEBUG, )
+        **p.FLASK_CONFIG,
+    )
