@@ -21,14 +21,6 @@ from netsocadmin import config
 
 TUTORIALS = []
 
-SHELL_PATHS = {
-    "bash": "/bin/bash",
-    "csh": "/bin/csh",
-    "fish": "/usr/bin/fish",
-    "ksh": "/usr/bin/ksh",
-    "zsh": "/usr/bin/zsh"
-}
-
 app = flask.Flask(__name__)
 app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
@@ -72,16 +64,14 @@ def sendconfirmation() -> str:
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
         app.logger.debug(
             "sendconfirmation(): address %s is not a valid UCC email" % email)
-        return flask.render_template("index.html",
-                                     error_message="Must be a UCC Umail email address")
+        return flask.render_template("index.html", error_message="Must be a UCC Umail email address")
 
     # make sure email has not already been used to make an account
     if email not in config.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
         message = "There is an existing account with email '%s'. Please contact us if you think this is an error." % (
         email)
-        app.logger.debug(
-            "senconfirmation(): account already exists with email %s" % (email))
+        app.logger.debug("senconfirmation(): account already exists with email %s" % (email))
         return flask.render_template("message.html", caption=caption, message=message)
 
     # send confirmation link to ensure they own the email account
@@ -89,8 +79,7 @@ def sendconfirmation() -> str:
     confirmation_sent = r.send_confirmation_email(email, out_email)
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
-        return flask.render_template("index.html",
-                                     error_message="An error occured. Please try again or contact us")
+        return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
 
     caption = "Thank you!"
     message = "Your confirmation link has been sent to %s" % (email)
@@ -114,8 +103,7 @@ def signup() -> str:
     uri = flask.request.args.get('t')
     if not r.good_token(email, uri):
         app.logger.debug("signup(): bad token %s used for email %s" % (uri, email))
-        return flask.render_template("index.html",
-                                     error_message="Your request was not valid. Please try again or contact us")
+        return flask.render_template("index.html", error_message="Your request was not valid. Please try again or contact us")
 
     return flask.render_template("form.html", email_address=email, token=uri)
 
@@ -139,8 +127,7 @@ def completeregistration():
     if not r.good_token(email, uri):
         app.logger.debug(
             "completeregistration(): invalid token %s for email %s" % (uri, email))
-        return flask.render_template("index.html",
-                                     error_message="Your token has expired or never existed. Please try again or contact us")
+        return flask.render_template("index.html", error_message="Your token has expired or never existed. Please try again or contact us")
 
     # make sure form is flled out and username is still legit
     form_fields = (
@@ -171,8 +158,7 @@ def completeregistration():
         app.logger.debug("completeregistration(): failed to add user to LDAP: %s" % (info))
         # clean db of token so they have to start again
         r.remove_token(email)
-        return flask.render_template("index.html",
-                                     error_message="An error occured. Please try again or contact us")
+        return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
 
     # add all info to Netsoc MySQL DB
     info["name"] = flask.request.form["name"]
@@ -183,14 +169,12 @@ def completeregistration():
     app.logger.debug("info: %s" % (info))
     if not r.add_netsoc_database(info):
         app.logger.debug("completeregistration(): failed to add data to mysql db")
-        return flask.render_template("index.html",
-                                     error_message="An error occured. Please try again or contact us")
+        return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
 
     # send user's details to them
     if not r.send_details_email(email, user, info["password"]):
         app.logger.debug("completeregistration(): failed to send confirmation email")
-        return flask.render_template("index.html",
-                                     error_message="An error occured. Please try again or contact us")
+        return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
 
     # initialise the user's home directories so they can use netsoc admin
     # without ever having to SSH into the server.
@@ -291,7 +275,7 @@ def tools():
                                  weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                                  monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                                  username=flask.session["username"],
-                                 login_shells=[(k, k.capitalize()) for k in SHELL_PATHS])
+                                 login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
