@@ -278,7 +278,7 @@ def has_username(uid:str) -> bool:
     :param uid the uid being queried about
     :returns True if the uid exists, False otherwise
     """
-    if uid in config.BLACKLIST:
+    if uid in config.USERNAME_BLACKLIST:
         return True
     ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
