@@ -169,11 +169,7 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         "gid": 422,
         "home_dir": "/home/users/%s"%(user),
     }
-    with ldap3.Connection(
-                        ldap_server,
-                        user=p.LDAP_USER,
-                        password=p.LDAP_KEY,
-                        auto_bind=True) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
 
         # checks if username exists and also gets next uid number
         success = conn.search(
@@ -283,11 +279,7 @@ def has_username(uid:str) -> bool:
     if uid in p.BLACKLIST:
         return True
     ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
-    with ldap3.Connection(
-                        ldap_server,
-                        user=p.LDAP_USER,
-                        password=p.LDAP_KEY,
-                        auto_bind=True) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
 
         return conn.search(
                     search_base="dc=netsoc,dc=co",

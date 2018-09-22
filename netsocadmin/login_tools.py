@@ -38,11 +38,7 @@ def is_correct_password(username:str, password:str) -> bool:
     is the password has which is on file in the Netsoc MySQL database.
     """
     ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
-    with ldap3.Connection(
-                        ldap_server,
-                        user=p.LDAP_USER,
-                        password=p.LDAP_KEY,
-                        auto_bind=True) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
 
         success = conn.search(
                     search_base="dc=netsoc,dc=co",

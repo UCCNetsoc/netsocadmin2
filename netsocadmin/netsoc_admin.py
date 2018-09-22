@@ -622,5 +622,5 @@ if __name__ == '__main__':
 
     app.run(
         threaded=True,
-        **p.FLASK_CONFIG,
+        **config.FLASK_CONFIG,
     )
