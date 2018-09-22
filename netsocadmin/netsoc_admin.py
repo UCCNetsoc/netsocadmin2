@@ -19,18 +19,6 @@ from netsocadmin.wordpress_install import get_wordpress, wordpress_exists
 import netsocadmin.cli.mysql as m
 from netsocadmin import config
 
-HOST = "0.0.0.0"
-PORT = "5050"
-DEBUG = False
-TUTORIALS = []
-
-SHELL_PATHS = {
-    "bash": "/bin/bash",
-    "csh": "/bin/csh",
-    "fish": "/usr/bin/fish",
-    "ksh": "/usr/bin/ksh",
-    "zsh": "/usr/bin/zsh"
-}
 
 app = flask.Flask(__name__)
 app.secret_key = config.SECRET_KEY
@@ -294,7 +282,7 @@ def tools():
                                  weekly_backups=b.list_backups(flask.session["username"], "weekly"),
                                  monthly_backups=b.list_backups(flask.session["username"], "monthly"),
                                  username=flask.session["username"],
-                                 login_shells=[(k, k.capitalize()) for k in SHELL_PATHS])
+                                 login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS])
 
 
 @app.route("/createdb", methods=["POST", "GET"])
@@ -730,7 +718,7 @@ if __name__ == '__main__':
     populate_tutorials()
 
     app.run(
-        host=HOST,
-        port=int(PORT),
+        host=config.HOST,
+        port=int(config.PORT),
         threaded=True,
-        debug=DEBUG, )
+        debug=config.DEBUG)
