@@ -28,7 +28,6 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
-
 @app.route('/')
 def signinup():
     """
@@ -58,27 +57,25 @@ def sendconfirmation() -> str:
     # make sure is ucc email
     email = flask.request.form['email']
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
-        app.logger.debug(
-            "sendconfirmation(): address %s is not a valid UCC email" % email)
+        app.logger.debug(f"sendconfirmation(): address {email} is not a valid UCC email")
         return flask.render_template("index.html", error_message="Must be a UCC Umail email address")
 
     # make sure email has not already been used to make an account
     if email not in config.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
-        message = "There is an existing account with email '%s'. Please contact us if you think this is an error." % (
-        email)
-        app.logger.debug("senconfirmation(): account already exists with email %s" % (email))
+        message = f"There is an existing account with email '{email}'. Please contact us if you think this is an error."
+        app.logger.debug(f"senconfirmation(): account already exists with email {email}")
         return flask.render_template("message.html", caption=caption, message=message)
 
     # send confirmation link to ensure they own the email account
-    out_email = "admin.netsoc.co" if not DEBUG else "%s:%s" % (HOST, PORT)
+    out_email = "admin.netsoc.co" if not DEBUG else f"{config.FLASK_CONFIG['HOST']}:{config.FLASK_CONFIG['PORT']}"
     confirmation_sent = r.send_confirmation_email(email, out_email)
     if not confirmation_sent:
         app.logger.debug("sendconfirmation(): confirmation email failed to send")
         return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
 
     caption = "Thank you!"
-    message = "Your confirmation link has been sent to %s" % (email)
+    message = f"Your confirmation link has been sent to {email}"
     return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -93,7 +90,7 @@ def signup() -> str:
     email = flask.request.args.get('e')
     uri = flask.request.args.get('t')
     if not r.good_token(email, uri):
-        app.logger.debug("signup(): bad token %s used for email %s" % (uri, email))
+        app.logger.debug(f"signup(): bad token {uri} used for email {email}")
         return flask.render_template("index.html", error_message="Your request was not valid. Please try again or contact us")
 
     return flask.render_template("form.html", email_address=email, token=uri)
@@ -111,8 +108,7 @@ def completeregistration():
     email = flask.request.form["email"]
     uri = flask.request.form["_token"]
     if not r.good_token(email, uri):
-        app.logger.debug(
-            "completeregistration(): invalid token %s for email %s" % (uri, email))
+        app.logger.debug(f"completeregistration(): invalid token {uri} for email {email}")
         return flask.render_template("index.html", error_message="Your token has expired or never existed. Please try again or contact us")
 
     # make sure form is flled out and username is still legit
@@ -141,7 +137,7 @@ def completeregistration():
     # add user to ldap db
     success, info = r.add_ldap_user(user)
     if not success:
-        app.logger.debug("completeregistration(): failed to add user to LDAP: %s" % (info))
+        app.logger.debug(f"completeregistration(): failed to add user to LDAP: {info}")
         # clean db of token so they have to start again
         r.remove_token(email)
         return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
@@ -152,7 +148,7 @@ def completeregistration():
     info["course"] = flask.request.form["course"]
     info["grad_year"] = flask.request.form["graduation_year"]
     info["email"] = email
-    app.logger.debug("info: %s" % (info))
+    app.logger.debug(f"info: {info}")
     if not r.add_netsoc_database(info):
         app.logger.debug("completeregistration(): failed to add data to mysql db")
         return flask.render_template("index.html", error_message="An error occured. Please try again or contact us")
@@ -195,7 +191,7 @@ def username():
     # check db for username
     requested_username = flask.request.headers["uid"]
     if r.has_username(requested_username):
-        app.logger.debug("username(): uid %s is in use" % (requested_username))
+        app.logger.debug(f"username(): uid {requested_username} is in use")
         return "Not available"
     return "Available"
 
@@ -254,7 +250,7 @@ def createdb():
         database with the name in the request.form.
         This can only be reached if you are logged in.
     """
-    app.logger.debug("Form: %s", flask.request.form)
+    app.logger.debug(f"Form: {flask.request.form}")
     username = flask.request.form["username"]
     password = flask.request.form["password"]
     dbname = flask.request.form["dbname"]
@@ -292,7 +288,7 @@ def deletedb():
         contained in the request.form. This can only be reached if you are
         logged in.
     """
-    app.logger.debug("Form: %s", flask.request.form)
+    app.logger.debug(f"Form: {flask.request.form}")
     username = flask.request.form["username"]
     password = flask.request.form["password"]
     dbname = flask.request.form["dbname"]
@@ -329,7 +325,7 @@ def resetpw():
         MySQL account password.
         This can only be reached if you are logged in.
     """
-    app.logger.debug("Form: %s", flask.request.form)
+    app.logger.debug(f"Form: {flask.request.form}")
     username = flask.request.form["username"]
     password = flask.request.form["password"]
 
@@ -399,7 +395,7 @@ def help():
     try:
         sent_discord = h.send_help_bot(flask.session['username'], email, subject, message)
     except Exception as e:
-        app.logger.error("Failed to send message to discord bot: %s", str(e))
+        app.logger.error(f"Failed to send message to discord bot: {str(e)}")
         # in this case, the disocrd bot was unreachable. We log this error but
         # continue as success because the email is still sent. This fix will have
         # to remain until the Discord bot becomes more reliable.
@@ -435,8 +431,7 @@ def backup(username: str, timeframe: str, backup_date: str):
     if not re.match(r"^[a-z]+$", username) or \
             not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
                     timeframe not in ["weekly", "monthly"]:
-        app.logger.debug("backups(%s, %s, %s): invalid arguments" % (
-            username, timeframe, backup_date))
+        app.logger.debug(f"backups({username}, {timeframe}, {backup_date}): invalid arguments")
         return flask.abort(400)
 
     backups_base_dir = os.path.join(b.BACKUPS_DIR, username, timeframe)
@@ -550,7 +545,7 @@ def completesudoapplication():
         h.send_sudo_request_email(username, email)
     except Exception as e:
         email_failed = True
-        app.logger.error("Failed to send email: %s", str(e))
+        app.logger.error(f"Failed to send email: {str(e)}")
 
     try:
         h.send_help_bot(username,
@@ -559,7 +554,7 @@ def completesudoapplication():
                         "This user wants an account on feynman pls.\nReason: " + reason)
     except Exception as e:
         discord_failed = True
-        app.logger.error("Failed to send message to discord bot: %s", str(e))
+        app.logger.error(f"Failed to send message to discord bot: {str(e)}")
 
     if email_failed and discord_failed:
         return flask.render_template(
