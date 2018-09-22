@@ -8,7 +8,7 @@ from email.message import EmailMessage
 
 import requests
 
-from netsocadmin import config
+import config
 
 DISCORD_BOT_HELP_ADDRESS = config.DISCORD_BOT_HELP_ADDRESS
 
@@ -39,12 +39,13 @@ PS: Please "Reply All" to the emails so that you get a quicker response."""
     msg["To"] = config.NETSOC_EMAIL_ADDRESS
     msg["Subject"] = "[Netsoc Help] " + subject
     msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
-    try:
-        with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-            s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-            s.send_message(msg)
-    except:
-        return False
+    if not config.FLASK_CONFIG['DEBUG']:
+        try:
+            with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
+                s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
+                s.send_message(msg)
+        except:
+            return False
     return True
 
 
@@ -78,10 +79,10 @@ PS: Please "Reply All" to the emails so that you get a quicker response.
     msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
         user=username)
     msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
-
-    with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-        s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-        s.send_message(msg)
+    if not config.FLASK_CONFIG['DEBUG']:
+        with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
+            s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
+            s.send_message(msg)
 
 
 def send_help_bot(username: str, email: str, subject: str, message: str) -> bool:
@@ -92,5 +93,8 @@ def send_help_bot(username: str, email: str, subject: str, message: str) -> bool
     output = {"user": username, "email": email, "subject": subject, "message": message}
     headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(DISCORD_BOT_HELP_ADDRESS, data=json.dumps(output).encode(), headers=headers)
+    if not config.FLASK_CONFIG['DEBUG']:
+        response = requests.post(DISCORD_BOT_HELP_ADDRESS, data=json.dumps(output).encode(), headers=headers)
+    else:
+        response = type("Response", object, {"status_code": 200})
     return response.status_code == 200

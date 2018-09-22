@@ -6,7 +6,7 @@ print_db() in order to examine the contents of the DB.
 """
 import sqlite3
 
-from netsocadmin import config
+import config
 
 RESET = "DROP TABLE IF EXISTS uris"
 CREATE = "CREATE TABLE uris(email TEXT, uri INT)"
@@ -20,7 +20,7 @@ def print_db():
     """
     conn, c, uri = None, None, None
     try:
-        conn = sqlite3.connect(config.DBNAME)
+        conn = sqlite3.connect(config.TOKEN_DB_NAME)
         c = conn.cursor()
         c.execute("SELECT * FROM uris")
         row_pattern = "%64s | %-64s"
@@ -38,7 +38,7 @@ def reset_db() -> object:
     """
     Resets the database to being empty.
     """
-    conn = sqlite3.connect(config.DBNAME)
+    conn = sqlite3.connect(config.TOKEN_DB_NAME)
     c = conn.cursor()
     c.execute(RESET)
     c.execute(CREATE)

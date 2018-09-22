@@ -9,7 +9,7 @@ from typing import List
 
 import pymysql
 
-from netsocadmin import config
+import config
 
 
 class DatabaseAccessError(Exception):

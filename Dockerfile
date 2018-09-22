@@ -29,4 +29,4 @@ WORKDIR /netsocadmin/webapp
 
 # # not actually used, just for documentaion
 EXPOSE 5050
-ENTRYPOINT ["python3", "/netsocadmin/webapp/netsoc_admin.py"]
+ENTRYPOINT ["python3", "/netsocadmin/netsoc_admin.py"]

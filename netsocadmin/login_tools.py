@@ -9,7 +9,7 @@ import typing
 import flask
 import ldap3
 
-from netsocadmin import config
+import config
 
 
 def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[..., None]:

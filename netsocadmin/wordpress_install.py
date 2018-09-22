@@ -2,7 +2,7 @@ from jinja2 import Environment, PackageLoader
 import requests
 import pymysql
 
-from netsocadmin import config
+import config
 import logging
 from logging.config import fileConfig
 
@@ -13,7 +13,7 @@ import wget
 import subprocess
 import os
 
-fileConfig(config.wordpress_config["package"]["logging_config"])
+#fileConfig(config.WORDPRESS_CONFIG["package"]["logging_config"])
 logger = logging.getLogger(__name__)
 
 """

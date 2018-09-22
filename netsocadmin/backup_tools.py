@@ -5,7 +5,7 @@ import os
 import re
 import typing
 
-from netsocadmin import config
+import config
 
 
 def list_backups(username:str, timeframe:str) -> typing.List[str]:

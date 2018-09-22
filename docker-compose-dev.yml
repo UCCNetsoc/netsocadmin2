@@ -23,4 +23,4 @@ services:
       MYSQL_USER: netsoc
       MYSQL_PASSWORD: netsoc
       MYSQL_DATABASE: netsoc_admin
-      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'

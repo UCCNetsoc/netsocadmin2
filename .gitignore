@@ -48,7 +48,6 @@ docs/_build
 src/data
 *.log
 __pycache__
-config.py
 
 
 # db files
@@ -61,6 +60,7 @@ logs/wordpress_installer.log
 # other stuff
 /**/plan.txt
 /**/.mypy_cache
+.uri.db
 
 # PyCharm
 .idea/

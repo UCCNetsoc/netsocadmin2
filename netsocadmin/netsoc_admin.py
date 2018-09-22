@@ -10,13 +10,13 @@ import sys
 import flask
 import ldap3
 import markdown
-import netsocadmin.backup_tools as b
-import netsocadmin.cli.mysql as m
-import netsocadmin.help_post as h
-import netsocadmin.login_tools as l
-import netsocadmin.register_tools as r
-import netsocadmin.wordpress_install as w
-from netsocadmin import config
+import backup_tools as b
+import mysql as m
+import help_post as h
+import login_tools as l
+import register_tools as r
+import wordpress_install as w
+import config
 
 
 TUTORIALS = []
