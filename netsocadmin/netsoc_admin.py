@@ -64,7 +64,7 @@ def sendconfirmation() -> str:
     if email not in config.EMAIL_WHITELIST and r.has_account(email):
         caption = "Sorry!"
         message = f"There is an existing account with email '{email}'. Please contact us if you think this is an error."
-        app.logger.debug(f"senconfirmation(): account already exists with email {email}")
+        app.logger.debug(f"sendconfirmation(): account already exists with email {email}")
         return flask.render_template("message.html", caption=caption, message=message)
 
     # send confirmation link to ensure they own the email account
@@ -79,7 +79,7 @@ def sendconfirmation() -> str:
     return flask.render_template("message.html", caption=caption, message=message)
 
 
-@app.route("/signup", methods=["GET"])
+@app.route("/signup")
 def signup() -> str:
     """
     Route: signup
@@ -122,17 +122,21 @@ def completeregistration():
         flask.request.form["graduation_year"],
     )
     if not all(form_fields):
-        return flask.render_template("form.html",
-                                     email_address=email,
-                                     token=uri,
-                                     error_message="You must fill out all of the fields")
+        return flask.render_template(
+            "form.html",
+            email_address=email,
+            token=uri,
+            error_message="You must fill out all of the fields",
+        )
 
     user = flask.request.form["uid"]
     if r.has_username(user):
-        return flask.render_template("form.html",
-                                     email_address=email,
-                                     token=uri,
-                                     error_message="The requested username is not available")
+        return flask.render_template(
+            "form.html",
+            email_address=email,
+            token=uri,
+            error_message="The requested username is not available",
+        )
 
     # add user to ldap db
     success, info = r.add_ldap_user(user)
@@ -214,7 +218,7 @@ def login():
     return flask.redirect("/")
 
 
-@app.route("/logout", methods=["GET"])
+@app.route("/logout")
 def logout():
     """
     Route: logout
@@ -227,7 +231,7 @@ def logout():
 # -------------------------------Server Tools Routes-----------------------------#
 
 
-@app.route("/tools", methods=["GET"])
+@app.route("/tools")
 @l.protected_page
 def tools():
     """
@@ -275,7 +279,7 @@ def createdb():
             mysql_error=e.__cause__,
             mysql_active=True,
         )
-    # Why does it redirect? Shouldn't it display an error message?
+    # Why does it redirect? Shouldn't it display a message?
     return flask.redirect("/")
 
 
@@ -313,6 +317,7 @@ def deletedb():
             mysql_error=e.__cause__,
             mysql_active=True,
         )
+    # Why redirect when it can display a message?
     return flask.redirect("/")
 
 
@@ -357,7 +362,7 @@ def resetpw():
         )
 
 
-@app.route("/wordpressinstall", methods=["GET"])
+@app.route("/wordpressinstall")
 @l.protected_page
 def wordpressinstall():
     """
@@ -413,8 +418,7 @@ def help():
 
 
 
-@app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
-           methods=["GET"])
+@app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>")
 @l.protected_page
 def backup(username: str, timeframe: str, backup_date: str):
     """
@@ -466,7 +470,7 @@ def change_shell():
         for group in groups:
             success = conn.search(
                 search_base=f"cn={group},dc=netsoc,dc=co",
-                search_filter=f"(&(uid={username}))"
+                search_filter=f"(&(uid={username}))",
             )
             if success:
                 found = True
@@ -475,7 +479,7 @@ def change_shell():
             # Now that we've found the group, we can modify the value
             success = conn.modify(
                 dn=f"cn={username},cn={group},dc=netsoc,dc=co",
-                changes={'loginShell': [(ldap3.MODIFY_REPLACE, [shell_path])]}
+                changes={'loginShell': [(ldap3.MODIFY_REPLACE, [shell_path])]},
             )
             if not success:
                 return render_tools(
@@ -495,7 +499,7 @@ def change_shell():
         )
 
 
-@app.route("/tutorials", methods=["GET"])
+@app.route("/tutorials")
 def tutorials():
     """
     Route: /tutorials
@@ -504,18 +508,22 @@ def tutorials():
     """
     global TUTORIALS
     if len(TUTORIALS) == 0:
-        return flask.render_template("tutorials.html",
-                                     show_logout_button=l.is_logged_in(),
-                                     error="No tutorials to show")
+        return flask.render_template(
+            "tutorials.html",
+            show_logout_button=l.is_logged_in(),
+            error="No tutorials to show",
+        )
     if DEBUG:
         TUTORIALS = []
         populate_tutorials()
-    return flask.render_template("tutorials.html",
-                                 show_logout_button=l.is_logged_in(),
-                                 tutorials=TUTORIALS)
+    return flask.render_template(
+        "tutorials.html",
+        show_logout_button=l.is_logged_in(),
+        tutorials=TUTORIALS,
+    )
 
 
-@app.route("/sudo", methods=["GET"])
+@app.route("/sudo")
 @l.protected_page
 def sudo():
     """
@@ -548,10 +556,12 @@ def completesudoapplication():
         app.logger.error(f"Failed to send email: {str(e)}")
 
     try:
-        h.send_help_bot(username,
-                        email,
-                        "Feynman Account Request",
-                        "This user wants an account on feynman pls.\nReason: " + reason)
+        h.send_help_bot(
+            username,
+            email,
+            "Feynman Account Request",
+            f"This user wants an account on feynman pls.\nReason: {reason}",
+        )
     except Exception as e:
         discord_failed = True
         app.logger.error(f"Failed to send message to discord bot: {str(e)}")
