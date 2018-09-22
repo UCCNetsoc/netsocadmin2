@@ -39,12 +39,11 @@ def is_correct_password(username:str, password:str) -> bool:
     """
     ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
-
+        username = ldap3.utils.conv.escape_filter_chars(username)
         success = conn.search(
-                    search_base="dc=netsoc,dc=co",
-                    search_filter="(&(objectClass=account)(uid=%s))"%(
-                            ldap3.utils.conv.escape_filter_chars(username)),
-                    attributes=["userPassword", "uid"],)
+            search_base="dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={username}))",
+            attributes=["userPassword", "uid"],)
         if not success or len(conn.entries) != 1:
             return False
 

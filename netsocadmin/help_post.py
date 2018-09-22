@@ -15,7 +15,7 @@ DISCORD_BOT_HELP_ADDRESS = config.DISCORD_BOT_HELP_ADDRESS
 
 def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
     """
-    Sends an email to the netsoc email address containing the help data, 
+    Sends an email to the netsoc email address containing the help data,
     CC'ing all the SysAdmins and the user requesting help.
     This enables us to reply to the email directly instead of copypasting the
     from address and disconnecting history.
@@ -25,15 +25,13 @@ def send_help_email(username: str, user_email: str, subject: str, message: str) 
     :param subject the subject of the user's help requests
     :param message the user's actual message
     """
-    message_body = \
-        """
-From: %s\n
-Email: %s
+    message_body = f"""
+From: {username}\n
+Email: {user_email}
 
-%s
+{message}
 
-PS: Please "Reply All" to the emails so that you get a quicker response.""" % (
-            username, user_email, message)
+PS: Please "Reply All" to the emails so that you get a quicker response."""
 
     msg = EmailMessage()
     msg.set_content(message_body)
@@ -63,7 +61,7 @@ Hi {username},
 
 Thank you for making a request for an account with sudo privileges on feynman.netsoc.co.
 
-We will be in touch shortly. 
+We will be in touch shortly.
 
 Best,
 

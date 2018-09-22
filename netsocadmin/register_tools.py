@@ -29,17 +29,17 @@ def send_confirmation_email(email:str, server_url:str) -> bool:
     """
     uri = generate_uri(email)
     message_body = \
-    """
+    f"""
 Hello,
 
 Please confirm your account by going to:
 
-http://%s/signup?t=%s&e=%s
+http://{server_url}/signup?t={uri}&e={email}
 
 Yours,
 
 The UCC Netsoc SysAdmin Team
-    """%(server_url, uri, email)
+    """
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
@@ -61,19 +61,19 @@ def send_details_email(email:str, user:str, password:str) -> bool:
     :returns True if the email has been sent succesfully, False otherwise
     """
     message_body = \
-    """
+    f"""
 Hello,
 
 Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
 
-username: %s
+username: {user}
 
-password: %s
+password: {password}
 
 Please note that you must log into the server at least once before the web portal will work for you. If you need any help on this, contact adamgillessen@gmail.com.
 
 To log in, run:
-    ssh %s@leela.netsoc.co
+    ssh {user}@leela.netsoc.co
 and enter your password when prompted. If you are using windows, go to http://www.putty.org/ and download the SSH client.
 
 Please change your password when you first log-in to something you'll remember!
@@ -81,7 +81,7 @@ Please change your password when you first log-in to something you'll remember!
 Yours,
 
 The UCC Netsoc SysAdmin Team
-    """%(user, password, user)
+    """
     sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
     from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
@@ -166,16 +166,17 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
     ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
     info = {
         "uid": user,
-        "gid": 422,
-        "home_dir": "/home/users/%s"%(user),
+        "gid": p.LDAP_USER_GROUP_ID,
+        "home_dir": f"/home/users/{user}",
     }
     with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
 
         # checks if username exists and also gets next uid number
         success = conn.search(
-                    search_base="cn=member,dc=netsoc,dc=co",
-                    search_filter="(objectClass=account)",
-                    attributes=["uidNumber", "uid"],)
+            search_base="cn=member,dc=netsoc,dc=co",
+            search_filter="(objectClass=account)",
+            attributes=["uidNumber", "uid"],
+        )
         if not success:
             return False, conn.last_error
         last = None
@@ -200,22 +201,23 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             "account",
             "top",
             "posixAccount",
-            "mailAccount"
+            "mailAccount",
         ]
         attributes = {
-            "cn" : user ,
-            "gidNumber": 422,
+            "cn" : user,
+            "gidNumber": p.LDAP_USER_GROUP_ID,
             "homeDirectory": info["home_dir"],
-            "mail": "%s@netsoc.co"%(user),
+            "mail": f"{user}@netsoc.co"%(user),
             "uid" : user,
             "uidNumber": next_uid,
             "loginShell": "/bin/bash",
             "userPassword": crypt_password,
         }
         success = conn.add(
-            "cn=%s,cn=member,dc=netsoc,dc=co"%(user),
+            f"cn={user},cn=member,dc=netsoc,dc=co",
             object_class,
-            attributes)
+            attributes,
+        )
         if not success:
             return False, conn.last_error
     return True, info
@@ -280,12 +282,12 @@ def has_username(uid:str) -> bool:
         return True
     ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
-
+        uid = ldap3.utils.conv.escape_filter_chars(uid)
         return conn.search(
-                    search_base="dc=netsoc,dc=co",
-                    search_filter="(&(objectClass=account)(uid=%s))"%(
-                            ldap3.utils.conv.escape_filter_chars(uid)),
-                    attributes=["uid"],)
+            search_base="dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={uid}))",
+            attributes=["uid"],
+        )
     return True
 
 def initialise_directories(username:str, password:str):
@@ -302,5 +304,6 @@ def initialise_directories(username:str, password:str):
     client.connect(
         hostname=p.SERVER_HOSTNAME,
         username=username,
-        password=password)
+        password=password,
+    )
 
