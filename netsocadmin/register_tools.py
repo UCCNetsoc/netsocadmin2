@@ -29,7 +29,7 @@ def send_confirmation_email(email:str, server_url:str) -> bool:
     """
     uri = generate_uri(email)
     message_body = \
-    f"""
+f"""
 Hello,
 
 Please confirm your account by going to:
@@ -39,14 +39,17 @@ http://{server_url}/signup?t={uri}&e={email}
 Yours,
 
 The UCC Netsoc SysAdmin Team
-    """
-    sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
-    from_email = Email("server.registration@netsoc.co")
-    subject = "Account Registration"
-    to_email = Email(email)
-    content = Content("text/plain", message_body)
-    mail = Mail(from_email, subject, to_email, content)
-    response = sg.client.mail.send.post(request_body=mail.get())
+"""
+    if not config.FLASK_CONFIG['DEBUG']:
+        sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
+        from_email = Email("server.registration@netsoc.co")
+        subject = "Account Registration"
+        to_email = Email(email)
+        content = Content("text/plain", message_body)
+        mail = Mail(from_email, subject, to_email, content)
+        response = sg.client.mail.send.post(request_body=mail.get())
+    else:
+        response = type("Response", object, {"status_code": 200})
     return str(response.status_code).startswith("20")
 
 
