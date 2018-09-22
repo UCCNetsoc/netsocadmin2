@@ -16,7 +16,7 @@ import pymysql
 from sendgrid import Email, sendgrid
 from sendgrid.helpers.mail import Content, Mail
 
-from netsocadmin import config as p
+from netsocadmin import config
 
 
 def send_confirmation_email(email:str, server_url:str) -> bool:
@@ -40,7 +40,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
     """
-    sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
+    sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
     from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
@@ -82,7 +82,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
     """
-    sg = sendgrid.SendGridAPIClient(apikey=p.SENDGRID_KEY)
+    sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
     from_email = Email("server.registration@netsoc.co")
     subject = "Account Registration"
     to_email = Email(email)
@@ -106,7 +106,7 @@ def generate_uri(email:str) -> str:
         id_ = "".join(random.choice(chars) for _ in range(size))
         uri = hashlib.sha256(id_.encode()).hexdigest()
 
-        conn = sqlite3.connect(p.TOKEN_DB_NAME)
+        conn = sqlite3.connect(config.TOKEN_DB_NAME)
         c = conn.cursor()
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
@@ -132,7 +132,7 @@ def good_token(email:str, uri:str) -> bool:
     :returns True if the token is valid (i.e. sent by us to this email),
         False otherwise (including if a DB error occured)
     """
-    with sqlite3.connect(p.TOKEN_DB_NAME) as conn:
+    with sqlite3.connect(config.TOKEN_DB_NAME) as conn:
         c = conn.cursor()
         c.execute("SELECT * FROM uris WHERE uri=?", (uri,))
         row = c.fetchone()
@@ -147,7 +147,7 @@ def remove_token(email:str):
 
     :param email the email address corresponding to the token being removed
     """
-    with sqlite3.connect(p.TOKEN_DB_NAME) as conn:
+    with sqlite3.connect(config.TOKEN_DB_NAME) as conn:
         c = conn.cursor()
         c.execute("DELETE FROM uris WHERE email=?", (email,))
         conn.commit()
@@ -163,13 +163,13 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         info is a dictionary of information values for the mysql db. This will
             have to be added to when the user completes the form.
     """
-    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
+    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     info = {
         "uid": user,
-        "gid": p.LDAP_USER_GROUP_ID,
+        "gid": config.LDAP_USER_GROUP_ID,
         "home_dir": f"/home/users/{user}",
     }
-    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
 
         # checks if username exists and also gets next uid number
         success = conn.search(
@@ -205,7 +205,7 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         ]
         attributes = {
             "cn" : user,
-            "gidNumber": p.LDAP_USER_GROUP_ID,
+            "gidNumber": config.LDAP_USER_GROUP_ID,
             "homeDirectory": info["home_dir"],
             "mail": f"{user}@netsoc.co"%(user),
             "uid" : user,
@@ -230,7 +230,7 @@ def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
         collected during signup to go in the database.
     :returns Boolean True if the data was succesfully added
     """
-    conn = pymysql.connect(**p.MYSQL_DETAILS)
+    conn = pymysql.connect(**config.MYSQL_DETAILS)
     with conn.cursor() as c:
         sql = \
             """
@@ -263,7 +263,7 @@ def has_account(email:str) -> bool:
     :returns True if their already as an account with that email,
         False otherwise.
     """
-    conn = pymysql.connect(**p.MYSQL_DETAILS)
+    conn = pymysql.connect(**config.MYSQL_DETAILS)
     with conn.cursor() as c:
         sql = "SELECT * FROM users WHERE email=%s;"
         c.execute(sql, (email,))
@@ -278,10 +278,10 @@ def has_username(uid:str) -> bool:
     :param uid the uid being queried about
     :returns True if the uid exists, False otherwise
     """
-    if uid in p.BLACKLIST:
+    if uid in config.BLACKLIST:
         return True
-    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
-    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
+    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         uid = ldap3.utils.conv.escape_filter_chars(uid)
         return conn.search(
             search_base="dc=netsoc,dc=co",
@@ -302,7 +302,7 @@ def initialise_directories(username:str, password:str):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.connect(
-        hostname=p.SERVER_HOSTNAME,
+        hostname=config.SERVER_HOSTNAME,
         username=username,
         password=password,
     )

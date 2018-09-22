@@ -9,7 +9,7 @@ import typing
 import flask
 import ldap3
 
-from netsocadmin import config as p
+from netsocadmin import config
 
 
 def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[..., None]:
@@ -20,7 +20,7 @@ def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[...,
     """
     @functools.wraps(view_func)
     def protected_view_func(*args, **kwargs):
-        if p.LOGGED_IN_KEY not in flask.session or not flask.session[p.LOGGED_IN_KEY]:
+        if config.LOGGED_IN_KEY not in flask.session or not flask.session[config.LOGGED_IN_KEY]:
             return flask.render_template("index.html", error_message="Please log in to view this page")
         return view_func(*args, **kwargs)
     return protected_view_func
@@ -29,7 +29,7 @@ def is_logged_in():
     """
     Returns True if the user is currently logged in.
     """
-    return p.LOGGED_IN_KEY in flask.session and flask.session[p.LOGGED_IN_KEY]
+    return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY]
 
 
 def is_correct_password(username:str, password:str) -> bool:
@@ -37,8 +37,8 @@ def is_correct_password(username:str, password:str) -> bool:
     is_correct_password tells you whether or not a given password
     is the password has which is on file in the Netsoc MySQL database.
     """
-    ldap_server = ldap3.Server(p.LDAP_HOST, get_info=ldap3.ALL)
-    with ldap3.Connection(ldap_server, auto_bind=True, **p.LDAP_AUTH) as conn:
+    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         username = ldap3.utils.conv.escape_filter_chars(username)
         success = conn.search(
             search_base="dc=netsoc,dc=co",

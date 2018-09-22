@@ -9,7 +9,7 @@ from typing import List
 
 import pymysql
 
-from netsocadmin import config as p
+from netsocadmin import config
 
 
 class DatabaseAccessError(Exception):
@@ -34,18 +34,23 @@ class UserError(Exception):
     pass
 
 
-def _mysql_connection(username:str=p.SQL_USER, password:str=p.SQL_PASS) -> pymysql.connections.Connection:
+def _mysql_connection(username:str=None, password:str=None) -> pymysql.connections.Connection:
     """
     _mysql_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.SQL_USER.
 
     :returns pymysql.connections.Connection
     """
+    if username is None:
+        username = config.MYSQL_DETAILS["user"]
+    if password is None:
+        password = config.MYSQL_DETAILS["password"]
     return pymysql.connect(
-        host=p.SQL_HOST,
+        host=config.MYSQL_DETAILS["host"],
         user=username,
         password=password,
-        cursorclass=pymysql.cursors.DictCursor)
+        cursorclass=pymysql.cursors.DictCursor,
+    )
 
 
 def list_dbs(user:str) -> List[str]:
