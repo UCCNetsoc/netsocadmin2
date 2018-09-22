@@ -34,7 +34,7 @@ Hello,
 
 Please confirm your account by going to:
 
-http://%s/signup?t=%s&e=%s 
+http://%s/signup?t=%s&e=%s
 
 Yours,
 
@@ -96,7 +96,7 @@ def generate_uri(email:str) -> str:
     Generates a uri token which will identify this user's email address.
     This should be checked when the user signs up to make sure it was the
     token they sent.
-    
+
     :param email the email used to sign up with
     :returns the generated uri string or None of there was a failure
     """
@@ -174,7 +174,7 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
                         user=p.LDAP_USER,
                         password=p.LDAP_KEY,
                         auto_bind=True) as conn:
-        
+
         # checks if username exists and also gets next uid number
         success = conn.search(
                     search_base="cn=member,dc=netsoc,dc=co",
@@ -212,13 +212,13 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             "homeDirectory": info["home_dir"],
             "mail": "%s@netsoc.co"%(user),
             "uid" : user,
-            "uidNumber": next_uid, 
+            "uidNumber": next_uid,
             "loginShell": "/bin/bash",
             "userPassword": crypt_password,
         }
         success = conn.add(
-            "cn=%s,cn=member,dc=netsoc,dc=co"%(user), 
-            object_class, 
+            "cn=%s,cn=member,dc=netsoc,dc=co"%(user),
+            object_class,
             attributes)
         if not success:
             return False, conn.last_error
@@ -232,16 +232,12 @@ def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
         collected during signup to go in the database.
     :returns Boolean True if the data was succesfully added
     """
-    conn = pymysql.connect(
-            host=p.SQL_HOST,
-            user=p.SQL_USER,
-            password=p.SQL_PASS,
-            db=p.SQL_DB,)
+    conn = pymysql.connect(**p.MYSQL_DETAILS)
     with conn.cursor() as c:
         sql = \
             """
-            INSERT INTO users 
-                (uid, name, password, gid, home_directory, uid_number, 
+            INSERT INTO users
+                (uid, name, password, gid, home_directory, uid_number,
                 student_id, course, graduation_year, email)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
             """
@@ -266,14 +262,10 @@ def has_account(email:str) -> bool:
     Sees if their is already an account on record with this email address.
 
     :param email the in-question email address being used to sign up
-    :returns True if their already as an account with that email, 
+    :returns True if their already as an account with that email,
         False otherwise.
     """
-    conn = pymysql.connect(
-        host=p.SQL_HOST,
-        user=p.SQL_USER,
-        password=p.SQL_PASS,
-        db=p.SQL_DB,)
+    conn = pymysql.connect(**p.MYSQL_DETAILS)
     with conn.cursor() as c:
         sql = "SELECT * FROM users WHERE email=%s;"
         c.execute(sql, (email,))
@@ -296,7 +288,7 @@ def has_username(uid:str) -> bool:
                         user=p.LDAP_USER,
                         password=p.LDAP_KEY,
                         auto_bind=True) as conn:
-    
+
         return conn.search(
                     search_base="dc=netsoc,dc=co",
                     search_filter="(&(objectClass=account)(uid=%s))"%(
@@ -306,7 +298,7 @@ def has_username(uid:str) -> bool:
 
 def initialise_directories(username:str, password:str):
     """
-    Makes an ssh connection to the server which will initialise a 
+    Makes an ssh connection to the server which will initialise a
     user's home directory. This allows them to not have to ever connect
     to the server directly and still use netsoc admin.
 
