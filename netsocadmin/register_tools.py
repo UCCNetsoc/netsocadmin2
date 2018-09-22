@@ -106,7 +106,7 @@ def generate_uri(email:str) -> str:
         id_ = "".join(random.choice(chars) for _ in range(size))
         uri = hashlib.sha256(id_.encode()).hexdigest()
 
-        conn = sqlite3.connect(p.DBNAME)
+        conn = sqlite3.connect(p.TOKEN_DB_NAME)
         c = conn.cursor()
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
@@ -132,7 +132,7 @@ def good_token(email:str, uri:str) -> bool:
     :returns True if the token is valid (i.e. sent by us to this email),
         False otherwise (including if a DB error occured)
     """
-    with sqlite3.connect(p.DBNAME) as conn:
+    with sqlite3.connect(p.TOKEN_DB_NAME) as conn:
         c = conn.cursor()
         c.execute("SELECT * FROM uris WHERE uri=?", (uri,))
         row = c.fetchone()
@@ -147,7 +147,7 @@ def remove_token(email:str):
 
     :param email the email address corresponding to the token being removed
     """
-    with sqlite3.connect(p.DBNAME) as conn:
+    with sqlite3.connect(p.TOKEN_DB_NAME) as conn:
         c = conn.cursor()
         c.execute("DELETE FROM uris WHERE email=?", (email,))
         conn.commit()

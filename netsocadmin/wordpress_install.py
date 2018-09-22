@@ -2,7 +2,7 @@ from jinja2 import Environment, PackageLoader
 import requests
 import pymysql
 
-import config
+from netsocadmin import config
 import logging
 from logging.config import fileConfig
 
@@ -28,8 +28,7 @@ def extract_from_tar(path_to_file, target_dir):
     """
     Extracts files from a tar compressed file, and places them into a target directory
     """
-    logger.debug("extracting file %s from tar to %s" %
-                 (path_to_file, target_dir))
+    logger.debug("extracting file %s from tar to %s" % (path_to_file, target_dir))
     split_command = ["tar", "-xzf", path_to_file, "-C", target_dir]
     completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
 
@@ -93,7 +92,7 @@ def create_wordpress_database(username, is_debug_mode):
     """
     logger.debug("Creating wordpress database and user for %s" % (username))
 
-    database_connection = pymysql.connect(**config.db)
+    database_connection = pymysql.connect(**config.MYSQL_DETAILS)
     cursor = database_connection.cursor(pymysql.cursors.DictCursor)
 
     db_user = 'wp_' + username

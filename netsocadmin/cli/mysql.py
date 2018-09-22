@@ -67,7 +67,7 @@ def list_dbs(user:str) -> List[str]:
                 filter(is_user_db, map(
                     lambda row: row["Database"], cur.fetchall())))
     except Exception as e:
-        raise DatabaseAccessError("failed to list databases for user '%s'"%(user)) from e
+        raise DatabaseAccessError("failed to list databases for user '%s'" % (user)) from e
     finally:
         con.close()
     return databases
