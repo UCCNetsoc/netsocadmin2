@@ -7,13 +7,11 @@ import typing
 
 from netsocadmin import config
 
-BACKUPS_DIR = config.BACKUPS_DIR
-
 
 def list_backups(username:str, timeframe:str) -> typing.List[str]:
-    backups_base_dir = os.path.join(BACKUPS_DIR, username, timeframe)
+    backups_base_dir = os.path.join(config.BACKUPS_DIR, username, timeframe)
     if not os.path.exists(backups_base_dir):
         os.makedirs(backups_base_dir)
-    all_backups = sorted([b.strip(".tgz") for b in os.listdir(backups_base_dir) if 
+    all_backups = sorted([b.strip(".tgz") for b in os.listdir(backups_base_dir) if
             re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}\.tgz", b)], reverse=True)
     return all_backups
