@@ -1,0 +1,16 @@
+version: '3'
+services: 
+  ldap:
+    image: osixia/openldap
+    container_name: netsoc-admin-ldap
+    ports: 
+      - 389:389
+    environment: 
+      LDAP_ADMIN_PASSWORD: netsoc
+      LDAP_CONFIG_PASSWORD: netsoc
+      LDAP_DOMAIN: netsoc.co
+      LDAP_TLS: 'false'
+      LDAP_REPLICATION: 'false'
+    volumes: 
+      - './dev/ldap/database:/var/lib/ldap'
+      - './dev/ldap/config:/etc/ldap/slapd.d'
