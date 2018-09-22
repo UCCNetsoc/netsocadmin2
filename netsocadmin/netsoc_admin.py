@@ -45,7 +45,7 @@ def signinup():
 # ------------------------------Server Signup Routes------------------------------#
 
 
-@app.route("/sendconfirmation", methods=["POST", "GET"])
+@app.route("/sendconfirmation", methods=["POST"])
 def sendconfirmation() -> str:
     """
     Route: /sendconfirmation
@@ -54,11 +54,6 @@ def sendconfirmation() -> str:
         It then checks that form data to make sure it's a valid UCC email.
         Sends an email with a link to validate the email holder is who is registering.
     """
-    # if they got here through GET, something done fucked up
-    if flask.request.method != "POST":
-        app.logger.debug("sendconfirmation(): method not POST: %s" % flask.request.method)
-        return flask.redirect("/")
-
     # make sure is ucc email
     email = flask.request.form['email']
     if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email):
@@ -93,11 +88,6 @@ def signup() -> str:
         This is the link which they will be taken to with the confirmation email.
         It checks if the token they have used is valid and corresponds to the email.
     """
-    # this check isn't vital but better safe than sorry
-    if flask.request.method != "GET":
-        app.logger.debug("signup(): method was not GET: %s" % flask.request.method)
-        return flask.redirect("/")
-
     # make sure they haven't forged the URI
     email = flask.request.args.get('e')
     uri = flask.request.args.get('t')
@@ -108,7 +98,7 @@ def signup() -> str:
     return flask.render_template("form.html", email_address=email, token=uri)
 
 
-@app.route("/completeregistration", methods=["POST", "GET"])
+@app.route("/completeregistration", methods=["POST"])
 def completeregistration():
     """
     Route: register
@@ -116,11 +106,6 @@ def completeregistration():
         and should only be available through POST. It adds the
         given data to the Netsoc LDAP database.
     """
-    # if they haven't gotten here through POST something has gone wrong
-    if flask.request.method != "POST":
-        app.logger.debug("completeregistration(): method was not POST: %s" % flask.request.method)
-        return flask.redirect("/")
-
     # make sure token is valid
     email = flask.request.form["email"]
     uri = flask.request.form["_token"]
@@ -188,17 +173,16 @@ def completeregistration():
     return flask.render_template("message.html", caption=caption, message=message)
 
 
-@app.route("/username", methods=["POST", "GET"])
+@app.route("/username", methods=["POST"])
 def username():
     """
     Route: username
         This should be called by javascript in the registration form
         to test whether or not a username is already used.
     """
-    if flask.request.method != "POST" or \
-                    "email" not in flask.request.headers or \
-                    "uid" not in flask.request.headers or \
-                    "token" not in flask.request.headers:
+    if ("email" not in flask.request.headers or
+            "uid" not in flask.request.headers or
+            "token" not in flask.request.headers):
         return flask.abort(400)
 
     # check if request is legit
@@ -208,9 +192,9 @@ def username():
         return flask.abort(403)
 
     # check db for username
-    requested_uername = flask.request.headers["uid"]
-    if r.has_username(requested_uername):
-        app.logger.debug("username(): uid %s is in use" % (requested_uername))
+    requested_username = flask.request.headers["uid"]
+    if r.has_username(requested_username):
+        app.logger.debug("username(): uid %s is in use" % (requested_username))
         return "Not available"
     return "Available"
 
@@ -218,15 +202,13 @@ def username():
 # -------------------------------Login/Logout Routes-----------------------------#
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
 def login():
     """
     Route: login
     This route should be reached by a form sending login information to it via
     a POST request.
     """
-    if flask.request.method != "POST":
-        return flask.render_template("index.html", error_message="Bad request")
     if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
     r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
@@ -235,14 +217,12 @@ def login():
     return flask.redirect("/")
 
 
-@app.route("/logout", methods=["GET", "POST"])
+@app.route("/logout", methods=["GET"])
 def logout():
     """
     Route: logout
         This route logs a user out an redirects them back to the index page.
     """
-    if flask.request.method != "GET":
-        return flask.redirect("/")
     flask.session.pop(config.LOGGED_IN_KEY, None)
     return flask.redirect("/")
 
@@ -250,7 +230,7 @@ def logout():
 # -------------------------------Server Tools Routes-----------------------------#
 
 
-@app.route("/tools", methods=["POST", "GET"])
+@app.route("/tools", methods=["GET"])
 @l.protected_page
 def tools():
     """
@@ -260,9 +240,6 @@ def tools():
         Note that this should only be shown when a user is logged in.
     """
     app.logger.debug("tools(): received tools page request")
-    if flask.request.method != "GET":
-        app.logger.debug("tools(): bad request method")
-        return flask.redirect("/")
 
     # The wordpress variables are used by the WordPress card in the rendered HTML
     wordpress_link = "http://%s.netsoc.co/wordpress/wp-admin/index.php" % (flask.session["username"])
@@ -278,7 +255,7 @@ def tools():
                                  login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS])
 
 
-@app.route("/createdb", methods=["POST", "GET"])
+@app.route("/createdb", methods=["POST"])
 @l.protected_page
 def createdb():
     """
@@ -287,9 +264,6 @@ def createdb():
         database with the name in the request.form.
         This can only be reached if you are logged in.
     """
-    if flask.request.method != "POST":
-        return flask.redirect("/")
-
     app.logger.debug("Form: %s", flask.request.form)
     username = flask.request.form["username"]
     password = flask.request.form["password"]
@@ -323,7 +297,7 @@ def createdb():
     return flask.redirect("/")
 
 
-@app.route("/deletedb", methods=["POST", "GET"])
+@app.route("/deletedb", methods=["POST"])
 @l.protected_page
 def deletedb():
     """
@@ -332,9 +306,6 @@ def deletedb():
         contained in the request.form. This can only be reached if you are
         logged in.
     """
-    if flask.request.method != "POST":
-        return flask.redirect("/")
-
     app.logger.debug("Form: %s", flask.request.form)
     username = flask.request.form["username"]
     password = flask.request.form["password"]
@@ -370,7 +341,7 @@ def deletedb():
     return flask.redirect("/")
 
 
-@app.route("/resetpw", methods=["POST", "GET"])
+@app.route("/resetpw", methods=["POST"])
 @l.protected_page
 def resetpw():
     """
@@ -379,9 +350,6 @@ def resetpw():
         MySQL account password.
         This can only be reached if you are logged in.
     """
-    if flask.request.method != "POST":
-        return flask.redirect("/")
-
     app.logger.debug("Form: %s", flask.request.form)
     username = flask.request.form["username"]
     password = flask.request.form["password"]
@@ -442,7 +410,7 @@ def wordpressinstall():
     return username, 200
 
 
-@app.route("/help", methods=["POST", "GET"])
+@app.route("/help", methods=["POST"])
 @l.protected_page
 def help():
     """
@@ -492,7 +460,7 @@ def help():
 
 
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>",
-           methods=["POST", "GET"])
+           methods=["GET"])
 @l.protected_page
 def backup(username: str, timeframe: str, backup_date: str):
     """
@@ -505,9 +473,6 @@ def backup(username: str, timeframe: str, backup_date: str):
     :param backup_date the backup-date of the requested backup. Must be in the
         form YYYY-MM-DD.
     """
-    if flask.request.method != "GET":
-        return flask.abort(400)
-
     # make sure the arguments are valid
     if not re.match(r"^[a-z]+$", username) or \
             not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
@@ -520,7 +485,7 @@ def backup(username: str, timeframe: str, backup_date: str):
     return flask.send_from_directory(backups_base_dir, backup_date + ".tgz")
 
 
-@app.route("/change-shell", methods=["POST", "GET"])
+@app.route("/change-shell", methods=["POST"])
 @l.protected_page
 def change_shell():
     """
@@ -528,9 +493,6 @@ def change_shell():
         This route will change the user's shell in the LDAP server to the one
         that they request from the dropdown
     """
-    if flask.request.method != "POST":
-        return flask.redirect("/")
-
     # Ensure the selected shell is in the list of allowed shells
     shell_path = SHELL_PATHS.get(flask.request.form["shell"], None)
 
@@ -610,7 +572,7 @@ def change_shell():
             shells_error="User could not be found to modify")
 
 
-@app.route("/tutorials", methods=["POST", "GET"])
+@app.route("/tutorials", methods=["GET"])
 def tutorials():
     """
     Route: /tutorials
@@ -618,8 +580,6 @@ def tutorials():
         files are read when the application starts-up.
     """
     global TUTORIALS
-    if flask.request.method != "GET":
-        return flask.abort(400)
     if len(TUTORIALS) == 0:
         return flask.render_template("tutorials.html",
                                      show_logout_button=l.is_logged_in(),
@@ -632,21 +592,19 @@ def tutorials():
                                  tutorials=TUTORIALS)
 
 
-@app.route("/sudo", methods=["POST", "GET"])
+@app.route("/sudo", methods=["GET"])
 @l.protected_page
 def sudo():
     """
     Route: /sudo
         This route will render the page for applying for sudo privilages.
     """
-    if flask.request.method != "GET":
-        return flask.abort(400)
     return flask.render_template("sudo.html",
                                  show_logout_button=l.is_logged_in(),
                                  username=flask.session["username"])
 
 
-@app.route("/completesudoapplication", methods=["POST", "GET"])
+@app.route("/completesudoapplication", methods=["POST"])
 @l.protected_page
 def completesudoapplication():
     """
@@ -655,9 +613,6 @@ def completesudoapplication():
         email to the SysAdmin team as well as to the discord server
         notifying us that a request for sudo on feynman has been made.
     """
-    if flask.request.method != "POST":
-        return flask.abort(400)
-
     email = flask.request.form["email"]
     reason = flask.request.form["reason"]
     username = flask.session['username']
