@@ -24,7 +24,7 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 To build the docker image:
 
-1. Create a file called `wordpress_installer_config.py` following the same format as of that in `sample_wordpress_installer_config.py`. This file configures the wordpress_installer package. 
+1. Create a file called `wordpress_installer_config.py` following the same format as of that in `sample_wordpress_installer_config.py`. This file configures the wordpress_installer package.
 2. Create a `admin_passwords.py` following the same format as of that in `sample_admin_passwords.py`. This file configures the netsoc admin server itself.
 3. In this directory, run:
 
@@ -43,4 +43,14 @@ docker run \
     -v /path/to/admin_passwords.py:/netsocadmin/webapp/passwords.py \
     -v /path/to/wordpress_installer_config.py:/netsocadmin/wordpress_installer/wordpress_installer/config.py \
     docker.netsoc.co/netsocadmin:latest
+```
 
+## Dev Environment
+
+Admin User details;
+- username: `john`
+- password: `johns-password`
+
+Normal User details;
+- username: `sofia`
+- password: `sofias-password`
