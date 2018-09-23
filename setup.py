@@ -12,8 +12,8 @@ requirements = [
     'wheel',
 ]
 
-with open('requirements.txt') as f:
-    requirements.extend(f.readlines())
+# with open('requirements.txt') as f:
+#     requirements.extend(f.readlines())
 
 test_requirements = [
     # TODO: put package test requirements here
