@@ -38,6 +38,8 @@ clean-test:
 	rm -fr htmlcov/
 
 test:
+	pwd
+	ls -l /drone/src/github.com/UCCNetworkingSociety/netsocadmin2/
 	tox
 
 coverage:
