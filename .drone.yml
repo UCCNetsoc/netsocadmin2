@@ -1,9 +1,9 @@
 pipeline:
   run_tests:
-    image: hostedgraphite/pythonbuild:xenial_python3
+    image: python:3.7
     commands:
       - apt-get update
-      - apt-get -qq install alien build-essential libssl-dev libffi-dev -y
+      - apt-get -qq install alien build-essential libssl-dev libffi-dev tox -y
       - make install
       - make test
     when:
