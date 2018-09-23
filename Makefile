@@ -38,7 +38,7 @@ clean-test:
 	rm -fr htmlcov/
 
 test:
-	pwd
+	cat ' /drone/src/github.com/UCCNetworkingSociety/netsocadmin2/requirements.txt'
 	ls -l /drone/src/github.com/UCCNetworkingSociety/netsocadmin2/
 	tox
 
