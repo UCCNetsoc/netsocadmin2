@@ -4,39 +4,39 @@
 
     <script>
 		function checkUsername() {
-	  	// disable until good uid has been found
-	  	document.getElementById("register-button").disabled = true;
+            // disable until good uid has been found
+            document.getElementById("register-button").disabled = true;
 
-	  	// get shit from form
-	  	var token = document.getElementById("_token").value;
-	  	var email = document.getElementById("email").value;
-	  	var uid = document.getElementById("uid").value;
+            // get shit from form
+            var token = document.getElementById("_token").value;
+            var email = document.getElementById("email").value;
+            var uid = document.getElementById("uid").value;
 
-	  	// make AJAX request
-	  	var req = new XMLHttpRequest();
-	  	req.open("POST", window.location.origin + "/username")
-	  	req.setRequestHeader("email", email);
-	  	req.setRequestHeader("token", token);
-	  	req.setRequestHeader("uid", uid);
+            // make AJAX request
+            var req = new XMLHttpRequest();
+            req.open("POST", window.location.origin + "/username")
+            req.setRequestHeader("email", email);
+            req.setRequestHeader("token", token);
+            req.setRequestHeader("uid", uid);
 
-	  	req.addEventListener("load", function() {
-	  		var err = document.getElementById("taken-error");
-	  		var good = document.getElementById("good-name");
-	  		err.innerText = "";
-	  		good.innerText = "";
-	  		if (req.status !== 200) {
-	  			err.innerText = "Invalid request"
-	  		} else if (req.responseText !== "Available") {
-	  			err.innerText = "Username not available";
-	  		} else if (! /[a-z]/.test(uid)) {
-	  			err.innerText = "Username must be all lower case letters"
-	  		} else {
-	  			good.innerText = "Username available!"
-	  			document.getElementById("register-button").disabled = false;
-	  		}
-	  	});
-	  	req.send();
-	  }
+            req.addEventListener("load", function() {
+                var err = document.getElementById("taken-error");
+                var good = document.getElementById("good-name");
+                err.innerText = "";
+                good.innerText = "";
+                if (req.status !== 200) {
+                    err.innerText = "Invalid request"
+                } else if (req.responseText !== "Available") {
+                    err.innerText = "Username not available";
+                } else if (! /[a-z]/.test(uid)) {
+                    err.innerText = "Username must be all lower case letters"
+                } else {
+                    good.innerText = "Username available!"
+                    document.getElementById("register-button").disabled = false;
+                }
+            });
+            req.send();
+        }
 	</script>
 
 	<style>

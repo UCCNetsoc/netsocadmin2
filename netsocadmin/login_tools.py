@@ -12,7 +12,7 @@ import ldap3
 import config
 
 
-def protected_page(view_func:typing.Callable[..., None]) -> typing.Callable[..., None]:
+def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
     """
     protected_page is a route function decorator which will check that a user
     is logged in before allowing the decorated view function to be shown. If the
@@ -32,7 +32,7 @@ def is_logged_in():
     return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY]
 
 
-def is_correct_password(username:str, password:str) -> bool:
+def is_correct_password(username: str, password: str) -> bool:
     """
     is_correct_password tells you whether or not a given password
     is the password has which is on file in the Netsoc MySQL database.
@@ -43,7 +43,8 @@ def is_correct_password(username:str, password:str) -> bool:
         success = conn.search(
             search_base="dc=netsoc,dc=co",
             search_filter=f"(&(objectClass=account)(uid={username}))",
-            attributes=["userPassword", "uid"],)
+            attributes=["userPassword", "uid"],
+        )
         if not success or len(conn.entries) != 1:
             return False
 
@@ -51,8 +52,7 @@ def is_correct_password(username:str, password:str) -> bool:
         if hashed_password.startswith("{crypt}") or hashed_password.startswith("{CRYPT}"):
             # strips off the "{crypt}" prefix
             hashed_password = hashed_password[len("{crypt}"):]
-        return hmac.compare_digest(
-            crypt.crypt(password, hashed_password), hashed_password)
+        return hmac.compare_digest(crypt.crypt(password, hashed_password), hashed_password)
 
 
 if __name__ == "__main__":

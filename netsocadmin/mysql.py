@@ -34,7 +34,7 @@ class UserError(Exception):
     pass
 
 
-def _mysql_connection(username:str=None, password:str=None) -> pymysql.connections.Connection:
+def _mysql_connection(username: str=None, password: str=None) -> pymysql.connections.Connection:
     """
     _mysql_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.SQL_USER.
@@ -53,7 +53,7 @@ def _mysql_connection(username:str=None, password:str=None) -> pymysql.connectio
     )
 
 
-def list_dbs(user:str) -> List[str]:
+def list_dbs(user: str) -> List[str]:
     """
     list_dbs lists all of the dbs partaining to "user".
 
@@ -62,23 +62,23 @@ def list_dbs(user:str) -> List[str]:
     :raises DatabaseAccessError if the operation fails.
     """
     databases = None
+    con = None
     try:
         con = _mysql_connection()
         with con.cursor() as cur:
             sql = "SHOW DATABASES;"
             cur.execute(sql)
             is_user_db = lambda dbname: dbname.startswith(f"{user}_")
-            databases = list(
-                filter(is_user_db, map(
-                    lambda row: row["Database"], cur.fetchall())))
+            databases = list(filter(is_user_db, map(lambda row: row["Database"], cur.fetchall())))
     except Exception as e:
         raise DatabaseAccessError(f"failed to list databases for user '{user}'") from e
     finally:
-        con.close()
+        if con:
+            con.close()
     return databases
 
 
-def create_user(username:str) -> str:
+def create_user(username: str) -> str:
     """
     create_user adds a new user to the MySQL DBMS if and only if
     a user of that name does not already exist.
@@ -101,8 +101,7 @@ def create_user(username:str) -> str:
 
             # create new user
             chars = string.ascii_letters + string.digits
-            password = "".join(
-                random.choice(chars) for _ in range(random.randint(10, 15)))
+            password = "".join(random.choice(chars) for _ in range(random.randint(10, 15)))
             sql = """CREATE USER %s@'%%' IDENTIFIED BY %s;"""
             cur.execute(sql, (username, password,))
             sql = """CREATE USER %s@'localhost' IDENTIFIED BY %s;"""
@@ -132,7 +131,7 @@ def create_user(username:str) -> str:
         con.close()
 
 
-def delete_user(username:str):
+def delete_user(username: str):
     """
     delete_user removes a username from the MySQL DBMS. If the username does
     not exist, it does nothing.
@@ -163,7 +162,7 @@ def delete_user(username:str):
         con.close()
 
 
-def create_database(username:str, dbname:str, delete:bool=False) -> str:
+def create_database(username: str, dbname: str, delete: bool=False) -> str:
     """
     create_database creates a new database for the given user. If the delete
     argument is True, then it will delete the database specified. Note that

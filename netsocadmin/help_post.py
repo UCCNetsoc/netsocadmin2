@@ -5,7 +5,7 @@ currently Discord and email of SysAdmins and the main Netsoc email
 import json
 import smtplib
 from email.message import EmailMessage
-
+import mail_helper
 import requests
 
 import config
@@ -32,21 +32,17 @@ Email: {user_email}
 {message}
 
 PS: Please "Reply All" to the emails so that you get a quicker response."""
-
-    msg = EmailMessage()
-    msg.set_content(message_body)
-    msg["From"] = config.NETSOC_ADMIN_EMAIL_ADDRESS
-    msg["To"] = config.NETSOC_EMAIL_ADDRESS
-    msg["Subject"] = "[Netsoc Help] " + subject
-    msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
     if not config.FLASK_CONFIG['DEBUG']:
-        try:
-            with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-                s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-                s.send_message(msg)
-        except:
-            return False
-    return True
+        response = mail_helper.send_mail(
+            config.NETSOC_ADMIN_EMAIL_ADDRESS,
+            config.NETSOC_EMAIL_ADDRESS,
+            "[Netsoc Help] " + subject,
+            message_body,
+            [user_email] + config.SYSADMIN_EMAILS,
+        )
+    else:
+        response = type("Response", object, {"status_code": 200})
+    return str(response.status_code).startswith("20")
 
 
 def send_sudo_request_email(username: str, user_email: str):
@@ -57,7 +53,7 @@ def send_sudo_request_email(username: str, user_email: str):
     :param user_email the email address of that user to contact them for vetting.
     """
     message_body = \
-        """
+        f"""
 Hi {username},
 
 Thank you for making a request for an account with sudo privileges on feynman.netsoc.co.
@@ -70,20 +66,15 @@ The UCC Netsoc SysAdmin Team.
 
 PS: Please "Reply All" to the emails so that you get a quicker response.
 
-""".format(username=username)
-
-    msg = EmailMessage()
-    msg.set_content(message_body)
-    msg["From"] = config.NETSOC_ADMIN_EMAIL_ADDRESS
-    msg["To"] = config.NETSOC_EMAIL_ADDRESS
-    msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
-        user=username)
-    msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
-    if not config.FLASK_CONFIG['DEBUG']:
-        with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-            s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-            s.send_message(msg)
-
+"""
+    response = mail_helper.send_mail(
+        config.NETSOC_ADMIN_EMAIL_ADDRESS,
+        config.NETSOC_EMAIL_ADDRESS,
+        "[Netsoc Help] Sudo request on Feynman for " + username,
+        message_body,
+        [user_email] + config.SYSADMIN_EMAILS,
+    )
+    
 
 def send_help_bot(username: str, email: str, subject: str, message: str) -> bool:
     """
@@ -94,7 +85,7 @@ def send_help_bot(username: str, email: str, subject: str, message: str) -> bool
     headers = {'Content-Type': 'application/json'}
 
     if not config.FLASK_CONFIG['DEBUG']:
-        response = requests.post(DISCORD_BOT_HELP_ADDRESS, data=json.dumps(output).encode(), headers=headers)
+        response = requests.post(DISCORD_BOT_HELP_ADDRESS, json=output, headers=headers)
     else:
         response = type("Response", object, {"status_code": 200})
     return response.status_code == 200

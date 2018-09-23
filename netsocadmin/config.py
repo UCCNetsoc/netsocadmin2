@@ -54,8 +54,6 @@ MYSQL_DETAILS = {
 
 # sendgrid api key
 SENDGRID_KEY = "sample_text"
-SENDGRID_USERNAME = "netsoc"
-SENDGRID_PASSWORD = "the_cake_is_a_lie"
 NETSOC_EMAIL_ADDRESS = "netsoc@uccsocieties.com"
 NETSOC_ADMIN_EMAIL_ADDRESS = "netsocadmin@netsoc.co"
 

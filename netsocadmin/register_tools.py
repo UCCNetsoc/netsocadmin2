@@ -13,13 +13,12 @@ import db
 import ldap3
 import paramiko
 import pymysql
-from sendgrid import Email, sendgrid
-from sendgrid.helpers.mail import Content, Mail
+import mail_helper
 
 import config
 
 
-def send_confirmation_email(email:str, server_url:str) -> bool:
+def send_confirmation_email(email: str, server_url: str) -> bool:
     """
     Sends email containing the link which users use to set up their accounts.
 
@@ -41,19 +40,18 @@ Yours,
 The UCC Netsoc SysAdmin Team
 """
     if not config.FLASK_CONFIG['DEBUG']:
-        sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
-        from_email = Email("server.registration@netsoc.co")
-        subject = "Account Registration"
-        to_email = Email(email)
-        content = Content("text/plain", message_body)
-        mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        response = mail_helper.send_mail(
+            "server.registration@netsoc.co",
+            email,
+            "Account Registration",
+            message_body,
+        )
     else:
         response = type("Response", object, {"status_code": 200})
     return str(response.status_code).startswith("20")
 
 
-def send_details_email(email:str, user:str, password:str) -> bool:
+def send_details_email(email: str, user: str, password: str) -> bool:
     """
     Sends an email once a user has registered succesfully confirming
     the details they have signed up with.
@@ -86,18 +84,17 @@ Yours,
 The UCC Netsoc SysAdmin Team
     """
     if not config.FLASK_CONFIG['DEBUG']:
-        sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
-        from_email = Email("server.registration@netsoc.co")
-        subject = "Account Registration"
-        to_email = Email(email)
-        content = Content("text/plain", message_body)
-        mail = Mail(from_email, subject, to_email, content)
-        response = sg.client.mail.send.post(request_body=mail.get())
+        response = mail_helper.send_mail(
+            "server.registration@netsoc.co",
+            email,
+            "Account Registration",
+            message_body,
+        )
     else:
         response = type("Response", object, {"status_code": 200})
     return str(response.status_code).startswith("20")
 
-def generate_uri(email:str) -> str:
+def generate_uri(email: str) -> str:
     """
     Generates a uri token which will identify this user's email address.
     This should be checked when the user signs up to make sure it was the
@@ -116,20 +113,17 @@ def generate_uri(email:str) -> str:
         c = conn.cursor()
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
-
     except sqlite3.OperationalError:
         c.execute(db.RESET)
         c.execute(db.CREATE)
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
-
     finally:
         if conn: conn.close()
-
     return uri
 
 
-def good_token(email:str, uri:str) -> bool:
+def good_token(email: str, uri: str) -> bool:
     """
     Confirms whether an email and uri pair are valid.
 
@@ -147,7 +141,7 @@ def good_token(email:str, uri:str) -> bool:
     return True
 
 
-def remove_token(email:str):
+def remove_token(email: str):
     """
     Removes a token from the database for a given email address.
 
@@ -159,7 +153,7 @@ def remove_token(email:str):
         conn.commit()
 
 
-def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
+def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
     """
     Adds the user to the Netsoc LDAP DB.
 
@@ -195,10 +189,8 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
 
         # creates initial password for user. They will be asked to change
         # this when they first log in.
-        password = "".join(random.choice(
-            string.ascii_letters + string.digits) for _ in range(12))
-        crypt_password = "{crypt}" + \
-                crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
+        password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+        crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         info["password"] = password
         info["crypt_password"] = crypt_password
 
@@ -209,11 +201,12 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             "posixAccount",
             "mailAccount",
         ]
+
         attributes = {
             "cn" : user,
             "gidNumber": config.LDAP_USER_GROUP_ID,
             "homeDirectory": info["home_dir"],
-            "mail": f"{user}@netsoc.co"%(user),
+            "mail": f"{user}@netsoc.co",
             "uid" : user,
             "uidNumber": next_uid,
             "loginShell": "/bin/bash",
@@ -228,7 +221,7 @@ def add_ldap_user(user:str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             return False, conn.last_error
     return True, info
 
-def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
+def add_netsoc_database(info: typing.Dict[str, str]) -> bool:
     """
     Adds a user's details to the Netsoc MySQL database.
 
@@ -261,7 +254,7 @@ def add_netsoc_database(info:typing.Dict[str, str]) -> bool:
     conn.commit()
     return True
 
-def has_account(email:str) -> bool:
+def has_account(email: str) -> bool:
     """
     Sees if their is already an account on record with this email address.
 
@@ -277,7 +270,7 @@ def has_account(email:str) -> bool:
             return True
     return False
 
-def has_username(uid:str) -> bool:
+def has_username(uid: str) -> bool:
     """
     Tells whether or not a uid is already used on the server.
 
@@ -296,7 +289,7 @@ def has_username(uid:str) -> bool:
         )
     return True
 
-def initialise_directories(username:str, password:str):
+def initialise_directories(username: str, password: str):
     """
     Makes an ssh connection to the server which will initialise a
     user's home directory. This allows them to not have to ever connect
