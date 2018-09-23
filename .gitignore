@@ -66,7 +66,6 @@ logs/wordpress_installer.log
 .idea/
 
 # configuration files
-netsocadmin/config.py
 netsocadmin/logging_config.ini
 passwords.py
 
