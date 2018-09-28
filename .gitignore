@@ -76,3 +76,4 @@ passwords.py
 .DS_Store
 
 .vscode
+lock.mdb
