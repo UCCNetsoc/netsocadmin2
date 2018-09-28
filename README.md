@@ -47,6 +47,14 @@ docker run \
 
 ## Dev Environment
 
+### To run
+
+In one terminal, run `docker-compose -f docker-compose-dev.yml up`
+
+In another terminal, run `python3 netsocadmin/netsoc_admin.py`
+
+Go to [`http://localhost:5050`](http://localhost:5050) and away you go!
+
 Admin User details;
 - username: `john`
 - password: `johns-password`
