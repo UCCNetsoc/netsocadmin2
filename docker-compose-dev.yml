@@ -17,10 +17,13 @@ services:
   sql:
     image: mysql
     container_name: netsoc-admin-mysql
+    command: mysqld --default-authentication-plugin=mysql_native_password
     ports:
       - 3306:3306
+    volumes: 
+      - './dev/mysql:/var/lib/mysql'
     environment:
       MYSQL_USER: netsoc
       MYSQL_PASSWORD: netsoc
       MYSQL_DATABASE: netsoc_admin
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_ROOT_PASSWORD: netsoc

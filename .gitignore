@@ -77,3 +77,7 @@ passwords.py
 
 .vscode
 lock.mdb
+
+binlog.*
+undo_*
+dev/mysql/performance_schema

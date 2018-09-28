@@ -39,7 +39,7 @@ LDAP_USER_GROUP_ID = 422
 TUTORIAL_FOLDER = "./tutorials"
 
 # the root directory with all of the backups in it
-BACKUPS_DIR = "/backups"
+BACKUPS_DIR = "./dev/backups"
 
 # local uri db name
 TOKEN_DB_NAME = ".uri.db"  # should end with .db for .gitignore
@@ -47,7 +47,7 @@ TOKEN_DB_NAME = ".uri.db"  # should end with .db for .gitignore
 # mysql db details
 MYSQL_DETAILS = {
     "host": "localhost",
-    "user": "netsoc",
+    "user": "root",
     "password": "netsoc",
     "db": "netsoc_admin",
 }
