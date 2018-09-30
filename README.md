@@ -6,7 +6,8 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 ## Features
 
-### We have:
+### We have
+
 * Automated user account creation
 * MySQL database managment
 * Backup managment
@@ -14,7 +15,8 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 * WordPress installer
 * Tutorials
 
-### We will have:
+### We will have
+
 * Server password reset functionality
 * Own domain name linking to WordPress installation
 
@@ -24,9 +26,8 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 To build the docker image:
 
-1. Create a file called `wordpress_installer_config.py` following the same format as of that in `sample_wordpress_installer_config.py`. This file configures the wordpress_installer package.
-2. Create a `admin_passwords.py` following the same format as of that in `sample_admin_passwords.py`. This file configures the netsoc admin server itself.
-3. In this directory, run:
+1. Create a `netsocadmin/config.py` following the same format as of that in `netsocadmin/config.py`. This file configures the netsoc admin server itself.
+2. In this directory, run:
 
 ```bash
 docker build -t netsocadmin .
@@ -40,8 +41,7 @@ docker run \
     --name netsocadmin \
     -v /path/to/backups:/backups \
     -v /path/to/home/dirs:/home/users \
-    -v /path/to/admin_passwords.py:/netsocadmin/webapp/passwords.py \
-    -v /path/to/wordpress_installer_config.py:/netsocadmin/wordpress_installer/wordpress_installer/config.py \
+    -v /path/to/admin_passwords.py:/netsocadmin/config.py \
     docker.netsoc.co/netsocadmin:latest
 ```
 
@@ -55,10 +55,12 @@ In another terminal, run `python3 netsocadmin/netsoc_admin.py`
 
 Go to [`http://localhost:5050`](http://localhost:5050) and away you go!
 
-Admin User details;
-- username: `john`
-- password: `johns-password`
+Admin User details:
 
-Normal User details;
-- username: `sofia`
-- password: `sofias-password`
+* username: `john`
+* password: `johns-password`
+
+Normal User details:
+
+* username: `sofia`
+* password: `sofias-password`

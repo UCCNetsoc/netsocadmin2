@@ -1,4 +1,4 @@
-FROM python:alpine
+FROM python:alpine3.7
 LABEL maintainer="netsoc@netsoc.co"
 
 COPY . /netsocadmin
@@ -26,6 +26,8 @@ RUN mkdir ~/.ssh
 RUN ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
 WORKDIR /netsocadmin/webapp
+
+VOLUME ["/backups", "/home/users", "/netsocadmin/config.py"]
 
 # # not actually used, just for documentaion
 EXPOSE 5050
