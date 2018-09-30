@@ -39,7 +39,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
 """
-    if not config.FLASK_CONFIG['DEBUG']:
+    if not config.FLASK_CONFIG['debug']:
         response = mail_helper.send_mail(
             "server.registration@netsoc.co",
             email,
@@ -83,7 +83,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
     """
-    if not config.FLASK_CONFIG['DEBUG']:
+    if not config.FLASK_CONFIG['debug']:
         response = mail_helper.send_mail(
             "server.registration@netsoc.co",
             email,

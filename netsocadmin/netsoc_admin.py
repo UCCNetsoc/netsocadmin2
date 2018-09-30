@@ -374,7 +374,7 @@ def wordpressinstall():
     """
     username = flask.session["username"]
     home_dir = "/home/users/" + username
-    w.get_wordpress(home_dir, username, DEBUG)
+    w.get_wordpress(home_dir, username, config.FLASK_CONFIG['debug'])
     return username, 200
 
 
@@ -452,7 +452,7 @@ def change_shell():
         that they request from the dropdown
     """
     # Ensure the selected shell is in the list of allowed shells
-    shell_path = SHELL_PATHS.get(flask.request.form["shell"], None)
+    shell_path = config.SHELL_PATHS.get(flask.request.form["shell"], None)
 
     if shell_path is None:
         # Return an error message

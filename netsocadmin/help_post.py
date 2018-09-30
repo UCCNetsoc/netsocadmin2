@@ -32,7 +32,7 @@ Email: {user_email}
 {message}
 
 PS: Please "Reply All" to the emails so that you get a quicker response."""
-    if not config.FLASK_CONFIG['DEBUG']:
+    if not config.FLASK_CONFIG['debug']:
         response = mail_helper.send_mail(
             config.NETSOC_ADMIN_EMAIL_ADDRESS,
             config.NETSOC_EMAIL_ADDRESS,
@@ -41,7 +41,7 @@ PS: Please "Reply All" to the emails so that you get a quicker response."""
             [user_email] + config.SYSADMIN_EMAILS,
         )
     else:
-        response = type("Response", object, {"status_code": 200})
+        response = type("Response", (object,), {"status_code": 200})
     return str(response.status_code).startswith("20")
 
 
@@ -84,7 +84,7 @@ def send_help_bot(username: str, email: str, subject: str, message: str) -> bool
     output = {"user": username, "email": email, "subject": subject, "message": message}
     headers = {'Content-Type': 'application/json'}
 
-    if not config.FLASK_CONFIG['DEBUG']:
+    if not config.FLASK_CONFIG['debug']:
         response = requests.post(DISCORD_BOT_HELP_ADDRESS, json=output, headers=headers)
     else:
         response = type("Response", object, {"status_code": 200})
