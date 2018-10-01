@@ -47,14 +47,18 @@ docker run \
 
 ## Dev Environment
 
-### To run
+### To Run
 
-In one terminal, run `docker-compose -f docker-compose-dev.yml up`
+To bring up the external services needed for NetsocAdmin to run (LDAP and MySQL), run `docker-compose -f docker-compose-dev.yml up -d`.
 
-In another terminal, run `python3 netsocadmin/netsoc_admin.py`
+Then you can run `python3 netsocadmin/netsoc_admin.py` to run the actual netsoc admin.
+Please ensure you have Python3.6+ for this.
 
-Go to [`http://localhost:5050`](http://localhost:5050) and away you go!
+Go to `http://localhost:5050` and away you go!
 
+To shut down the services afterwards, run `docker-compose -f docker-compose-dev.yml down`.
+
+### Dev Env User Details
 Admin User details:
 
 * username: `john`
