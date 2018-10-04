@@ -9,7 +9,6 @@ import sys
 
 import flask
 import help_post
-import markdown
 import login_tools
 import register_tools as r
 import routes
@@ -317,8 +316,6 @@ if __name__ == '__main__':
 
     if os.getenv("NETSOCADMINDEBUG"):
         DEBUG = True
-
-    populate_tutorials()
 
     app.run(
         threaded=True,
