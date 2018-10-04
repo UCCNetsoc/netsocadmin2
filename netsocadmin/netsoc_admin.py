@@ -3,18 +3,10 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
-import os
-import re
-import sys
-
+import config
 import flask
 import login_tools
-import register_tools as r
 import routes
-import config
-
-
-TUTORIALS = []
 
 
 app = flask.Flask("netsocadmin")
@@ -25,7 +17,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
 
 @app.route('/')
-def signinup():
+def index():
     """
     Route: /
         This route is for the index page. If a user is already logged in, it will
@@ -73,12 +65,6 @@ app.add_url_rule('/completesudoapplication', view_func=routes.CompleteSudo.as_vi
 
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1 and sys.argv[1] == "debug":
-        DEBUG = True
-
-    if os.getenv("NETSOCADMINDEBUG"):
-        DEBUG = True
-
     app.run(
         threaded=True,
         **config.FLASK_CONFIG,
