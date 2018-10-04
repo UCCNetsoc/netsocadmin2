@@ -18,15 +18,15 @@ def print_db():
     which are currently in the database. Intended for use
     within an interactive shell.
     """
-    conn, c, uri = None, None, None
+    conn, c = None, None
     try:
         conn = sqlite3.connect(config.TOKEN_DB_NAME)
         c = conn.cursor()
         c.execute("SELECT * FROM uris")
         row_pattern = "%64s | %-64s"
-        print(row_pattern%("email", "uri"))
+        print(row_pattern % ("email", "uri"))
         for row in c.fetchall():
-            print(row_pattern%(row[0], row[1]))
+            print(row_pattern % (row[0], row[1]))
     finally:
         if c:
             c.close()

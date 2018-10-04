@@ -13,7 +13,7 @@ import markdown
 import backup_tools as b
 import mysql as m
 import help_post as h
-import login_tools as l
+import login_tools
 import register_tools as r
 import routes
 import wordpress_install as w
@@ -29,6 +29,7 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
+
 @app.route('/')
 def signinup():
     """
@@ -36,7 +37,7 @@ def signinup():
         This route is for the index page. If a user is already logged in, it will
         redirect to the server tools page.
     """
-    if l.is_logged_in():
+    if login_tools.is_logged_in():
         return flask.redirect("/tools")
 
     app.logger.debug("Received index page request")
@@ -92,7 +93,10 @@ def signup() -> str:
     uri = flask.request.args.get('t')
     if not r.good_token(email, uri):
         app.logger.debug(f"signup(): bad token {uri} used for email {email}")
-        return flask.render_template("index.html", error_message="Your request was not valid. Please try again or contact us")
+        return flask.render_template(
+            "index.html",
+            error_message="Your request was not valid. Please try again or contact us",
+        )
 
     return flask.render_template("form.html", email_address=email, token=uri)
 
@@ -110,7 +114,10 @@ def completeregistration():
     uri = flask.request.form["_token"]
     if not r.good_token(email, uri):
         app.logger.debug(f"completeregistration(): invalid token {uri} for email {email}")
-        return flask.render_template("index.html", error_message="Your token has expired or never existed. Please try again or contact us")
+        return flask.render_template(
+            "index.html",
+            error_message="Your token has expired or never existed. Please try again or contact us",
+        )
 
     # make sure form is flled out and username is still legit
     form_fields = (
@@ -211,7 +218,7 @@ def login():
     This route should be reached by a form sending login information to it via
     a POST request.
     """
-    if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
+    if not login_tools.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
     if not config.FLASK_CONFIG["debug"]:
         r.initialise_directories(flask.request.form["username"], flask.request.form["password"])

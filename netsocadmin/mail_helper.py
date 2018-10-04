@@ -3,6 +3,7 @@ import sendgrid
 from sendgrid.helpers.mail import Email, Content, Mail, Personalization
 import config
 
+
 def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List[str]=None) -> int:
     sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
     from_email = Email("server.registration@netsoc.co")

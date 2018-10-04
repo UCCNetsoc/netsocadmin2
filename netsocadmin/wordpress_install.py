@@ -4,7 +4,6 @@ import pymysql
 
 import config
 import logging
-from logging.config import fileConfig
 
 import random
 import string
@@ -13,7 +12,7 @@ import wget
 import subprocess
 import os
 
-#fileConfig(config.WORDPRESS_CONFIG["package"]["logging_config"])
+# fileConfig(config.WORDPRESS_CONFIG["package"]["logging_config"])
 logger = logging.getLogger(__name__)
 
 """
@@ -30,7 +29,7 @@ def extract_from_tar(path_to_file, target_dir):
     """
     logger.debug(f"extracting file {path_to_file} from tar to {target_dir}")
     split_command = ["tar", "-xzf", path_to_file, "-C", target_dir]
-    completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
+    subprocess.call(split_command, stdout=subprocess.PIPE)
 
 
 def download_to(url, path_to_dir):
@@ -60,7 +59,7 @@ def chown_dir_and_children(path_to_dir, username):
         f"changing owner and group of directory {path_to_dir} and children",
     )
     split_command = ["chown", "-R", username + ":member", path_to_dir]
-    completed_process = subprocess.call(split_command, stdout=subprocess.PIPE)
+    subprocess.call(split_command, stdout=subprocess.PIPE)
 
 
 def file_exists(path_to_file):
@@ -136,10 +135,10 @@ def create_wordpress_database(username, is_debug_mode):
     logger.debug("Granting privileges to user")
 
     new_db_conf = {
-        "user"          : db_user,
-        "password" 		: password,
-        "db" 			: db_user,
-        "host"			: config.db["host"]
+        "user":     db_user,
+        "password": password,
+        "db":       db_user,
+        "host":     config.db["host"]
     }
 
     return new_db_conf
@@ -188,9 +187,10 @@ def get_wordpress(user_dir, username, is_debug_mode):
             Deletes the tar compressed wordpress install from the user's home directory.
     Configuration:
             Creates new database and user for wordpress.
-            Generates a new wordpress cofiguration, and places it in the wordpress directory created in the download phase.
-            Changes owner and group of wordpress directory and child files/directories to the username given, and 'member'
-            relatively.
+            Generates a new wordpress cofiguration, and places it in the wordpress directory created in the download
+            phase.
+            Changes owner and group of wordpress directory and child files/directories to the username given, and
+            'member' relatively.
     """
 
     logger.debug(f"Installing WordPress for {username}")

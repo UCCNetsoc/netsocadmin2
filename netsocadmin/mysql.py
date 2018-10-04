@@ -68,8 +68,12 @@ def list_dbs(user: str) -> List[str]:
         with con.cursor() as cur:
             sql = "SHOW DATABASES;"
             cur.execute(sql)
-            is_user_db = lambda dbname: dbname.startswith(f"{user}_")
-            databases = list(filter(is_user_db, map(lambda row: row["Database"], cur.fetchall())))
+            databases = list(
+                filter(
+                    lambda dbname: dbname.startswith(f"{user}_"),
+                    map(lambda row: row["Database"], cur.fetchall())
+                )
+            )
     except Exception as e:
         raise DatabaseAccessError(f"failed to list databases for user '{user}'") from e
     finally:
@@ -197,7 +201,7 @@ def create_database(username: str, dbname: str, delete: bool=False) -> str:
 
             # execute the operation
             command = "CREATE" if not delete else "DROP"
-            sql =f"{command} DATABASE `{user_dbname}`;"
+            sql = f"{command} DATABASE `{user_dbname}`;"
             cur.execute(sql)
             return user_dbname
     except Exception as e:
@@ -214,16 +218,28 @@ def main():
     p = argparse.ArgumentParser(
         description="Easily manage your Netsoc MySQL databases.")
     group = p.add_mutually_exclusive_group()
-    group.add_argument("-c", "--createdb",
-        help="Create a new database with the specified name.")
-    group.add_argument("-d", "--deletedb",
-        help="Delete a database with the specified name.")
-    group.add_argument("-l", "--listdb",
+    group.add_argument(
+        "-c",
+        "--createdb",
+        help="Create a new database with the specified name.",
+    )
+    group.add_argument(
+        "-d",
+        "--deletedb",
+        help="Delete a database with the specified name.",
+    )
+    group.add_argument(
+        "-l",
+        "--listdb",
         action="store_true",
-        help="Lists all of your Netsoc MySQL Databases.")
-    group.add_argument("-n", "--new",
+        help="Lists all of your Netsoc MySQL Databases.",
+    )
+    group.add_argument(
+        "-n",
+        "--new",
         action="store_true",
-        help="Creates a new MySQL account name for you. Any existing accounts are removed completely.")
+        help="Creates a new MySQL account name for you. Any existing accounts are removed completely.",
+    )
 
     args = p.parse_args()
     if args.createdb:
@@ -271,7 +287,7 @@ def main():
         new_password = create_user(user)
         print("Your new account details:")
         print(f"Username: '{user}'")
-        print("Password: '{new_password}'")
+        print(f"Password: '{new_password}'")
         exit(0)
 
 
