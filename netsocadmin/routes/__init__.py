@@ -9,6 +9,7 @@ from .tools import (
     ToolIndex,
     WordpressInstall,
 )
+from .tutorials import Tutorials
 
 __all__ = [
     # Tools routes
@@ -20,4 +21,7 @@ __all__ = [
     'ResetPassword',
     'ToolIndex',
     'WordpressInstall',
+
+    # Tutorials
+    'Tutorials',
 ]

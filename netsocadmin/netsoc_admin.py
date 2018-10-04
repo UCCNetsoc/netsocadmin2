@@ -248,39 +248,7 @@ app.add_url_rule('/wordpressinstall', view_func=routes.WordpressInstall.as_view(
 
 
 # ------------------------------------Tutorials---------------------------------- #
-def populate_tutorials():
-    """
-    Opens the tutorials folder and parses all of the markdown tutorials
-    contained within.
-    """
-    for tut_file in filter(lambda f: f.endswith(".md"), os.listdir(config.TUTORIAL_FOLDER)):
-        with open(os.path.join(config.TUTORIAL_FOLDER, tut_file)) as f:
-            tutorial = markdown.markdown(f.read())
-            TUTORIALS.append(flask.Markup(tutorial))
-
-
-@app.route("/tutorials")
-def tutorials():
-    """
-    Route: /tutorials
-        This route will render the tutorials page. Note that the markdown tutorial
-        files are read when the application starts-up.
-    """
-    global TUTORIALS
-    if len(TUTORIALS) == 0:
-        return flask.render_template(
-            "tutorials.html",
-            show_logout_button=login_tools.is_logged_in(),
-            error="No tutorials to show",
-        )
-    if DEBUG:
-        TUTORIALS = []
-        populate_tutorials()
-    return flask.render_template(
-        "tutorials.html",
-        show_logout_button=login_tools.is_logged_in(),
-        tutorials=TUTORIALS,
-    )
+app.add_url_rule('/tutorials', view_func=routes.Tutorials.as_view('tutorials'))
 
 
 # --------------------------------------Sudo------------------------------------- #
