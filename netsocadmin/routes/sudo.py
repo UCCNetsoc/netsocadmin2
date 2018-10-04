@@ -8,8 +8,8 @@ import login_tools
 
 
 __all__ = [
-    'CompleteSudo',
-    'Sudo',
+    "CompleteSudo",
+    "Sudo",
 ]
 
 
@@ -23,9 +23,9 @@ class CompleteSudo(flask.views.View):
     # Decorate all methods with this
     decorators = [login_tools.protected_page]
     # Logger instance
-    logger = logging.getLogger('netsocadmin.completesudoapplication')
+    logger = logging.getLogger("netsocadmin.completesudoapplication")
     # Specify which method(s) are allowed to be used to access the route
-    methods = ['POST']
+    methods = ["POST"]
 
     def render(self, error=False):
         """Render the template with appropriate messages for whether or not there's an error"""
@@ -44,11 +44,11 @@ class CompleteSudo(flask.views.View):
 
 
     def dispatch_requests(self):
-        self.logger.debug('Received request')
+        self.logger.debug("Received request")
         # Get the details from the form data
         email = flask.request.form["email"]
         reason = flask.request.form["reason"]
-        username = flask.session['username']
+        username = flask.session["username"]
 
         # Try to send the email
         try:
@@ -78,10 +78,10 @@ class Sudo(flask.views.View):
     # Decorate all methods with this
     decorators = [login_tools.protected_page]
     # Logger instance
-    logger = logging.getLogger('netsocadmin.sudo')
+    logger = logging.getLogger("netsocadmin.sudo")
 
     def dispatch_request(self):
-        self.logger.debug('Received request')
+        self.logger.debug("Received request")
         return flask.render_template(
             "sudo.html",
             show_logout_button=login_tools.is_logged_in(),

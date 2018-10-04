@@ -17,14 +17,14 @@ import wordpress_install
 
 
 __all__ = [
-    'Backup',
-    'ChangeShell',
-    'CreateDB',
-    'DeleteDB',
-    'Help',
-    'ResetPassword',
-    'ToolIndex',
-    'WordpressInstall',
+    "Backup",
+    "ChangeShell",
+    "CreateDB",
+    "DeleteDB",
+    "Help",
+    "ResetPassword",
+    "ToolIndex",
+    "WordpressInstall",
 ]
 
 
@@ -38,19 +38,19 @@ class ToolView(flask.views.View):
 
     # Default variables used to populate the tools template
     default_vars = {
-        'show_logout_button': login_tools.is_logged_in(),
-        'databases': mysql.list_dbs(flask.session["username"]),
-        'wordpress_exists': wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
-        'wordpress_link': f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
-        'weekly_backups': backup_tools.list_backups(flask.session["username"], "weekly"),
-        'monthly_backups': backup_tools.list_backups(flask.session["username"], "monthly"),
-        'username': flask.session["username"],
-        'login_shells': [(k, k.capitalize()) for k in config.SHELL_PATHS],
+        "show_logout_button": login_tools.is_logged_in(),
+        "databases": mysql.list_dbs(flask.session["username"]),
+        "wordpress_exists": wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
+        "wordpress_link": f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
+        "weekly_backups": backup_tools.list_backups(flask.session["username"], "weekly"),
+        "monthly_backups": backup_tools.list_backups(flask.session["username"], "monthly"),
+        "username": flask.session["username"],
+        "login_shells": [(k, k.capitalize()) for k in config.SHELL_PATHS],
     }
     # Logger instance (should be defined in each sub class to use correct naming)
     logger = None
     # Specify which method(s) are allowed to be used to access the route
-    methods = ['GET']
+    methods = ["GET"]
 
     def render(self, **data: Dict) -> str:
         """
@@ -69,7 +69,7 @@ class DBView(ToolView):
     Extend the ToolView with methods that help abstract some of the work out of the db related views
     """
     # Specify which method(s) are allowed to be used to access the route
-    methods = ['POST']
+    methods = ["POST"]
 
     def validate(self, username: str, password: str, dbname: str=None) -> Tuple[bool, str]:
         """
@@ -86,12 +86,12 @@ class DBView(ToolView):
         else:
             fields = [username, password, dbname]
         if not all(fields):
-            return False, 'Please specify all fields.'
+            return False, "Please specify all fields."
         # Check that the username / password combination is correct
         if not login_tools.is_correct_password(username, password):
-            return False, 'Wrong username or password.'
+            return False, "Wrong username or password."
         # We good
-        return True, ''
+        return True, ""
 
 
 # Actual View Classes
@@ -107,18 +107,18 @@ class Backup(ToolView):
         Must be in the form YYYY-MM-DD.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.backup')
+    logger = logging.getLogger("netsocadmin.backup")
 
     def dispatch_request(self, username: str, timeframe: str, backup_date: str):
-        self.logger.debug('received request')
+        self.logger.debug("Received request")
         # Validate the parameters
-        if (not re.match(r'[a-z]+$', username) or not re.match(r'^[0-9]{4}-[0-9]{2}-[0-9]{2}') or
-                timeframe not in ['weekly', 'monthly']):
-            self.logger.debug(f'received invalid arguments: {username}, {timeframe}, {backup_date}')
+        if (not re.match(r"[a-z]+$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}") or
+                timeframe not in ["weekly", "monthly"]):
+            self.logger.debug(f"received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
         # Retrieve the backup and send it to the user
         backups_base_dir = os.path.join(backup_tools.BACKUPS_DIR, username, timeframe)
-        return flask.send_from_directory(backups_base_dir, f'{backup_date}.tgz')
+        return flask.send_from_directory(backups_base_dir, f"{backup_date}.tgz")
 
 
 class ChangeShell(ToolView):
@@ -128,39 +128,39 @@ class ChangeShell(ToolView):
         that they request from the dropdown
     """
     # Specify which method(s) are allowed to be used to access the route
-    methods = ['POST']
+    methods = ["POST"]
     # Logger instance
-    logger = logging.getLogger('netsocadmin.change-shell')
+    logger = logging.getLogger("netsocadmin.change-shell")
 
     def dispatch_request(self):
-        self.logger.debug('received request')
+        self.logger.debug("Received request")
         # Ensure the selected shell is in the list of allowed shells
-        shell_path = config.SHELL_PATHS.get(flask.request.form.get('shell', ''), None)
+        shell_path = config.SHELL_PATHS.get(flask.request.form.get("shell", ""), None)
         if shell_path is None:
-            return self.render(shells_error='Invalid shell selection!', shells_active=True)
+            return self.render(shells_error="Invalid shell selection!", shells_active=True)
         # Attempt to update LDAP for the logged in user to update their loginShell
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
         with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
             # Find the user
-            username = flask.session['username']
+            username = flask.session["username"]
             # Put member first since it's the most probable
-            groups = ['member', 'admins', 'committee']
+            groups = ["member", "admins", "committee"]
             found = False
             for group in groups:
                 success = conn.search(
-                    search_base=f'cn={group},dc=netsoc,dc=co',
-                    search_filter=f'(&(uid={username}))',
+                    search_base=f"cn={group},dc=netsoc,dc=co",
+                    search_filter=f"(&(uid={username}))",
                 )
                 if success:
                     found = True
                     break
             if not found:
-                return self.render(shells_error='Could not find your user to update it', shells_active=True)
+                return self.render(shells_error="Could not find your user to update it", shells_active=True)
 
             # Modify the user now
             success = conn.modfy(
-                dn=f'cn={username},cn={group},dc=netsoc,dc=co',
-                changes={'loginShell': (ldap3.MODIFY_REPLACE, [shell_path])},
+                dn=f"cn={username},cn={group},dc=netsoc,dc=co",
+                changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
             )
             if not success:
                 return self.render(shells_error=conn.last_error, shells_active=True)
@@ -175,14 +175,15 @@ class CreateDB(DBView):
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.createdb')
+    logger = logging.getLogger("netsocadmin.createdb")
 
     def dispatch_request(self):
-        self.logger.debug(f'Form: {flask.request.form}')
+        self.logger.debug("Received request")
+        self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
-        username = flask.request.form.get('username', '')
-        password = flask.request.form.get('password', '')
-        dbname = flask.request.form.get('dbname', '')
+        username = flask.request.form.get("username", "")
+        password = flask.request.form.get("password", "")
+        dbname = flask.request.form.get("dbname", "")
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
@@ -193,7 +194,7 @@ class CreateDB(DBView):
         except mysql.DatabaseAccessError as e:
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
-        return flask.redirect('/')
+        return flask.redirect("/")
 
 
 class DeleteDB(DBView):
@@ -204,14 +205,15 @@ class DeleteDB(DBView):
         logged in.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.deletedb')
+    logger = logging.getLogger("netsocadmin.deletedb")
 
     def dispatch_request(self):
-        self.logger.debug(f'Form: {flask.request.form}')
+        self.logger.debug("Received request")
+        self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
-        username = flask.request.form.get('username', '')
-        password = flask.request.form.get('password', '')
-        dbname = flask.request.form.get('dbname', '')
+        username = flask.request.form.get("username", "")
+        password = flask.request.form.get("password", "")
+        dbname = flask.request.form.get("dbname", "")
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
@@ -222,7 +224,7 @@ class DeleteDB(DBView):
         except mysql.DatabaseAccessError as e:
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
-        return flask.redirect('/')
+        return flask.redirect("/")
 
 
 class Help(ToolView):
@@ -233,25 +235,25 @@ class Help(ToolView):
         This can only be reached if you are logged in.
     """
     # Specify the method(s) that are allowed to be used to reach this view
-    methods = ['POST']
+    methods = ["POST"]
     # Logger instance
-    logger = logging.getLogger('netsocadmin.help')
+    logger = logging.getLogger("netsocadmin.help")
 
     def dispatch_request(self) -> str:
-        self.logger.debug('received request for help')
-        email = flask.request.form.get('email', '')
-        subject = flask.request.form.get('subject', '')
-        message = flask.request.form.get('message', '')
+        self.logger.debug("Received request")
+        email = flask.request.form.get("email", "")
+        subject = flask.request.form.get("subject", "")
+        message = flask.request.form.get("message", "")
         # Ensure all fields are populated
         if not all([email, subject, message]):
-            return self.render(help_error='Please specify all fields', help_active=True)
+            return self.render(help_error="Please specify all fields", help_active=True)
         # Send the email
-        sent_email = help_post.send_help_email(flask.session['username'], email, subject, message)
+        sent_email = help_post.send_help_email(flask.session["username"], email, subject, message)
         # Try and send to Discord bot
         try:
-            sent_discord = help_post.send_help_bot(flask.session['username'], email, subject, message)
+            sent_discord = help_post.send_help_bot(flask.session["username"], email, subject, message)
         except Exception as e:
-            self.logger.error(f'Failed to send message to discord bot: {str(e)}')
+            self.logger.error(f"Failed to send message to discord bot: {str(e)}")
             # in this case, the Discord bot was unreachable. We log this error but
             # continue as success because the email may still be sent. This fix will have
             # to remain until the Discord bot becomes more reliable.
@@ -260,7 +262,7 @@ class Help(ToolView):
         if not sent_email and not sent_discord:
             # If not, report an error to the user
             return self.render(
-                help_error='There was a problem :( Please email netsoc@uccsocieties.ie instead',
+                help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
                 help_active=True,
             )
         # Otherwise when things are okay, report back stating so
@@ -275,13 +277,14 @@ class ResetPassword(DBView):
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.resetpw')
+    logger = logging.getLogger("netsocadmin.resetpw")
 
     def dispatch_request(self):
-        self.logger.debug(f'Form: {flask.request.form}')
+        self.logger.debug("Received request")
+        self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
-        username = flask.request.form.get('username', '')
-        password = flask.request.form.get('password', '')
+        username = flask.request.form.get("username", "")
+        password = flask.request.form.get("password", "")
         # Check that all fields are valid
         valid, msg = self.validate(username, password)
         if not valid:
@@ -304,10 +307,10 @@ class ToolIndex(ToolView):
         Note that this should only be shown when a user is logged in.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.tools')
+    logger = logging.getLogger("netsocadmin.tools")
 
     def dispatch_request(self):
-        self.logger.debug('received tools page request')
+        self.logger.debug("Received request")
         return self.render()
 
 
@@ -320,15 +323,15 @@ class WordpressInstall(ToolView):
         This endpoint is pinged via an AJAX request on the clients' side.
     """
     # Logger instance
-    logger = logging.getLogger('netsocadmin.wordpressinstall')
+    logger = logging.getLogger("netsocadmin.wordpressinstall")
 
     def dispatch_request(self) -> Tuple[str, int]:
-        self.logger.debug('received request to install wordpress')
+        self.logger.debug("Received request")
         username = flask.session["username"]
         wordpress_install.get_wordpress(
-            f'/home/users/{username}',
+            f"/home/users/{username}",
             username,
-            config.FLASK_CONFIG['debug']
+            config.FLASK_CONFIG["debug"]
         )
         # This is where you'll want to work on #30; no error checking, always returns 200 (tsk tsk tsk)
         return username, 200
