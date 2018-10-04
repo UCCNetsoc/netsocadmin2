@@ -1,4 +1,5 @@
 # stdlib
+import logging
 import os
 # lib
 import flask
@@ -34,7 +35,7 @@ class Tutorials(flask.views.View):
         return flask.render_template(
             "tutorials.html",
             show_logout_button=login_tools.is_logged_in(),
-            **kwt,
+            **kw,
         )
 
     def populate_tutorials(self):

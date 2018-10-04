@@ -15,19 +15,24 @@ from .tutorials import Tutorials
 
 __all__ = [
     # Login / Logout
-    'Login',
-    'Logout',
+    "Login",
+    "Logout",
+
+    # Sudo
+    "CompleteSudo",
+    "Sudo",
+
 
     # Tools
-    'Backup',
-    'ChangeShell',
-    'CreateDB',
-    'DeleteDB',
-    'Help',
-    'ResetPassword',
-    'ToolIndex',
-    'WordpressInstall',
+    "Backup",
+    "ChangeShell",
+    "CreateDB",
+    "DeleteDB",
+    "Help",
+    "ResetPassword",
+    "ToolIndex",
+    "WordpressInstall",
 
     # Tutorials
-    'Tutorials',
+    "Tutorials",
 ]

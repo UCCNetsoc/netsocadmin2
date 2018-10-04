@@ -8,7 +8,6 @@ import re
 import sys
 
 import flask
-import help_post
 import login_tools
 import register_tools as r
 import routes

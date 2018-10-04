@@ -42,7 +42,6 @@ class CompleteSudo(flask.views.View):
             message=message,
         )
 
-
     def dispatch_requests(self):
         self.logger.debug("Received request")
         # Get the details from the form data
