@@ -154,7 +154,7 @@ class Signup(flask.views.View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.signup")
 
-    def render(self, error: bool=False, email: str, token: str) -> str:
+    def render(self, email: str, token: str, error: bool=False) -> str:
         """Render the template with appropriate messages for whether or not there's an error"""
         if error:
             self.logger.debug(f"Bad token {token} used for email {email}")
@@ -170,7 +170,7 @@ class Signup(flask.views.View):
         # Make sure they haven't forget the URL
         email = flask.request.args.get("e")
         token = flask.request.args.get("t")
-        return self.render(not register_tools.good_token(email, token), email, token)
+        return self.render(email, token, not register_tools.good_token(email, token))
 
 
 class Username(flask.views.View):
