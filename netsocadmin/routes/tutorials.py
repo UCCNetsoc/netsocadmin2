@@ -27,7 +27,7 @@ class Tutorials(flask.views.View):
         self.tutorials = []
         self.populate_tutorials()
 
-    def render(self, error=False):
+    def render(self, error=False) -> str:
         if error:
             kw = {"error": "No tutorials to show!"}
         else:
@@ -50,7 +50,7 @@ class Tutorials(flask.views.View):
                 # Render the content and attach it to the tutorials list
                 self.tutorials.append(flask.Markup(content))
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         # Re-populate the tutorials if we're in debug mode
         if config.FLASK_CONFIG["debug"]:

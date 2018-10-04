@@ -24,7 +24,7 @@ class Login(flask.views.View):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         # Validate the login request
         if not login_tools.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
@@ -49,7 +49,7 @@ class Logout(flask.views.View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.logout")
 
-    def dispatch_reqests(self):
+    def dispatch_reqests(self) -> str:
         self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user
         flask.session.pop(config.LOGGED_IN_KEY, None)

@@ -27,7 +27,7 @@ class CompleteSudo(flask.views.View):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def render(self, error=False):
+    def render(self, error=False) -> str:
         """Render the template with appropriate messages for whether or not there's an error"""
         if error:
             caption = "There was a problem :("
@@ -42,7 +42,7 @@ class CompleteSudo(flask.views.View):
             message=message,
         )
 
-    def dispatch_requests(self):
+    def dispatch_requests(self) -> str:
         self.logger.debug("Received request")
         # Get the details from the form data
         email = flask.request.form["email"]
@@ -79,7 +79,7 @@ class Sudo(flask.views.View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.sudo")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         return flask.render_template(
             "sudo.html",

@@ -109,7 +109,7 @@ class Backup(ToolView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.backup")
 
-    def dispatch_request(self, username: str, timeframe: str, backup_date: str):
+    def dispatch_request(self, username: str, timeframe: str, backup_date: str) -> str:
         self.logger.debug("Received request")
         # Validate the parameters
         if (not re.match(r"[a-z]+$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}") or
@@ -132,7 +132,7 @@ class ChangeShell(ToolView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.change-shell")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         # Ensure the selected shell is in the list of allowed shells
         shell_path = config.SHELL_PATHS.get(flask.request.form.get("shell", ""), None)
@@ -177,7 +177,7 @@ class CreateDB(DBView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.createdb")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
@@ -207,7 +207,7 @@ class DeleteDB(DBView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.deletedb")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
@@ -279,7 +279,7 @@ class ResetPassword(DBView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.resetpw")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         self.logger.debug(f"Form: {flask.request.form}")
         # Get the fields necessary
@@ -309,7 +309,7 @@ class ToolIndex(ToolView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.tools")
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         return self.render()
 

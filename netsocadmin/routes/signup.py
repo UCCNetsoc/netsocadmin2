@@ -26,7 +26,7 @@ class CompleteRegistration(flask.views.View):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         # make sure token is valid
         email = flask.request.form["email"]
@@ -184,7 +184,7 @@ class Username(flask.views.View):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def dispatch_request(self):
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         if ("email" not in flask.request.headers or "uid" not in flask.request.headers or
                 "token" not in flask.request.headers):
