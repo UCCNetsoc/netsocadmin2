@@ -51,8 +51,9 @@ docker run \
 
 To bring up the external services needed for NetsocAdmin to run (LDAP and MySQL), run `docker-compose -f docker-compose-dev.yml up -d`.
 
-Then you can run `python3 netsocadmin/netsoc_admin.py` to run the actual netsoc admin.
+Then you can run `cd netsocadmin` followed by `python3 netsoc_admin.py` to run the actual netsoc admin.
 Please ensure you have Python3.6+ for this.
+Also note that you must run the script from inside the `netsocadmin` directory or else flask won't be able to find the templates!
 
 Go to `http://localhost:5050` and away you go!
 
