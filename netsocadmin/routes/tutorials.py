@@ -26,17 +26,14 @@ class Tutorials(flask.views.View):
 
     def render(self, error=False):
         if error:
-            return flask.render_template(
-                "tutorials.html",
-                show_logout_button=login_tools.is_logged_in(),
-                error="No tutorials to show!",
-            )
+            kw = {"error": "No tutorials to show!"}
         else:
-            return flask.render_template(
-                "tutorials.html",
-                show_logout_button=login_tools.is_logged_in(),
-                tutorials=self.tutorials,
-            )
+            kw = {"tutorials": self.tutorials}
+        return flask.render_template(
+            "tutorials.html",
+            show_logout_button=login_tools.is_logged_in(),
+            **kwt,
+        )
 
     def populate_tutorials(self):
         """
