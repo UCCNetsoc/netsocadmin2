@@ -1,5 +1,6 @@
 """Imports from all the files in the directory and makes the imports available to other parts of the system"""
 from .login import Login, Logout
+from .sudo import CompleteSudo, Sudo
 from .tools import (
     Backup,
     ChangeShell,

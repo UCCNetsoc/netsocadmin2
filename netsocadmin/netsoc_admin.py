@@ -226,63 +226,8 @@ app.add_url_rule('/tutorials', view_func=routes.Tutorials.as_view('tutorials'))
 
 
 # --------------------------------------Sudo------------------------------------- #
-@app.route("/sudo")
-@login_tools.protected_page
-def sudo():
-    """
-    Route: /sudo
-        This route will render the page for applying for sudo privilages.
-    """
-    return flask.render_template("sudo.html",
-                                 show_logout_button=login_tools.is_logged_in(),
-                                 username=flask.session["username"])
-
-
-@app.route("/completesudoapplication", methods=["POST"])
-@login_tools.protected_page
-def completesudoapplication():
-    """
-    Route: /completesudoapplication
-        This is run by the sudo-signup form in sudo.html. It will send an
-        email to the SysAdmin team as well as to the discord server
-        notifying us that a request for sudo on feynman has been made.
-    """
-    email = flask.request.form["email"]
-    reason = flask.request.form["reason"]
-    username = flask.session['username']
-
-    email_failed, discord_failed = False, False
-    try:
-        help_post.send_sudo_request_email(username, email)
-    except Exception as e:
-        email_failed = True
-        app.logger.error(f"Failed to send email: {str(e)}")
-
-    try:
-        help_post.send_help_bot(
-            username,
-            email,
-            "Feynman Account Request",
-            f"This user wants an account on feynman pls.\nReason: {reason}",
-        )
-    except Exception as e:
-        discord_failed = True
-        app.logger.error(f"Failed to send message to discord bot: {str(e)}")
-
-    if email_failed and discord_failed:
-        return flask.render_template(
-            "message.html",
-            show_logout_button=login_tools.is_logged_in(),
-            caption="There was a problem :(",
-            message="Please email netsoc@uccsocieties.ie instead",
-        )
-
-    return flask.render_template(
-        "message.html",
-        show_logout_button=login_tools.is_logged_in(),
-        caption="Success!",
-        message="A confirmation email has been sent to you. We will be in touch shortly.",
-    )
+app.add_url_rule('/sudo', view_func=routes.Sudo.as_view('sudo'))
+app.add_url_rule('/completesudoapplication', view_func=routes.CompleteSudo.as_view('completesudoapplication'))
 
 
 if __name__ == '__main__':
