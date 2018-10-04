@@ -1,8 +1,10 @@
 # stdlib
 import logging
+import re
 # lib
 import flask
 # local
+import config
 import register_tools
 
 
@@ -14,7 +16,7 @@ __all__ = [
 ]
 
 
-class CompleteRegistration(flask.views.View):
+class CompleteSignup(flask.views.View):
     """
     Route: register
         This is the route which is run by the registration form
@@ -134,7 +136,10 @@ class Confirmation(flask.views.View):
             )
 
         # send confirmation link to ensure they own the email account
-        out_email = "admin.netsoc.co" if not DEBUG else f"{config.FLASK_CONFIG['HOST']}:{config.FLASK_CONFIG['PORT']}"
+        out_email = (
+            "admin.netsoc.co" if not config.FLASK_CONFIG["debug"]
+            else f"{config.FLASK_CONFIG['host']}:{config.FLASK_CONFIG['port']}"
+        )
         confirmation_sent = register_tools.send_confirmation_email(email, out_email)
         if not confirmation_sent:
             self.logger.debug("Confirmation email failed to send")
@@ -198,7 +203,7 @@ class Username(flask.views.View):
 
         # check db for username
         requested_username = flask.request.headers["uid"]
-        if r.has_username(requested_username):
+        if register_tools.has_username(requested_username):
             self.logger.debug(f"uid {requested_username} is in use")
             return "Not available"
         return "Available"
