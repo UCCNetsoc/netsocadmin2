@@ -36,18 +36,6 @@ class ToolView(View):
     """
     # Decorate all subclasses with the following decorators
     decorators = [login_tools.protected_page]
-
-    # Default variables used to populate the tools template
-    default_vars = {
-        "show_logout_button": login_tools.is_logged_in(),
-        "databases": mysql.list_dbs(flask.session["username"]),
-        "wordpress_exists": wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
-        "wordpress_link": f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
-        "weekly_backups": backup_tools.list_backups(flask.session["username"], "weekly"),
-        "monthly_backups": backup_tools.list_backups(flask.session["username"], "monthly"),
-        "username": flask.session["username"],
-        "login_shells": [(k, k.capitalize()) for k in config.SHELL_PATHS],
-    }
     # Logger instance (should be defined in each sub class to use correct naming)
     logger = None
     # Specify which method(s) are allowed to be used to access the route
@@ -60,7 +48,14 @@ class ToolView(View):
         """
         return flask.render_template(
             "tools.html",
-            **self.default_vars,
+            databases=mysql.list_dbs(flask.session["username"]),
+            login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS],
+            monthly_backups=backup_tools.list_backups(flask.session["username"], "monthly"),
+            show_logout_button=login_tools.is_logged_in(),
+            username=flask.session["username"],
+            weekly_backups=backup_tools.list_backups(flask.session["username"], "weekly"),
+            wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
+            wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
             **data,
         )
 
