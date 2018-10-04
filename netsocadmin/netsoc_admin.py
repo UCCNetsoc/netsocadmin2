@@ -204,33 +204,8 @@ def username():
 
 
 # -------------------------------Login/Logout Routes-----------------------------#
-
-
-@app.route("/login", methods=["POST"])
-def login():
-    """
-    Route: login
-    This route should be reached by a form sending login information to it via
-    a POST request.
-    """
-    if not login_tools.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
-        return flask.render_template("index.html", error_message="Username or password was incorrect")
-    if not config.FLASK_CONFIG["debug"]:
-        r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
-    flask.session[config.LOGGED_IN_KEY] = True
-    flask.session["username"] = flask.request.form["username"]
-    return flask.redirect("/")
-
-
-@app.route("/logout")
-def logout():
-    """
-    Route: logout
-        This route logs a user out an redirects them back to the index page.
-    """
-    flask.session.pop(config.LOGGED_IN_KEY, None)
-    return flask.redirect("/")
-
+app.add_url_rule('/login', view_func=routes.Login.as_view('login'))
+app.add_url_rule('/logout', view_func=routes.Logout.as_view('logout'))
 
 # -------------------------------Server Tools Routes----------------------------- #
 app.add_url_rule(

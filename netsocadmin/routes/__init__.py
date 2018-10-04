@@ -1,4 +1,5 @@
 """Imports from all the files in the directory and makes the imports available to other parts of the system"""
+from .login import Login, Logout
 from .tools import (
     Backup,
     ChangeShell,
@@ -12,7 +13,11 @@ from .tools import (
 from .tutorials import Tutorials
 
 __all__ = [
-    # Tools routes
+    # Login / Logout
+    'Login',
+    'Logout',
+
+    # Tools
     'Backup',
     'ChangeShell',
     'CreateDB',
