@@ -8,7 +8,7 @@ import re
 import sys
 
 import flask
-import help_desk
+import help_post
 import markdown
 import login_tools
 import register_tools as r
