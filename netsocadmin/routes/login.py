@@ -1,7 +1,9 @@
 # lib
 import flask
 # local
+import config
 import login_tools
+import register_tools
 
 
 __all__ = [
@@ -27,7 +29,7 @@ class Login(flask.views.View):
             )
         # Initialise the user's directory if running on leela
         if not config.FLASK_CONFIG["debug"]:
-            r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
+            register_tools.initialise_directories(flask.request.form["username"], flask.request.form["password"])
         # Set the session info to reflect that the user is logged in and redirect back to /
         flask.session[config.LOGGED_IN_KEY] = True
         flask.session["username"] = flask.request.form["username"]
