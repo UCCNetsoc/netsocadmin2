@@ -4,6 +4,7 @@ import os
 # lib
 import flask
 import markdown
+from flask.views import View
 # local
 import config
 import login_tools
@@ -14,7 +15,7 @@ __all__ = [
 ]
 
 
-class Tutorials(flask.views.View):
+class Tutorials(View):
     """
     Route: /tutorials
         This route will render the tutorials page. Note that the markdown tutorial files are read when the application

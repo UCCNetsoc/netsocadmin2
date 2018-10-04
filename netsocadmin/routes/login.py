@@ -2,6 +2,7 @@
 import logging
 # lib
 import flask
+from flask.views import View
 # local
 import config
 import login_tools
@@ -14,7 +15,7 @@ __all__ = [
 ]
 
 
-class Login(flask.views.View):
+class Login(View):
     """
     Route: login
     This route should be reached by a form sending login information to it via a POST request.
@@ -41,7 +42,7 @@ class Login(flask.views.View):
         return flask.redirect("/")
 
 
-class Logout(flask.views.View):
+class Logout(View):
     """
     Route: logout
         This route logs a user out an redirects them back to the index page.

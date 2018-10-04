@@ -3,6 +3,7 @@ import logging
 import re
 # lib
 import flask
+from flask.views import View
 # local
 import config
 import register_tools
@@ -16,7 +17,7 @@ __all__ = [
 ]
 
 
-class CompleteSignup(flask.views.View):
+class CompleteSignup(View):
     """
     Route: register
         This is the route which is run by the registration form
@@ -102,7 +103,7 @@ class CompleteSignup(flask.views.View):
         return flask.render_template("message.html", caption=caption, message=message)
 
 
-class Confirmation(flask.views.View):
+class Confirmation(View):
     """
     Route: /sendconfirmation
         Users will be lead to this route when they submit an email for server sign up from route /
@@ -150,7 +151,7 @@ class Confirmation(flask.views.View):
         return flask.render_template("message.html", caption=caption, message=message)
 
 
-class Signup(flask.views.View):
+class Signup(View):
     """
     Route: signup
         This is the link which they will be taken to with the confirmation email.
@@ -178,7 +179,7 @@ class Signup(flask.views.View):
         return self.render(email, token, not register_tools.good_token(email, token))
 
 
-class Username(flask.views.View):
+class Username(View):
     """
     Route: username
         This should be called by javascript in the registration form

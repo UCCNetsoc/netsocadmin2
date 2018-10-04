@@ -2,6 +2,7 @@
 import logging
 # lib
 import flask
+from flask.views import View
 # local
 import help_post
 import login_tools
@@ -13,7 +14,7 @@ __all__ = [
 ]
 
 
-class CompleteSudo(flask.views.View):
+class CompleteSudo(View):
     """
     Route: /completesudoapplication
         This is run by the sudo-signup form in sudo.html.
@@ -69,7 +70,7 @@ class CompleteSudo(flask.views.View):
         return self.render(email_failed and discord_failed)
 
 
-class Sudo(flask.views.View):
+class Sudo(View):
     """
     Route: /sudo
         This route will render the page for applying for sudo privilages.

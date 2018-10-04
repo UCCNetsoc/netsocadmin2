@@ -7,6 +7,7 @@ import re
 from typing import Dict, Tuple
 # lib
 import flask
+from flask.views import View
 # local
 import backup_tools
 import config
@@ -29,7 +30,7 @@ __all__ = [
 
 
 # Super classes
-class ToolView(flask.views.View):
+class ToolView(View):
     """
     Super class for all of the routes that render the tools template
     """
