@@ -8,15 +8,11 @@ import re
 import sys
 
 import flask
-import ldap3
+import help_desk
 import markdown
-import backup_tools as b
-import mysql as m
-import help_post as h
 import login_tools
 import register_tools as r
 import routes
-import wordpress_install as w
 import config
 
 
@@ -235,6 +231,7 @@ def logout():
     """
     flask.session.pop(config.LOGGED_IN_KEY, None)
     return flask.redirect("/")
+
 
 # -------------------------------Server Tools Routes----------------------------- #
 app.add_url_rule(

@@ -1,6 +1,8 @@
 """File containing classes that represent all of the routes that are related to the `tools.html` template"""
 # python
+import ldap3
 import logging
+import os
 import re
 from typing import Dict, Tuple
 # lib
@@ -25,7 +27,8 @@ __all__ = [
     'WordpressInstall',
 ]
 
-"""Super classes"""
+
+# Super classes
 class ToolView(flask.views.View):
     """
     Super class for all of the routes that render the tools template
@@ -60,6 +63,7 @@ class ToolView(flask.views.View):
             **data,
         )
 
+
 class DBView(ToolView):
     """
     Extend the ToolView with methods that help abstract some of the work out of the db related views
@@ -90,7 +94,7 @@ class DBView(ToolView):
         return True, ''
 
 
-"""Actual View Classes"""
+# Actual View Classes
 class Backup(ToolView):
     """
     Route: /backup/{username}/{timeframe}/{backup_date}
@@ -311,7 +315,8 @@ class WordpressInstall(ToolView):
     """
     Route: wordpressinstall
         This endpoint only allows a GET method.
-        If a user is authenticated and accessed this endpoint, then wordpress is installed to their public_html directory.
+        If a user is authenticated and accessed this endpoint, then wordpress is installed to their public_html
+        directory.
         This endpoint is pinged via an AJAX request on the clients' side.
     """
     # Logger instance
@@ -319,8 +324,9 @@ class WordpressInstall(ToolView):
 
     def dispatch_request(self) -> Tuple[str, int]:
         self.logger.debug('received request to install wordpress')
+        username = flask.session["username"]
         wordpress_install.get_wordpress(
-            f'/home/users/{flask.session["username"]}',
+            f'/home/users/{username}',
             username,
             config.FLASK_CONFIG['debug']
         )
