@@ -1,5 +1,6 @@
 """Imports from all the files in the directory and makes the imports available to other parts of the system"""
 from .login import Login, Logout
+from .signup import CompleteSignup, Confirmation, Sudo, Username
 from .sudo import CompleteSudo, Sudo
 from .tools import (
     Backup,
@@ -17,6 +18,12 @@ __all__ = [
     # Login / Logout
     "Login",
     "Logout",
+
+    # Signup
+    "CompleteSignup",
+    "Confirmation",
+    "Sudo",
+    "Username",
 
     # Sudo
     "CompleteSudo",
