@@ -13,7 +13,7 @@ import markdown
 import backup_tools as b
 import mysql as m
 import help_post as h
-import login_tools as l
+import login_tools
 import register_tools as r
 import wordpress_install as w
 import config
@@ -28,6 +28,7 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
+
 @app.route('/')
 def signinup():
     """
@@ -35,7 +36,7 @@ def signinup():
         This route is for the index page. If a user is already logged in, it will
         redirect to the server tools page.
     """
-    if l.is_logged_in():
+    if login_tools.is_logged_in():
         return flask.redirect("/tools")
 
     app.logger.debug("Received index page request")
@@ -91,7 +92,10 @@ def signup() -> str:
     uri = flask.request.args.get('t')
     if not r.good_token(email, uri):
         app.logger.debug(f"signup(): bad token {uri} used for email {email}")
-        return flask.render_template("index.html", error_message="Your request was not valid. Please try again or contact us")
+        return flask.render_template(
+            "index.html",
+            error_message="Your request was not valid. Please try again or contact us",
+        )
 
     return flask.render_template("form.html", email_address=email, token=uri)
 
@@ -109,7 +113,10 @@ def completeregistration():
     uri = flask.request.form["_token"]
     if not r.good_token(email, uri):
         app.logger.debug(f"completeregistration(): invalid token {uri} for email {email}")
-        return flask.render_template("index.html", error_message="Your token has expired or never existed. Please try again or contact us")
+        return flask.render_template(
+            "index.html",
+            error_message="Your token has expired or never existed. Please try again or contact us",
+        )
 
     # make sure form is flled out and username is still legit
     form_fields = (
@@ -210,7 +217,7 @@ def login():
     This route should be reached by a form sending login information to it via
     a POST request.
     """
-    if not l.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
+    if not login_tools.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
         return flask.render_template("index.html", error_message="Username or password was incorrect")
     if not config.FLASK_CONFIG["debug"]:
         r.initialise_directories(flask.request.form["username"], flask.request.form["password"])
@@ -233,7 +240,7 @@ def logout():
 
 
 @app.route("/tools")
-@l.protected_page
+@login_tools.protected_page
 def tools():
     """
     Route: tools
@@ -247,7 +254,7 @@ def tools():
 
 
 @app.route("/createdb", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def createdb():
     """
     Route: createdb
@@ -268,7 +275,7 @@ def createdb():
         )
 
     # if password is correct, create the new database
-    if not l.is_correct_password(username, password):
+    if not login_tools.is_correct_password(username, password):
         return render_tools(
             mysql_error="Wrong username or password.",
             mysql_active=True,
@@ -285,7 +292,7 @@ def createdb():
 
 
 @app.route("/deletedb", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def deletedb():
     """
     Route: deletedb
@@ -306,7 +313,7 @@ def deletedb():
         )
 
     # if password is correct, do database removal
-    if not l.is_correct_password(username, password):
+    if not login_tools.is_correct_password(username, password):
         return render_tools(
             mysql_error="Wrong username or password.",
             mysql_active=True,
@@ -323,7 +330,7 @@ def deletedb():
 
 
 @app.route("/resetpw", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def resetpw():
     """
     Route: resetpw
@@ -343,7 +350,7 @@ def resetpw():
         )
 
     # if password is correct, reset password
-    if not l.is_correct_password(username, password):
+    if not login_tools.is_correct_password(username, password):
         return render_tools(
             mysql_error="Wrong username or password.",
             mysql_active=True,
@@ -364,12 +371,13 @@ def resetpw():
 
 
 @app.route("/wordpressinstall")
-@l.protected_page
+@login_tools.protected_page
 def wordpressinstall():
     """
     Route: wordpressinstall
         This endpoint only allows a GET method.
-        If a user is authenticated and accessed this endpoint, then wordpress is installed to their public_html directory.
+        If a user is authenticated and accessed this endpoint, then wordpress is installed to their public_html
+        directory.
         This endpoint is pinged via an AJAX request on the clients' side.
     """
     username = flask.session["username"]
@@ -379,7 +387,7 @@ def wordpressinstall():
 
 
 @app.route("/help", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def help():
     """
     Route: help
@@ -418,9 +426,8 @@ def help():
     )
 
 
-
 @app.route("/backup/<string:username>/<string:timeframe>/<string:backup_date>")
-@l.protected_page
+@login_tools.protected_page
 def backup(username: str, timeframe: str, backup_date: str):
     """
     Route: /backup/username/timeframe/backup_date
@@ -435,7 +442,7 @@ def backup(username: str, timeframe: str, backup_date: str):
     # make sure the arguments are valid
     if not re.match(r"^[a-z]+$", username) or \
             not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or \
-                    timeframe not in ["weekly", "monthly"]:
+            timeframe not in ["weekly", "monthly"]:
         app.logger.debug(f"backups({username}, {timeframe}, {backup_date}): invalid arguments")
         return flask.abort(400)
 
@@ -444,7 +451,7 @@ def backup(username: str, timeframe: str, backup_date: str):
 
 
 @app.route("/change-shell", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def change_shell():
     """
     Route: /change-shell
@@ -511,7 +518,7 @@ def tutorials():
     if len(TUTORIALS) == 0:
         return flask.render_template(
             "tutorials.html",
-            show_logout_button=l.is_logged_in(),
+            show_logout_button=login_tools.is_logged_in(),
             error="No tutorials to show",
         )
     if DEBUG:
@@ -519,25 +526,25 @@ def tutorials():
         populate_tutorials()
     return flask.render_template(
         "tutorials.html",
-        show_logout_button=l.is_logged_in(),
+        show_logout_button=login_tools.is_logged_in(),
         tutorials=TUTORIALS,
     )
 
 
 @app.route("/sudo")
-@l.protected_page
+@login_tools.protected_page
 def sudo():
     """
     Route: /sudo
         This route will render the page for applying for sudo privilages.
     """
     return flask.render_template("sudo.html",
-                                 show_logout_button=l.is_logged_in(),
+                                 show_logout_button=login_tools.is_logged_in(),
                                  username=flask.session["username"])
 
 
 @app.route("/completesudoapplication", methods=["POST"])
-@l.protected_page
+@login_tools.protected_page
 def completesudoapplication():
     """
     Route: /completesudoapplication
@@ -570,14 +577,14 @@ def completesudoapplication():
     if email_failed and discord_failed:
         return flask.render_template(
             "message.html",
-            show_logout_button=l.is_logged_in(),
+            show_logout_button=login_tools.is_logged_in(),
             caption="There was a problem :(",
             message="Please email netsoc@uccsocieties.ie instead",
         )
 
     return flask.render_template(
         "message.html",
-        show_logout_button=l.is_logged_in(),
+        show_logout_button=login_tools.is_logged_in(),
         caption="Success!",
         message="A confirmation email has been sent to you. We will be in touch shortly.",
     )
@@ -600,7 +607,7 @@ def render_tools(**data):
     """
     return flask.render_template(
         "tools.html",
-        show_logout_button=l.is_logged_in(),
+        show_logout_button=login_tools.is_logged_in(),
         databases=m.list_dbs(flask.session["username"]),
         wordpress_exists=w.wordpress_exists(f"/home/users/{flask.session['username']}"),
         wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",

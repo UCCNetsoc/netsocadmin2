@@ -14,7 +14,7 @@ def list_backups(username: str, timeframe: str) -> typing.List[str]:
         os.makedirs(backups_base_dir)
     all_backups = sorted(
         [
-            b.strip(".tgz") 
+            b.strip(".tgz")
             for b in os.listdir(backups_base_dir)
             if re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}\.tgz", b)
         ],

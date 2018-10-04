@@ -27,8 +27,7 @@ def send_confirmation_email(email: str, server_url: str) -> bool:
     :returns boolean true if the email was sent succesfully, false otherwise.
     """
     uri = generate_uri(email)
-    message_body = \
-f"""
+    message_body = f"""
 Hello,
 
 Please confirm your account by going to:
@@ -61,8 +60,7 @@ def send_details_email(email: str, user: str, password: str) -> bool:
     :param password the password which you log into the servers with
     :returns True if the email has been sent succesfully, False otherwise
     """
-    message_body = \
-    f"""
+    message_body = f"""
 Hello,
 
 Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
@@ -71,11 +69,13 @@ username: {user}
 
 password: {password}
 
-Please note that you must log into the server at least once before the web portal will work for you. If you need any help on this, contact adamgillessen@gmail.com.
+Please note that you must log into the server at least once before the web portal will work for you.
+If you need any help on this, contact adamgillessen@gmail.com.
 
 To log in, run:
     ssh {user}@leela.netsoc.co
-and enter your password when prompted. If you are using windows, go to http://www.putty.org/ and download the SSH client.
+and enter your password when prompted.
+If you are using windows, go to http://www.putty.org/ and download the SSH client.
 
 Please change your password when you first log-in to something you'll remember!
 
@@ -93,6 +93,7 @@ The UCC Netsoc SysAdmin Team
     else:
         response = type("Response", object, {"status_code": 200})
     return str(response.status_code).startswith("20")
+
 
 def generate_uri(email: str) -> str:
     """
@@ -119,7 +120,8 @@ def generate_uri(email: str) -> str:
         c.execute("INSERT INTO uris VALUES (?, ?)", (email, uri))
         conn.commit()
     finally:
-        if conn: conn.close()
+        if conn:
+            conn.close()
     return uri
 
 
@@ -203,14 +205,14 @@ def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         ]
 
         attributes = {
-            "cn" : user,
-            "gidNumber": config.LDAP_USER_GROUP_ID,
+            "cn":            user,
+            "gidNumber":     config.LDAP_USER_GROUP_ID,
             "homeDirectory": info["home_dir"],
-            "mail": f"{user}@netsoc.co",
-            "uid" : user,
-            "uidNumber": next_uid,
-            "loginShell": "/bin/bash",
-            "userPassword": crypt_password,
+            "mail":          f"{user}@netsoc.co",
+            "uid":           user,
+            "uidNumber":     next_uid,
+            "loginShell":    "/bin/bash",
+            "userPassword":  crypt_password,
         }
         success = conn.add(
             f"cn={user},cn=member,dc=netsoc,dc=co",
@@ -220,6 +222,7 @@ def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         if not success:
             return False, conn.last_error
     return True, info
+
 
 def add_netsoc_database(info: typing.Dict[str, str]) -> bool:
     """
@@ -254,6 +257,7 @@ def add_netsoc_database(info: typing.Dict[str, str]) -> bool:
     conn.commit()
     return True
 
+
 def has_account(email: str) -> bool:
     """
     Sees if their is already an account on record with this email address.
@@ -269,6 +273,7 @@ def has_account(email: str) -> bool:
         if c.fetchone():
             return True
     return False
+
 
 def has_username(uid: str) -> bool:
     """
@@ -289,6 +294,7 @@ def has_username(uid: str) -> bool:
         )
     return True
 
+
 def initialise_directories(username: str, password: str):
     """
     Makes an ssh connection to the server which will initialise a
@@ -305,4 +311,3 @@ def initialise_directories(username: str, password: str):
         username=username,
         password=password,
     )
-

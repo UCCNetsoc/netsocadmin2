@@ -25,6 +25,7 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
         return view_func(*args, **kwargs)
     return protected_view_func
 
+
 def is_logged_in():
     """
     Returns True if the user is currently logged in.
