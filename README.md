@@ -75,5 +75,5 @@ Just to be aware that testing on MacOS might require you to build the netsocadmi
 I don't know why it's a thing, but it is :(
 
 1. `docker build -t netsocadmin .`
-2. `docker run -d -p 5050:5050 --name netsocadmin netsocadmin`
+2. `docker run -d -p 5050:5050 --name netsocadmin --net host netsocadmin`
 3. Connect to `localhost:5050` and continue as normal
