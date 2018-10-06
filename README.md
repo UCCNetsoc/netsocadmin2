@@ -69,3 +69,7 @@ Normal User details:
 
 * username: `sofia`
 * password: `sofias-password`
+
+### Note
+Just to be aware that testing on MacOS might require you to build the netsocadmin docker image locally to test it, due to some issues with crypt functions on MacOS.
+I don't know why it's a thing, but it is :(
