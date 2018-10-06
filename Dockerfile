@@ -10,10 +10,6 @@ RUN apk add --no-cache curl pkgconfig python3-dev openssl-dev libffi-dev musl-de
 # install all python requirements
 RUN pip3 install -r /netsocadmin/requirements.txt
 
-# install the wordpress installer package
-RUN pip3 install -e /netsocadmin/netsocadmin/wordpress_installer
-RUN python3 -m wordpress_installer.calibrate
-
 # this will be the mount point for the user home directories
 RUN mkdir /home/users
 
@@ -21,7 +17,7 @@ RUN mkdir /home/users
 RUN mkdir ~/.ssh
 RUN ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
-WORKDIR /netsocadmin/
+WORKDIR /netsocadmin/netsocadmin/
 
 VOLUME ["/backups", "/home/users", "/netsocadmin/config.py"]
 
