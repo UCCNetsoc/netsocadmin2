@@ -138,7 +138,7 @@ def create_wordpress_database(username, is_debug_mode):
         "user":     db_user,
         "password": password,
         "db":       db_user,
-        "host":     config.db["host"]
+        "host":     config.MYSQL_DETAILS["host"]
     }
 
     return new_db_conf
