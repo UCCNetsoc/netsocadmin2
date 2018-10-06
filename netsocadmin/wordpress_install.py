@@ -154,7 +154,7 @@ def create_wordpress_conf(user_dir, db_conf):
     logger.debug("Generating wordpress configuration")
 
     env = Environment(loader=PackageLoader(
-        'wordpress_installer', 'templates'))
+        'wordpress_install', 'templates'))
     template = env.get_template('wp-config.php.j2')
 
     def get_wordpress_conf_keys():
