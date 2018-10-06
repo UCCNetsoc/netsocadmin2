@@ -4,7 +4,6 @@ registration by the main netsoc admin file.
 """
 import crypt
 import hashlib
-import os
 import random
 import sqlite3
 import string
