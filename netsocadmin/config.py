@@ -68,7 +68,7 @@ DISCORD_BOT_HELP_ADDRESS = "https://discordbot.netsoc.co/help"
 SYSADMIN_EMAILS = []
 
 # used for making the ssh connection to the server
-SERVER_HOSTNAME = "leela.netsoc.co"
+SERVER_HOSTNAME = "localhost"
 
 WORDPRESS_CONFIG = {
     "db": {
