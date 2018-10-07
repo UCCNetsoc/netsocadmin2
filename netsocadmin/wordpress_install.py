@@ -138,7 +138,7 @@ def create_wordpress_database(username, is_debug_mode):
         "user":     db_user,
         "password": password,
         "db":       db_user,
-        "host":     config.db["host"]
+        "host":     config.MYSQL_DETAILS["host"]
     }
 
     return new_db_conf
@@ -154,13 +154,12 @@ def create_wordpress_conf(user_dir, db_conf):
     logger.debug("Generating wordpress configuration")
 
     env = Environment(loader=PackageLoader(
-        'wordpress_installer', 'templates'))
+        'wordpress_install', 'templates'))
     template = env.get_template('wp-config.php.j2')
 
     def get_wordpress_conf_keys():
         logger.debug("Fetching wordpress configuration")
-        response = requests.get(
-            "https://api.wordpress.org/secret-key/1.1/salt/")
+        response = requests.get("https://api.wordpress.org/secret-key/1.1/salt/")
         return response.text
 
     wordpress_config = template.render(USER_DIR=user_dir,
@@ -169,8 +168,7 @@ def create_wordpress_conf(user_dir, db_conf):
                                        DB_PASSWORD=db_conf["password"],
                                        DB_HOST=db_conf["host"],
                                        KEYS=get_wordpress_conf_keys())
-    logger.debug(
-        "Wordpress configuration rendered from template, writing to file")
+    logger.debug("Wordpress configuration rendered from template, writing to file")
 
     with open(user_dir + "/public_html/wordpress/wp-config.php", "w") as fh:
         fh.write(wordpress_config)
