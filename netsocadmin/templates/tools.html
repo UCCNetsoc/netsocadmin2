@@ -233,11 +233,11 @@
 				<span class="card-title teal-title">Manage Your WordPress Site</span>
 				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/>
 
-				{% if WORDPRESS_EXISTS %}
+				{% if wordpress_exists %}
 
 				<p id="wordpress-link">WordPress is installed.
 					<b>Visit your WordPress site
-					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a></b>
+					<a href="{{ wordpress_link }}" target="_blank">here</a></b>
 				</p>
 
 				{% else %}

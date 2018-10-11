@@ -12,6 +12,14 @@ requirements = [
     'wheel',
 ]
 
+# When running `pip install .` this ensures all requirements are installed in one go
+try:
+    with open('requirements.txt') as f:
+        requirements.extend(f.readlines())
+except FileNotFoundError:
+    # tox doesn't like this for some reason
+    pass
+
 test_requirements = [
     # TODO: put package test requirements here
 ]

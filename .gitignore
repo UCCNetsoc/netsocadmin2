@@ -48,7 +48,6 @@ docs/_build
 src/data
 *.log
 __pycache__
-config.py
 
 
 # db files
@@ -61,12 +60,12 @@ logs/wordpress_installer.log
 # other stuff
 /**/plan.txt
 /**/.mypy_cache
+.uri.db
 
 # PyCharm
 .idea/
 
 # configuration files
-netsocadmin/config.py
 netsocadmin/logging_config.ini
 passwords.py
 
@@ -77,3 +76,8 @@ passwords.py
 .DS_Store
 
 .vscode
+lock.mdb
+
+binlog.*
+undo_*
+dev/mysql/performance_schema

@@ -3,9 +3,9 @@
     {{ super() }}
 
     <style>
-	    	nav {
+	    nav {
 			background-color: rgba(0,0,0,0);	
-	    	}	
+	    }	
 		
 		.card-panel {
 			min-height: 470px;
@@ -20,7 +20,19 @@
 				padding: 5% 15%;
 			}
 		}
-	</style>
+    </style>
+    <script>
+    function showPassword() {
+        var field = document.getElementById("password");
+        if (field.type === "password") {
+            field.type = "text";
+            document.getElementById("pass_label").style.textDecoration = "underline";
+        } else {
+            field.type = "password";
+            document.getElementById("pass_label").style.textDecoration = "none";
+        }
+    }
+    </script>
 {% endblock %}
 
 {% block body %}
@@ -65,11 +77,16 @@
 							<label for="password">Server Password</label>
 							<input autocomplete="off" name="password" type="password" id="password">
 						</div>
-					</div>
-					<button class="btn waves-effect waves-light" type="submit">
-						Login
-						<i class="mdi-content-send right"></i>
-					</button>
+                    </div>
+                    <div style="display: flex; flex-direction: row; justify-content: space-between">
+                        <button class="btn waves-effect waves-light" type="submit">
+                            Login<i class="mdi-content-send right"></i>
+                        </button>
+                        <div>
+                            <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
+                            <input type="checkbox" id="show_pass" onclick="showPassword()">
+                        </div>
+                    </div>
 				</form>
 				<div style="padding: 0 1em;" class="error-message red-text row s6">
 					<i> {{ error_message }} </i>

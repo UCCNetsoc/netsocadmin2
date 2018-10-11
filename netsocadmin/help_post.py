@@ -2,20 +2,17 @@
 This file takes care of sending off the data from the help section to multiple areas
 currently Discord and email of SysAdmins and the main Netsoc email
 '''
-import json
-import smtplib
-from email.message import EmailMessage
-
+import mail_helper
 import requests
 
-from netsocadmin import config
+import config
 
 DISCORD_BOT_HELP_ADDRESS = config.DISCORD_BOT_HELP_ADDRESS
 
 
 def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
     """
-    Sends an email to the netsoc email address containing the help data, 
+    Sends an email to the netsoc email address containing the help data,
     CC'ing all the SysAdmins and the user requesting help.
     This enables us to reply to the email directly instead of copypasting the
     from address and disconnecting history.
@@ -25,29 +22,24 @@ def send_help_email(username: str, user_email: str, subject: str, message: str) 
     :param subject the subject of the user's help requests
     :param message the user's actual message
     """
-    message_body = \
-        """
-From: %s\n
-Email: %s
+    message_body = f"""
+From: {username}\n
+Email: {user_email}
 
-%s
+{message}
 
-PS: Please "Reply All" to the emails so that you get a quicker response.""" % (
-            username, user_email, message)
-
-    msg = EmailMessage()
-    msg.set_content(message_body)
-    msg["From"] = config.NETSOC_ADMIN_EMAIL_ADDRESS
-    msg["To"] = config.NETSOC_EMAIL_ADDRESS
-    msg["Subject"] = "[Netsoc Help] " + subject
-    msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
-    try:
-        with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-            s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-            s.send_message(msg)
-    except:
-        return False
-    return True
+PS: Please "Reply All" to the emails so that you get a quicker response."""
+    if not config.FLASK_CONFIG['debug']:
+        response = mail_helper.send_mail(
+            config.NETSOC_ADMIN_EMAIL_ADDRESS,
+            config.NETSOC_EMAIL_ADDRESS,
+            "[Netsoc Help] " + subject,
+            message_body,
+            [user_email] + config.SYSADMIN_EMAILS,
+        )
+    else:
+        response = type("Response", (object,), {"status_code": 200})
+    return str(response.status_code).startswith("20")
 
 
 def send_sudo_request_email(username: str, user_email: str):
@@ -58,12 +50,12 @@ def send_sudo_request_email(username: str, user_email: str):
     :param user_email the email address of that user to contact them for vetting.
     """
     message_body = \
-        """
+        f"""
 Hi {username},
 
 Thank you for making a request for an account with sudo privileges on feynman.netsoc.co.
 
-We will be in touch shortly. 
+We will be in touch shortly.
 
 Best,
 
@@ -71,19 +63,14 @@ The UCC Netsoc SysAdmin Team.
 
 PS: Please "Reply All" to the emails so that you get a quicker response.
 
-""".format(username=username)
-
-    msg = EmailMessage()
-    msg.set_content(message_body)
-    msg["From"] = config.NETSOC_ADMIN_EMAIL_ADDRESS
-    msg["To"] = config.NETSOC_EMAIL_ADDRESS
-    msg["Subject"] = "[Netsoc Help] Sudo request on Feynman for {user}".format(
-        user=username)
-    msg["Cc"] = tuple(config.SYSADMIN_EMAILS + [user_email])
-
-    with smtplib.SMTP("smtp.sendgrid.net", 587) as s:
-        s.login(config.SENDGRID_USERNAME, config.SENDGRID_PASSWORD)
-        s.send_message(msg)
+"""
+    mail_helper.send_mail(
+        config.NETSOC_ADMIN_EMAIL_ADDRESS,
+        config.NETSOC_EMAIL_ADDRESS,
+        "[Netsoc Help] Sudo request on Feynman for " + username,
+        message_body,
+        [user_email] + config.SYSADMIN_EMAILS,
+    )
 
 
 def send_help_bot(username: str, email: str, subject: str, message: str) -> bool:
@@ -94,5 +81,8 @@ def send_help_bot(username: str, email: str, subject: str, message: str) -> bool
     output = {"user": username, "email": email, "subject": subject, "message": message}
     headers = {'Content-Type': 'application/json'}
 
-    response = requests.post(DISCORD_BOT_HELP_ADDRESS, data=json.dumps(output).encode(), headers=headers)
+    if not config.FLASK_CONFIG['debug']:
+        response = requests.post(DISCORD_BOT_HELP_ADDRESS, json=output, headers=headers)
+    else:
+        response = type("Response", object, {"status_code": 200})
     return response.status_code == 200
