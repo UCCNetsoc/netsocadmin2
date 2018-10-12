@@ -19,8 +19,12 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 * Server password reset functionality
 * Own domain name linking to WordPress installation
+* Slide upload page
+* And more
 
 ## Installation
+
+### For development environment, please look further below.
 
 **NOTE** if this is for production, use Portainer. It provides a `Recreate` button that can automatically pull the latest image and make a new container with the same settings
 
