@@ -12,7 +12,7 @@ Jinja2==2.10
 ldap3==2.5
 Markdown==2.6.11
 MarkupSafe==1.0
-paramiko==2.4.1
+paramiko==2.4.2
 pyasn1==0.4.4
 pycparser==2.18
 PyMySQL==0.9.2
