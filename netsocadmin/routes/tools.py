@@ -85,7 +85,7 @@ class DBView(ToolView):
             return False, "Please specify all fields."
         # Check that the username / password combination is correct
         if not login_tools.is_correct_password(username, password):
-            return False, "Wrong username or password."
+            return False, f"Wrong username or password for user {username}."
         # We good
         return True, ""
 
@@ -110,7 +110,7 @@ class Backup(ToolView):
         # Validate the parameters
         if (not re.match(r"[a-z]+$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}") or
                 timeframe not in ["weekly", "monthly"]):
-            self.logger.debug(f"received invalid arguments: {username}, {timeframe}, {backup_date}")
+            self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
         # Retrieve the backup and send it to the user
         backups_base_dir = os.path.join(backup_tools.BACKUPS_DIR, username, timeframe)
@@ -151,6 +151,7 @@ class ChangeShell(ToolView):
                     found = True
                     break
             if not found:
+                self.logger.debug(f"User {username} not found. Could not update shell")
                 return self.render(shells_error="Could not find your user to update it", shells_active=True)
 
             # Modify the user now
@@ -159,7 +160,9 @@ class ChangeShell(ToolView):
                 changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
             )
             if not success:
+                self.logger.error("Error changing shell")
                 return self.render(shells_error=conn.last_error, shells_active=True)
+            self.logger.debug("Shell changed successfully")
             return self.render(shells_success=True, shells_active=True)
 
 
@@ -183,13 +186,16 @@ class CreateDB(DBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
+            self.logger.error(f"Invalid username and password: {msg}")
             return self.render(mysql_error=msg, mysql_active=True)
         # Try to create the database
         try:
             mysql.create_database(username, dbname, False)
         except mysql.DatabaseAccessError as e:
+            self.logger.error(f"Database error {e.__cause__}")
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
+        self.logger.debug(f"Successfully created database for {username} named {dbname}")
         return flask.redirect("/")
 
 
@@ -213,11 +219,13 @@ class DeleteDB(DBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
+            self.logger.error(f"Invalid username and password: {msg}")
             return self.render(mysql_error=msg, mysql_active=True)
         # Try to create the database
         try:
             mysql.create_database(username, dbname, True)
         except mysql.DatabaseAccessError as e:
+            self.logger.error(f"Database error {e.__cause__}")
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
         return flask.redirect("/")
@@ -242,6 +250,7 @@ class Help(ToolView):
         message = flask.request.form.get("message", "")
         # Ensure all fields are populated
         if not all([email, subject, message]):
+            self.logger.debug("Not all fields specified")
             return self.render(help_error="Please specify all fields", help_active=True)
         # Send the email
         sent_email = help_post.send_help_email(flask.session["username"], email, subject, message)
@@ -257,11 +266,13 @@ class Help(ToolView):
         # Check that at least one form of communication was sent
         if not sent_email and not sent_discord:
             # If not, report an error to the user
+            self.logger.error(f"Unable to send email and unable to send to discord bot: {message}")
             return self.render(
                 help_error="There was a problem :( Please email netsoc@uccsocieties.ie instead",
                 help_active=True,
             )
         # Otherwise when things are okay, report back stating so
+        self.logger.debug("Successfully sent help email or contacted discord bot")
         return self.render(help_success=True, help_active=True)
 
 
@@ -284,14 +295,17 @@ class ResetPassword(DBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password)
         if not valid:
+            self.logger.error(f"Invalid username and password: {msg}")
             return self.render(mysql_error=msg, mysql_active=True)
         # Try to create the database
         try:
             mysql.delete_user(username)
             new_password = mysql.create_user(username)
         except mysql.DatabaseAccessError as e:
+            self.logger.error(f"Database error {e.__cause__}")
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         else:
+            self.logger.debug("Successfully changed password")
             return self.render(new_mysql_password=new_password, mysql_active=True)
 
 

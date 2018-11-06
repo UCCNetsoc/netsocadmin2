@@ -61,6 +61,7 @@ class CompleteSignup(View):
 
         user = flask.request.form["uid"]
         if register_tools.has_username(user):
+            self.logger.debug(f"Username {user} not available")
             return flask.render_template(
                 "form.html",
                 email_address=email,
@@ -100,6 +101,7 @@ class CompleteSignup(View):
 
         caption = "Thank you!"
         message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
+        self.logger.debug(f"Successfully signed up {flask.request.form['name']} and confirmation email sent")
         return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -148,6 +150,7 @@ class Confirmation(View):
 
         caption = "Thank you!"
         message = f"Your confirmation link has been sent to {email}"
+        self.logger.debug(f"Confirmation link sent to {email}")
         return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -194,17 +197,20 @@ class Username(View):
         self.logger.debug("Received request")
         if ("email" not in flask.request.headers or "uid" not in flask.request.headers or
                 "token" not in flask.request.headers):
+            self.logger.debug("Invalid request some information missing. Aborting.")
             return flask.abort(400)
 
         # check if request is legit
         email = flask.request.headers["email"]
         token = flask.request.headers["token"]
         if not register_tools.good_token(email, token):
+            self.logger.debug(f"Bad token {token} used for email {email}")
             return flask.abort(403)
 
         # check db for username
         requested_username = flask.request.headers["uid"]
         if register_tools.has_username(requested_username):
-            self.logger.debug(f"uid {requested_username} is in use")
+            self.logger.debug(f"Uid {requested_username} is in use")
             return "Not available"
+        self.logger.debug(f"Username {requested_username} available")
         return "Available"
