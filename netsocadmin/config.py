@@ -32,7 +32,6 @@ LDAP_AUTH = {
 }
 
 LDAP_HOST = "localhost:389"
-
 LDAP_USER_GROUP_ID = 422
 
 # location of the markdown tutorials
@@ -63,7 +62,7 @@ USERNAME_BLACKLIST = [
 ]
 
 # the URL which the netsoc discord bot can be reached at
-DISCORD_BOT_HELP_ADDRESS = "https://discordbot.netsoc.co/help"
+DISCORD_WEBHOOK_ADDRESS = "https://apitester.com"
 
 SYSADMIN_EMAILS = []
 
@@ -77,11 +76,9 @@ WORDPRESS_CONFIG = {
         "host": "mysql.mydomain.com",
     },
 
-
     # (Make this an absolute path)
     "package": {
         "logging_config":
             "./netsocadmin/logging_config.ini"
     }
-
 }

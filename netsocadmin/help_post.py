@@ -64,13 +64,13 @@ The UCC Netsoc SysAdmin Team.
 PS: Please "Reply All" to the emails so that you get a quicker response.
 
 """
-    mail_helper.send_mail(
+    return mail_helper.send_mail(
         config.NETSOC_ADMIN_EMAIL_ADDRESS,
         config.NETSOC_EMAIL_ADDRESS,
         "[Netsoc Help] Sudo request on Feynman for " + username,
         message_body,
         [user_email] + config.SYSADMIN_EMAILS,
-    )
+    ).status_code == 200
 
 
 def send_help_webhook(username: str, email: str, subject: str, message: str) -> bool:

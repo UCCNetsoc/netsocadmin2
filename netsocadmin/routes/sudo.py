@@ -35,7 +35,8 @@ class CompleteSudo(View):
             message = "Please email netsoc@uccsocieties.ie instead!"
         else:
             caption = "Success!"
-            message = "A confirmation email has been sent to you. We will be in touch shortly."
+            message = "A confirmation email has been sent to you. We will be in touch shortly." + \
+                "<br/>Return to <a href='/tools'>tools page</a>."
         return flask.render_template(
             "message.html",
             show_logout_button=login_tools.is_logged_in(),
@@ -54,7 +55,9 @@ class CompleteSudo(View):
 
         # Try to send the email
         try:
-            help_post.send_sudo_request_email(username, email)
+            email_failed = not help_post.send_sudo_request_email(username, email)
+            if email_failed:
+                self.logger.error("Failed to send email")
         except Exception as e:
             email_failed = True
             self.logger.error(f"Failed to send email: {e}")
@@ -63,7 +66,10 @@ class CompleteSudo(View):
         try:
             subject = "Feynman Account Request"
             msg = f"This user wants an account on Feynman pls.\nReason: {reason}"
-            help_post.send_help_webhook(username, email, subject, msg)
+            discord_failed = not help_post.send_help_webhook(username, email, subject, msg)
+            # Not sure if this part works yet
+            if discord_failed:
+                self.logger.error("Failed to send message to discord")
         except Exception as e:
             discord_failed = True
             self.logger.error(f"Failed to send message to Discord: {e}")

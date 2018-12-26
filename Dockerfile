@@ -19,7 +19,7 @@ RUN ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
 WORKDIR /netsocadmin/netsocadmin/
 
-VOLUME ["/backups", "/home/users", "/netsocadmin/config.py"]
+VOLUME ["/backups", "/home/users"]
 
 # not actually used, just for documentaion
 EXPOSE 5050
