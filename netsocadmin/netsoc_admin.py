@@ -7,13 +7,14 @@ import config
 import flask
 import login_tools
 import routes
-
+import logging
 
 app = flask.Flask("netsocadmin")
 app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
+app.logger.setLevel(logging.DEBUG)
 
 
 @app.route('/')

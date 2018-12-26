@@ -1,13 +1,3 @@
-function sendGET(endpoint) {
-	/* A generic method used to send a HTTP GET request for asynchronous querying */
-
-	var http = new XMLHttpRequest();
-    http.open("GET", endpoint);
-    http.timeout = 30000;
-    http.send()
-    return http.responseText;
-}
-
 function installWordpress() {
 
 	/*
@@ -19,18 +9,23 @@ function installWordpress() {
 	Changes text to be relevant during install and after install, so as to reveal wordpress link.
 	*/
 
-	var timeout_duration = 15000; // 15 seconds
-
 	document.getElementById("wordpress-install-button").style.display = "none";
 	document.getElementById("wordpress-install-description").innerHTML = "Installing WordPress...";
 	document.getElementById("wordpress-progress").style.display = "block";
 
-	sendGET("/wordpressinstall");
-	setTimeout(function() {
+	var request = new XMLHttpRequest()
+	request.onreadystatechange = () => {
+		if(request.readyState !== 4) return;
 		document.getElementById("wordpress-progress").style.display = "none";
 		document.getElementById("wordpress-install-description").style.display = "none";
-		document.getElementById("wordpress-setup-link").style.display = "block";
-		console.log("Wordpress install complete");
-	}, timeout_duration);
+		if(request.status === 200) {
+			document.getElementById("wordpress-setup-link").style.display = "block";
+			console.log("Wordpress install complete");
+		} else {
+			document.getElementById("wordpress-setup-fail").style.display = "block";
+		}
+	}
+	request.open("GET", "/wordpressinstall");
+	request.send();
 }
 

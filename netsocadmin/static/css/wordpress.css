@@ -19,11 +19,7 @@
 
 }
 
-#wordpress-progress {
-	display: none;
-}
-
-#wordpress-setup-link {
+#wordpress-setup-link, #wordpress-progress, #wordpress-setup-fail {
 	display: none;
 }
 

@@ -4,7 +4,7 @@ import ldap3
 import logging
 import os
 import re
-from typing import Dict, Tuple
+from typing import Tuple, Optional, Union
 # lib
 import flask
 from flask.views import View
@@ -37,11 +37,11 @@ class ToolView(View):
     # Decorate all subclasses with the following decorators
     decorators = [login_tools.protected_page]
     # Logger instance (should be defined in each sub class to use correct naming)
-    logger = None
+    logger: Optional[logging.Logger] = None
     # Specify which method(s) are allowed to be used to access the route
     methods = ["GET"]
 
-    def render(self, **data: Dict) -> str:
+    def render(self, **data: Union[str, bool]) -> str:
         """
         Method to render the tools template with the default vars and any extra data as decided by the route
         :param data: Some extra data to be passed to the template
@@ -108,7 +108,7 @@ class Backup(ToolView):
     def dispatch_request(self, username: str, timeframe: str, backup_date: str) -> str:
         self.logger.debug("Received request")
         # Validate the parameters
-        if (not re.match(r"[a-z]+$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}") or
+        if (not re.match(r"[a-z]+$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or
                 timeframe not in ["weekly", "monthly"]):
             self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
@@ -338,10 +338,14 @@ class WordpressInstall(ToolView):
     def dispatch_request(self) -> Tuple[str, int]:
         self.logger.debug("Received request")
         username = flask.session["username"]
-        wordpress_install.get_wordpress(
-            f"/home/users/{username}",
-            username,
-            config.FLASK_CONFIG["debug"]
-        )
-        # This is where you'll want to work on #30; no error checking, always returns 200 (tsk tsk tsk)
-        return username, 200
+        try:
+            wordpress_install.get_wordpress(
+                f"/home/users/{username}",
+                username,
+                config.FLASK_CONFIG["debug"]
+            )
+            self.logger.error(f"Wordpress install successful for {username}")
+            return username, 200
+        except Exception as e:
+            self.logger.error(f"Wordpress install failed for {username} {e}")
+            return username, 500
