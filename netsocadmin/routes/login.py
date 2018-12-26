@@ -52,7 +52,7 @@ class Logout(View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.logout")
 
-    def dispatch_reqests(self) -> str:
+    def dispatch_reqest(self) -> str:
         self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user
         self.logger.debug(f"{flask.session['username']} logged out")

@@ -7,8 +7,6 @@ import requests
 
 import config
 
-DISCORD_BOT_HELP_ADDRESS = config.DISCORD_BOT_HELP_ADDRESS
-
 
 def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
     """
@@ -73,16 +71,18 @@ PS: Please "Reply All" to the emails so that you get a quicker response.
     )
 
 
-def send_help_bot(username: str, email: str, subject: str, message: str) -> bool:
+def send_help_webhook(username: str, email: str, subject: str, message: str) -> bool:
     """
     This sends the help data to the Netsoc Discord Bot, which will then post it in the relevant channel
     in the Netsoc Committee Server
     """
-    output = {"user": username, "email": email, "subject": subject, "message": message}
+    output = {
+        "content": f"<@&318907623476822016> Help pls\n\n```From: {username}\nEmail: {email}\n\nSubject: {subject}\n\n{message}```",
+    }
     headers = {'Content-Type': 'application/json'}
 
     if not config.FLASK_CONFIG['debug']:
-        response = requests.post(DISCORD_BOT_HELP_ADDRESS, json=output, headers=headers)
+        response = requests.post(config.DISCORD_WEBHOOK_ADDRESS, json=output, headers=headers)
     else:
-        response = type("Response", object, {"status_code": 200})
+        response = type("Response", (object,), {"status_code": 200})
     return response.status_code == 200

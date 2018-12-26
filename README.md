@@ -24,7 +24,7 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 ## Installation
 
-### For development environment, please look further below.
+### For development environment, please look further below
 
 **NOTE** if this is for production, use Portainer. It provides a `Recreate` button that can automatically pull the latest image and make a new container with the same settings
 
@@ -64,6 +64,7 @@ Go to `http://localhost:5050` and away you go!
 To shut down the services afterwards, run `docker-compose -f docker-compose-dev.yml down`.
 
 ### Dev Env User Details
+
 Admin User details:
 
 * username: `john`
@@ -75,6 +76,7 @@ Normal User details:
 * password: `sofias-password`
 
 ### Note
+
 Just to be aware that testing on MacOS might require you to build the netsocadmin docker image locally to test it, due to some issues with crypt functions on MacOS.
 I don't know why it's a thing, but it is :(
 

@@ -43,28 +43,30 @@ class CompleteSudo(View):
             message=message,
         )
 
-    def dispatch_requests(self) -> str:
+    def dispatch_request(self) -> str:
         self.logger.debug("Received request")
         # Get the details from the form data
         email = flask.request.form["email"]
         reason = flask.request.form["reason"]
         username = flask.session["username"]
+        email_failed = False
+        discord_failed = False
 
         # Try to send the email
         try:
             help_post.send_sudo_request_email(username, email)
         except Exception as e:
             email_failed = True
-            self.logger.error(f"Failed to send email: {str(e)}")
+            self.logger.error(f"Failed to send email: {e}")
 
         # Try to send a message to the Discord
         try:
             subject = "Feynman Account Request"
             msg = f"This user wants an account on Feynman pls.\nReason: {reason}"
-            help_post.send_help_bot(username, email, subject, msg)
+            help_post.send_help_webhook(username, email, subject, msg)
         except Exception as e:
             discord_failed = True
-            self.logger.error(f"Failed to send message to Discord: {str(e)}")
+            self.logger.error(f"Failed to send message to Discord: {e}")
 
         # Return an appropriate response depending on whether or not the message sent
         return self.render(email_failed and discord_failed)

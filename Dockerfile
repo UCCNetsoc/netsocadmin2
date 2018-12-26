@@ -21,6 +21,6 @@ WORKDIR /netsocadmin/netsocadmin/
 
 VOLUME ["/backups", "/home/users", "/netsocadmin/config.py"]
 
-# # not actually used, just for documentaion
+# not actually used, just for documentaion
 EXPOSE 5050
 ENTRYPOINT ["python3", "netsoc_admin.py"]

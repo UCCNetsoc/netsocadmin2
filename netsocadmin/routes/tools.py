@@ -67,7 +67,7 @@ class DBView(ToolView):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def validate(self, username: str, password: str, dbname: str=None) -> Tuple[bool, str]:
+    def validate(self, username: str, password: str, dbname: str = None) -> Tuple[bool, str]:
         """
         Given a username and password, as well as an optional dbname, validate them.
             - Ensure the fields all have value (if dbname is not None check that too)
@@ -256,7 +256,7 @@ class Help(ToolView):
         sent_email = help_post.send_help_email(flask.session["username"], email, subject, message)
         # Try and send to Discord bot
         try:
-            sent_discord = help_post.send_help_bot(flask.session["username"], email, subject, message)
+            sent_discord = help_post.send_help_webhook(flask.session["username"], email, subject, message)
         except Exception as e:
             self.logger.error(f"Failed to send message to discord bot: {str(e)}")
             # in this case, the Discord bot was unreachable. We log this error but
