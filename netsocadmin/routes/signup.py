@@ -163,7 +163,7 @@ class Signup(View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.signup")
 
-    def render(self, email: str, token: str, error: bool=False) -> str:
+    def render(self, email: str, token: str, error: bool = False) -> str:
         """Render the template with appropriate messages for whether or not there's an error"""
         if error:
             self.logger.debug(f"Bad token {token} used for email {email}")

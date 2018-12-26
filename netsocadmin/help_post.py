@@ -7,6 +7,8 @@ import requests
 
 import config
 
+sysadmin_tag = '<@&318907623476822016>'
+
 
 def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
     """
@@ -77,7 +79,7 @@ def send_help_webhook(username: str, email: str, subject: str, message: str) -> 
     in the Netsoc Committee Server
     """
     output = {
-        "content": f"<@&318907623476822016> Help pls\n\n```From: {username}\nEmail: {email}\n\nSubject: {subject}\n\n{message}```",
+        "content": f"{sysadmin_tag}\n\n```From: {username}\nEmail: {email}\n\nSubject: {subject}\n\n{message}```",
     }
     headers = {'Content-Type': 'application/json'}
 

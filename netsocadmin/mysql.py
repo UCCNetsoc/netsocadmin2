@@ -34,7 +34,7 @@ class UserError(Exception):
     pass
 
 
-def _mysql_connection(username: str=None, password: str=None) -> pymysql.connections.Connection:
+def _mysql_connection(username: str = None, password: str = None) -> pymysql.connections.Connection:
     """
     _mysql_connection is a helper method which supplies a connection
     to the MySQL DB logged in as passwords.SQL_USER.
@@ -166,7 +166,7 @@ def delete_user(username: str):
         con.close()
 
 
-def create_database(username: str, dbname: str, delete: bool=False) -> str:
+def create_database(username: str, dbname: str, delete: bool = False) -> str:
     """
     create_database creates a new database for the given user. If the delete
     argument is True, then it will delete the database specified. Note that
