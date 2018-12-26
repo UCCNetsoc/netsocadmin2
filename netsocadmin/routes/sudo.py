@@ -55,9 +55,7 @@ class CompleteSudo(View):
 
         # Try to send the email
         try:
-            email_failed = not help_post.send_sudo_request_email(username, email)
-            if email_failed:
-                self.logger.error("Failed to send email")
+            help_post.send_sudo_request_email(username, email)
         except Exception as e:
             email_failed = True
             self.logger.error(f"Failed to send email: {e}")
@@ -66,10 +64,7 @@ class CompleteSudo(View):
         try:
             subject = "Feynman Account Request"
             msg = f"This user wants an account on Feynman pls.\nReason: {reason}"
-            discord_failed = not help_post.send_help_webhook(username, email, subject, msg)
-            # Not sure if this part works yet
-            if discord_failed:
-                self.logger.error("Failed to send message to discord")
+            help_post.send_help_webhook(username, email, subject, msg)
         except Exception as e:
             discord_failed = True
             self.logger.error(f"Failed to send message to Discord: {e}")
