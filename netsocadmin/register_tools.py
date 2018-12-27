@@ -46,7 +46,7 @@ The UCC Netsoc SysAdmin Team
             message_body,
         )
     else:
-        response = type("Response", object, {"status_code": 200})
+        response = type("Response", (object,), {"status_code": 200})
     return str(response.status_code).startswith("20")
 
 
@@ -91,7 +91,7 @@ The UCC Netsoc SysAdmin Team
             message_body,
         )
     else:
-        response = type("Response", object, {"status_code": 200})
+        response = type("Response", (object,), {"status_code": 200})
     return str(response.status_code).startswith("20")
 
 
