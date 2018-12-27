@@ -75,10 +75,4 @@ WORDPRESS_CONFIG = {
         "password": "password123",
         "host": "mysql.mydomain.com",
     },
-
-    # (Make this an absolute path)
-    "package": {
-        "logging_config":
-            "./netsocadmin/logging_config.ini"
-    }
 }
