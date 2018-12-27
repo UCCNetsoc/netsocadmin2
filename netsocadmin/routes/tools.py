@@ -264,7 +264,7 @@ class Help(ToolView):
             # to remain until the Discord bot becomes more reliable.
             sent_discord = True
         # Check that at least one form of communication was sent
-        if not sent_email and not sent_discord:have
+        if not sent_email and not sent_discord:
             # If not, report an error to the user
             self.logger.error(f"Unable to send email and unable to send to discord bot: {message}")
             return self.render(
