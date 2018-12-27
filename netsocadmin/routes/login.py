@@ -52,6 +52,8 @@ class Logout(View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.logout")
 
+    methods = ["GET"]
+
     def dispatch_reqest(self) -> str:
         self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user

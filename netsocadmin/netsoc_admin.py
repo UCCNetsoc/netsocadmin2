@@ -16,6 +16,8 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 app.logger.setLevel(logging.DEBUG)
 
+logging.getLogger("netsocadmin").setLevel(logging.DEBUG)
+
 
 @app.route('/')
 def index():
