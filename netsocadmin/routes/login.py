@@ -54,7 +54,7 @@ class Logout(View):
 
     methods = ["GET"]
 
-    def dispatch_reqest(self) -> str:
+    def dispatch_request(self):
         self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user
         flask.session.pop(config.LOGGED_IN_KEY, None)
