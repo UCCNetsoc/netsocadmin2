@@ -57,6 +57,6 @@ class Logout(View):
         self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user
         flask.session.pop(config.LOGGED_IN_KEY, None)
-        flask.session.pop("username", "")
         self.logger.debug(f"{flask.session['username']} logged out")
+        flask.session.pop("username", "")
         return flask.redirect("/")
