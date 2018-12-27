@@ -122,9 +122,9 @@ class Confirmation(View):
         self.logger.debug("Received request")
         # make sure is ucc email
         email = flask.request.form['email']
-        if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email) and not re.match(r"[a-z0-9]+@uccsocieties.com", email):
+        if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z0-9]+@uccsocieties.com", email):
             self.logger.debug(f"Email {email} is not a valid UCC email")
-            return flask.render_template("index.html", error_message="Must be a UCC Umail email address")
+            return flask.render_template("index.html", error_message="Must be a UCC Umail or Society email address")
 
         # make sure email has not already been used to make an account
         if email not in config.EMAIL_WHITELIST and register_tools.has_account(email):
