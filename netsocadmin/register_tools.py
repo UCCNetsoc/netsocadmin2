@@ -275,21 +275,21 @@ def has_account(email: str) -> bool:
     return False
 
 
-def has_username(uid: str) -> bool:
+def has_username(username: str) -> bool:
     """
-    Tells whether or not a uid is already used on the server.
+    Tells whether or not a username is already used on the server.
 
-    :param uid the uid being queried about
-    :returns True if the uid exists, False otherwise
+    :param username the username being queried about
+    :returns True if the username exists, False otherwise
     """
-    if uid in config.USERNAME_BLACKLIST:
+    if username in config.USERNAME_BLACKLIST:
         return True
     ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
-        uid = ldap3.utils.conv.escape_filter_chars(uid)
+        username = ldap3.utils.conv.escape_filter_chars(username)
         return conn.search(
             search_base="dc=netsoc,dc=co",
-            search_filter=f"(&(objectClass=account)(uid={uid}))",
+            search_filter=f"(&(objectClass=account)(uid={username}))",
             attributes=["uid"],
         )
     return True

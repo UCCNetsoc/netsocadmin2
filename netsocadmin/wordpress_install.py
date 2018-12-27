@@ -1,6 +1,7 @@
 from jinja2 import Environment, PackageLoader
 import requests
 import pymysql
+import ldap3
 
 import config
 import logging
@@ -58,8 +59,20 @@ def chown_dir_and_children(path_to_dir, username):
     logger.debug(
         f"changing owner and group of directory {path_to_dir} and children",
     )
-    split_command = ["chown", "-R", username + ":member", path_to_dir]
-    subprocess.call(split_command, stdout=subprocess.PIPE)
+    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+        username = ldap3.utils.conv.escape_filter_chars(username)
+        success = conn.search(
+            search_base="dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={username}))",
+            attributes=["uidNumber", "gidNumber"],
+        )
+        if not success or len(conn.entries) != 1:
+            raise Exception("user not found")
+        uidNumber = conn.entries[0]["uidNumber"].value
+        gidNumber = conn.entries[0]["gidNumber"].value
+        split_command = ["chown", "-R", f"{uidNumber}:{gidNumber}", path_to_dir]
+        subprocess.call(split_command, stdout=subprocess.PIPE)
 
 
 def file_exists(path_to_file):
@@ -200,10 +213,8 @@ def get_wordpress(user_dir, username, is_debug_mode):
             extract_from_tar(filename, user_dir + "/public_html")
             delete_file(filename)
         except Exception as e:
-            logger.warning(
-                "An issue has occured while trying to download wordpress\n" + str(e))
-            raise Exception(
-                "An issue has occured while trying to download wordpress")
+            logger.warning("An issue has occured while trying to download wordpress\n" + str(e))
+            raise Exception("An issue has occured while trying to download wordpress")
 
     def configure(user_dir, username):
         try:

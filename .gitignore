@@ -81,3 +81,9 @@ lock.mdb
 binlog.*
 undo_*
 dev/mysql/performance_schema
+
+ib_buffer_pool
+ib_logfile0
+ibdata1
+ibtmp1
+mysql.ibd
