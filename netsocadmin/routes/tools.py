@@ -1,4 +1,5 @@
 """File containing classes that represent all of the routes that are related to the `tools.html` template"""
+
 import logging
 import os
 import re
@@ -6,6 +7,7 @@ from typing import Optional, Tuple, Union
 
 # lib
 import flask
+# python
 # python
 import ldap3
 from flask.views import View
@@ -24,6 +26,7 @@ __all__ = [
     "CreateDB",
     "DeleteDB",
     "Help",
+    "HelpView",
     "ResetPassword",
     "ToolIndex",
     "WordpressInstall",
@@ -41,6 +44,8 @@ class ToolView(View):
     logger: Optional[logging.Logger] = None
     # Specify which method(s) are allowed to be used to access the route
     methods = ["GET"]
+    # What template file this view uses
+    template_file: Optional[str] = None
 
     def render(self, **data: Union[str, bool]) -> str:
         """
@@ -48,20 +53,58 @@ class ToolView(View):
         :param data: Some extra data to be passed to the template
         """
         return flask.render_template(
-            "tools.html",
-            databases=mysql.list_dbs(flask.session["username"]),
-            login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS],
-            monthly_backups=backup_tools.list_backups(flask.session["username"], "monthly"),
+            self.template_file,
             show_logout_button=login_tools.is_logged_in(),
             username=flask.session["username"],
-            weekly_backups=backup_tools.list_backups(flask.session["username"], "weekly"),
-            wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
-            wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
             **data,
         )
 
 
-class DBView(ToolView):
+class WordpressView(ToolView):
+    template_file = "wordpress.html"
+
+    def dispatch_request(self):
+        return self.render(
+            wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
+            wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
+        )
+
+
+class MySQLView(ToolView):
+    template_file = "mysql.html"
+
+    def dispatch_request(self):
+        return self.render(databases=mysql.list_dbs(flask.session["username"]))
+
+
+class BackupsView(ToolView):
+    template_file = "backups.html"
+
+    def dispatch_request(self):
+        return self.render(
+            monthly_backups=backup_tools.list_backups(flask.session["username"], "monthly"),
+            weekly_backups=backup_tools.list_backups(flask.session["username"], "weekly"),
+        )
+
+
+class ShellsView(ToolView):
+    template_file = "shells.html"
+
+    def dispatch_request(self, **data):
+        return self.render(
+            login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS],
+            **data,
+        )
+
+
+class HelpView(ToolView):
+    template_file = "help.html"
+
+    def dispatch_request(self, **data):
+        return self.render(**data)
+
+
+class AbstractDBView(MySQLView):
     """
     Extend the ToolView with methods that help abstract some of the work out of the db related views
     """
@@ -119,7 +162,7 @@ class Backup(ToolView):
         return flask.send_from_directory(backups_base_dir, f"{backup_date}.tgz")
 
 
-class ChangeShell(ToolView):
+class ChangeShell(ShellsView):
     """
     Route: /change-shell
         This route will change the user's shell in the LDAP server to the one
@@ -130,7 +173,7 @@ class ChangeShell(ToolView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.change-shell")
 
-    def dispatch_request(self) -> str:
+    def dispatch_request(self, **data) -> str:
         self.logger.debug("Received request")
         # Ensure the selected shell is in the list of allowed shells
         shell_path = config.SHELL_PATHS.get(flask.request.form.get("shell", ""), None)
@@ -162,13 +205,13 @@ class ChangeShell(ToolView):
                 changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
             )
             if not success:
-                self.logger.error("Error changing shell")
+                self.logger.error(f"Error changing shell for {username}")
                 return self.render(shells_error=conn.last_error, shells_active=True)
-            self.logger.debug("Shell changed successfully")
+            self.logger.debug(f"Shell changed successfully for {username} to {shell_path}")
             return self.render(shells_success=True, shells_active=True)
 
 
-class CreateDB(DBView):
+class CreateDB(AbstractDBView):
     """
     Route: createdb
         This route must be accessed via post. It is used to create a new
@@ -198,10 +241,10 @@ class CreateDB(DBView):
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
         self.logger.debug(f"Successfully created database for {username} named {dbname}")
-        return flask.redirect("/")
+        return flask.redirect("/tools/mysql")
 
 
-class DeleteDB(DBView):
+class DeleteDB(AbstractDBView):
     """
     Route: deletedb
         This route must be accessed via post. It is used to delete the database
@@ -230,10 +273,10 @@ class DeleteDB(DBView):
             self.logger.error(f"Database error {e.__cause__}")
             return self.render(mysql_error=e.__cause__, mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
-        return flask.redirect("/")
+        return flask.redirect("/tools/mysql")
 
 
-class Help(ToolView):
+class Help(HelpView):
     """
     Route: help
         This takes care of the help section, sending the data off
@@ -278,7 +321,7 @@ class Help(ToolView):
         return self.render(help_success=True, help_active=True)
 
 
-class ResetPassword(DBView):
+class ResetPassword(AbstractDBView):
     """
     Route: resetpw
         This route must be accessed via post. It is used to reset the user's
@@ -321,8 +364,10 @@ class ToolIndex(ToolView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.tools")
 
+    template_file = "tools.html"
+
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
+        self.logger.debug("Received request for tools")
         return self.render()
 
 

@@ -6,13 +6,6 @@
 	margin: 30px auto;
 }
 
-#wordpress-install-container {
-	min-height: 400px;
-	width:60%;
-	margin: 2% auto;
-	padding-bottom: 3%;
-}
-
 #wordpress-install-button {
 	margin-top: 30px;
 	text-align:center; 

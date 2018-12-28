@@ -13,11 +13,9 @@ function databaseForm(db) {
 	const formButton = document.querySelector("#database-form-button-text");
 	const form = document.querySelector("#database-change-form form");
 	const dbnameInput = document.querySelector("#dbname");
-	console.log("this");
 
 	if (db) {
 		form.action = "/deletedb";
-		console.log(form.action);
 		formTitle.innerText = "Delete Database:";
 		formButton.innerText = "Remove";
 		dbnameInput.value = db;

@@ -3,10 +3,12 @@
 {% block body %}
     <div class="row container">
         {{ error }}
-        {% for t in tutorials %}
-            <div class="card-panel white">
-                {{ t }}
-            </div>
-        {% endfor %}
+        <div class="card" style="padding: 1em;">
+            {% for t in tutorials %}
+                <div class="card-panel grey lighten-4">
+                    {{ t }}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

@@ -4,13 +4,18 @@ from .signup import CompleteSignup, Confirmation, Signup, Username
 from .sudo import CompleteSudo, Sudo
 from .tools import (
     Backup,
+    BackupsView,
     ChangeShell,
+    ShellsView,
+    MySQLView,
     CreateDB,
     DeleteDB,
     Help,
+    HelpView,
     ResetPassword,
     ToolIndex,
     WordpressInstall,
+    WordpressView,
 )
 from .tutorials import Tutorials
 
@@ -32,14 +37,18 @@ __all__ = [
 
     # Tools
     "Backup",
+    "BackupsView",
     "ChangeShell",
+    "ShellsView",
+    "MySQLView",
     "CreateDB",
     "DeleteDB",
     "Help",
+    "HelpView",
     "ResetPassword",
     "ToolIndex",
     "WordpressInstall",
-
+    "WordpressView",
     # Tutorials
     "Tutorials",
 ]

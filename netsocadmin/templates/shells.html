@@ -1,0 +1,42 @@
+{% extends "page-skeleton.html" %}
+{% block head %}
+	{{ super() }}
+{% endblock %}
+
+{% block body %}
+	{{ super() }}
+	
+	{# This tab is for the user to select a login shell for use on the servers #}
+    {# There are 5 to choose from: bash, csh, fish, ksh, zsh #}
+    <div id="shells" class="container">
+        <div class="card z-depth-3" style="margin-top:2%;">
+            <div class="card-content">
+                <div class="card-title teal-title">Select a Login Shell</div>
+                <br/>
+                {% if shells_error %}
+                    <p class="red-text">{{ shells_error }}</p>
+                {% elif shells_success %}
+                    <p class="teal-text">Shell was changed successfully</p>
+                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
+                {% else %}
+                    <p>You can now choose from one of the following login shells to use on Leela</p>
+                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
+                {% endif %}
+                <br />
+                <form action="/change-shell" method="POST">
+                    <div class="input-field col s12">
+                        <select name="shell">
+                            {% for shell in login_shells %}
+                                <option value="{{ shell[0] }}">{{ shell[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn waves-effect waves-light" type="submit">
+                        Change my Shell!
+                        <i class="mdi-content-send right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

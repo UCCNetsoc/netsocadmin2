@@ -36,11 +36,12 @@
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
 
-	{# makes the mobile menu appear #}
 	<script>
-		$( document ).ready(function(){
+		$(document).ready(function(){
 			$(".button-collapse").sideNav();
 			$('select').material_select();
+			$(".dropdown-button").dropdown({hover: false, belowOrigin: true});
+			$(".dropdown-button1").dropdown({hover: false, belowOrigin: false});
 		})
 	</script>
 
@@ -61,11 +62,51 @@
 		.error-msg {
 			color: red;
 		}
+
+		.teal-line {
+		  display: block;
+		  height: 1px;
+		  border: 0;
+		  border-top: 1px solid #009688;
+		  margin: 1em 0;
+		  padding: 0;
+		}
+		.teal-title {
+			background: #4db6ac;
+			width: 100%;
+			display: block;
+			padding: 0.1em;
+			color: white;
+			border: 1px solid #44a299;
+			text-align: center;
+		}
 	</style>
 	{% endblock %}
 </head>
 <body>
 	{# This is the navbar ontop of every page. All pages will need this. #}
+	<ul id="dropdown1" class="dropdown-content">
+		<li><a href="/tools">Home</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/mysql">MySQL</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/backups">Backups</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/wordpress">Wordpress</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/shells">Login Shell</a></li>
+	</ul>
+	<ul id="dropdown2" class="dropdown-content">
+		<li><a href="/tools">Home</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/mysql">MySQL</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/backups">Backups</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/wordpress">Wordpress</a></li>
+		<li class="divider"></li>
+		<li><a href="/tools/shells">Login Shell</a></li>
+	</ul>
 	<div class="navbar-fixed">
 		<nav>
 			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
@@ -74,21 +115,26 @@
 				{# This is the main navbar for when the screen is big enough #}
 				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
-					<li>
-						<a href="https://netsoc.co/">Netsoc Home</a>
-					</li>
-					<li>
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					{% if show_logout_button == True %}
-					<li>
+					<li title="Brings you to our homepage">
+						<a target="_blank" href="https://netsoc.co/">Netsoc Home</a>
+                    </li>
+                    {% if show_logout_button == True %}
+                    <li title="Occasionally updated list of tutorials and talks">
+                        <a href="/tutorials">Tutorials</a>
+                    </li>
+					<li title="Apply for sudo on one of our servers">
 						<a href="/sudo">Get Sudo</a>
 					</li>
-					<li>
-						<a href="/tools">Admin Tools</a>
+					<li title="Need help? Fill in the help form">
+						<a href="/help">Help</a>
 					</li>
+					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
+						<a class="dropdown-button" href="#" data-activates="dropdown1">
+							<b>Admin Tools</b><i class="mdi-navigation-arrow-drop-down right"></i>
+						</a>
+                    </li>
 					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+						<a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
 					{% else %}
 					<li>
@@ -101,11 +147,14 @@
 				<ul class="side-nav" id="mobile-demo">
 					{% if show_logout_button == True %}
 					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-					</li>
-					<li>
-						<a href="/tools">Admin Tools</a>
-					</li>
+                        <a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                    </li>
+					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
+                        <a class="dropdown-button1" href="#" data-activates="dropdown2">
+                            <b>Admin Tools</b>
+                            <i class="mdi-navigation-arrow-drop-down right"></i>
+                        </a>
+                    </li>
 					<li>
 						<a href="/sudo">Get Sudo</a>
 					</li>
@@ -117,8 +166,11 @@
 					<li>
 						<a href="/tutorials">Tutorials</a>
 					</li>
-					<li>
-						<a href="https://netsoc.co/">Netsoc Home</a>
+					<li title="Need help? Fill in the help form">
+						<a href="/help">Help</a>
+					</li>
+					<li title="Occasionally updated list of tutorials and talks">
+						<a href="/tutorials">Tutorials</a>
 					</li>
 				</ul>
 			</div>
@@ -146,5 +198,4 @@ An example usage of the template: some-page.html:
 
 	<p> Some dope ass page content </p>
 {% endblock %}
-
 #}
