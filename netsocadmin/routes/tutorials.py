@@ -35,7 +35,7 @@ class Tutorials(View):
             kw = {"tutorials": self.tutorials}
         return flask.render_template(
             "tutorials.html",
-            show_logout_button=login_tools.is_logged_in(),
+            is_logged_in=login_tools.is_logged_in(),
             **kw,
         )
 

@@ -49,9 +49,12 @@
 		body {
 			background-color: #eee;
 		}
-		li a.log-in-out-button {
+
+		{% if is_logged_in %}
+		li a.logout-button {
 			display: inline-block;
 		}
+        {% endif %}
 
 		{% if page == "login" %}
 		li a.log-in-out-button {
@@ -110,8 +113,8 @@
 	<div class="navbar-fixed">
 		<nav>
 			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
-				<div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
-
+				<div class="brand-logo"><a href='/tools'><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></a></div>
+				
 				{# This is the main navbar for when the screen is big enough #}
 				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
@@ -128,11 +131,15 @@
 					<li title="Need help? Fill in the help form">
 						<a href="/help">Help</a>
 					</li>
+					<li title="Occasionally updated list of tutorials and talks">
+						<a href="/tutorials">Tutorials</a>
+					</li>
+					{% if is_logged_in %}
 					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
 						<a class="dropdown-button" href="#" data-activates="dropdown1">
 							<b>Admin Tools</b><i class="mdi-navigation-arrow-drop-down right"></i>
 						</a>
-                    </li>
+					</li>
 					<li>
 						<a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
@@ -148,12 +155,6 @@
 					{% if show_logout_button == True %}
 					<li>
                         <a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-                    </li>
-					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
-                        <a class="dropdown-button1" href="#" data-activates="dropdown2">
-                            <b>Admin Tools</b>
-                            <i class="mdi-navigation-arrow-drop-down right"></i>
-                        </a>
                     </li>
 					<li>
 						<a href="/sudo">Get Sudo</a>
@@ -172,6 +173,14 @@
 					<li title="Occasionally updated list of tutorials and talks">
 						<a href="/tutorials">Tutorials</a>
 					</li>
+					{% if is_logged_in %}
+					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
+						<a class="dropdown-button1" href="#" data-activates="dropdown2">
+							<b>Admin Tools</b>
+							<i class="mdi-navigation-arrow-drop-down right"></i>
+						</a>
+					</li>
+					{% endif %}
 				</ul>
 			</div>
 		</nav>

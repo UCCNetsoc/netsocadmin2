@@ -39,7 +39,7 @@ class CompleteSudo(View):
                 "<br/>Return to <a href='/tools'>tools page</a>."
         return flask.render_template(
             "message.html",
-            show_logout_button=login_tools.is_logged_in(),
+            is_logged_in=login_tools.is_logged_in(),
             caption=caption,
             message=message,
         )
@@ -87,6 +87,6 @@ class Sudo(View):
         self.logger.debug("Received request")
         return flask.render_template(
             "sudo.html",
-            show_logout_button=login_tools.is_logged_in(),
+            is_logged_in=login_tools.is_logged_in(),
             username=flask.session["username"],
         )

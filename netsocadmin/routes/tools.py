@@ -54,7 +54,7 @@ class ToolView(View):
         """
         return flask.render_template(
             self.template_file,
-            show_logout_button=login_tools.is_logged_in(),
+            is_logged_in=login_tools.is_logged_in(),
             username=flask.session["username"],
             **data,
         )
