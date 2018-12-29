@@ -27,7 +27,7 @@
                     <div class="input-field col s12">
                         <select name="shell">
                             {% for shell in login_shells %}
-                                <option value="{{ shell[0] }}">{{ shell[1] }}</option>
+                                <option value="{{ shell[0] }}" {% if curr_shell == shell[1] %} selected="selected" {% endif %}>{{ shell[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>

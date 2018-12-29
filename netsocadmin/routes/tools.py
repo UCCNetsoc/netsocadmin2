@@ -91,8 +91,22 @@ class ShellsView(ToolView):
     template_file = "shells.html"
 
     def dispatch_request(self, **data):
+        ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+        with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+            username = ldap3.utils.conv.escape_filter_chars(flask.session["username"])
+            success = conn.search(
+                search_base="dc=netsoc,dc=co",
+                search_filter=f"(&(objectClass=account)(uid={username}))",
+                attributes=["loginShell"],
+            )
+            if not success or len(conn.entries) != 1:
+                shell = "Bash"
+            else:
+                shell = conn.entries[0]["loginShell"].value
+        inverse_shells = {v: k for k, v in config.SHELL_PATHS.items()}
         return self.render(
             login_shells=[(k, k.capitalize()) for k in config.SHELL_PATHS],
+            curr_shell=inverse_shells[shell].capitalize(),
             **data,
         )
 
@@ -208,7 +222,7 @@ class ChangeShell(ShellsView):
                 self.logger.error(f"Error changing shell for {username}")
                 return self.render(shells_error=conn.last_error, shells_active=True)
             self.logger.debug(f"Shell changed successfully for {username} to {shell_path}")
-            return self.render(shells_success=True, shells_active=True)
+            return flask.redirect(flask.url_for('shells'))
 
 
 class CreateDB(AbstractDBView):
