@@ -89,8 +89,6 @@
 <body>
 	{# This is the navbar ontop of every page. All pages will need this. #}
 	<ul id="dropdown1" class="dropdown-content">
-		<li><a href="/tools">Home</a></li>
-		<li class="divider"></li>
 		<li><a href="/tools/mysql">MySQL</a></li>
 		<li class="divider"></li>
 		<li><a href="/tools/backups">Backups</a></li>
@@ -100,8 +98,6 @@
 		<li><a href="/tools/shells">Login Shell</a></li>
 	</ul>
 	<ul id="dropdown2" class="dropdown-content">
-		<li><a href="/tools">Home</a></li>
-		<li class="divider"></li>
 		<li><a href="/tools/mysql">MySQL</a></li>
 		<li class="divider"></li>
 		<li><a href="/tools/backups">Backups</a></li>
@@ -113,18 +109,14 @@
 	<div class="navbar-fixed">
 		<nav>
 			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
-				<div class="brand-logo"><a href='/tools'><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></a></div>
+				<div class="brand-logo"><a target="_blank" href='https://netsoc.co/rk'><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></a></div>
 				
 				{# This is the main navbar for when the screen is big enough #}
 				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
-					<li title="Brings you to our homepage">
-						<a target="_blank" href="https://netsoc.co/">Netsoc Home</a>
-                    </li>
-                    {% if show_logout_button == True %}
-                    <li title="Occasionally updated list of tutorials and talks">
-                        <a href="/tutorials">Tutorials</a>
-                    </li>
+					<li title="Brings you to the homepage of Netsoc Admin">
+						<a href="/tools">Home</a>
+					</li>
 					<li title="Apply for sudo on one of our servers">
 						<a href="/sudo">Get Sudo</a>
 					</li>
@@ -159,9 +151,8 @@
 					<li>
 						<a href="/sudo">Get Sudo</a>
 					</li>
-					{% else %}
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
+					<li title="Brings you to the homepage of Netsoc Admin">
+						<a href="/tools">Home</a>
 					</li>
 					{% endif %}
 					<li>

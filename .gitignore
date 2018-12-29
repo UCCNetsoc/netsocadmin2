@@ -87,3 +87,4 @@ ib_logfile0
 ibdata1
 ibtmp1
 mysql.ibd
+*.ibt
