@@ -33,13 +33,16 @@ __all__ = [
 ]
 
 
+class ProtectedView(View):
+    # Decorate all subclasses with the following decorators
+    decorators = [login_tools.protected_page]
+
+
 # Super classes
-class ToolView(View):
+class ToolView(ProtectedView):
     """
     Super class for all of the routes that render the tools template
     """
-    # Decorate all subclasses with the following decorators
-    decorators = [login_tools.protected_page]
     # Logger instance (should be defined in each sub class to use correct naming)
     logger: Optional[logging.Logger] = None
     # Specify which method(s) are allowed to be used to access the route
@@ -176,7 +179,7 @@ class Backup(ToolView):
         return flask.send_from_directory(backups_base_dir, f"{backup_date}.tgz")
 
 
-class ChangeShell(ShellsView):
+class ChangeShell(ProtectedView):
     """
     Route: /change-shell
         This route will change the user's shell in the LDAP server to the one
@@ -187,12 +190,12 @@ class ChangeShell(ShellsView):
     # Logger instance
     logger = logging.getLogger("netsocadmin.change-shell")
 
-    def dispatch_request(self, **data) -> str:
+    def dispatch_request(self):
         self.logger.debug("Received request")
         # Ensure the selected shell is in the list of allowed shells
-        shell_path = config.SHELL_PATHS.get(flask.request.form.get("shell", ""), None)
+        shell_path = config.SHELL_PATHS.get(flask.request.args.get("shell", ""), None)
         if shell_path is None:
-            return self.render(shells_error="Invalid shell selection!", shells_active=True)
+            return "Invalid shell received", 400
         # Attempt to update LDAP for the logged in user to update their loginShell
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
         with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
@@ -211,7 +214,7 @@ class ChangeShell(ShellsView):
                     break
             if not found:
                 self.logger.debug(f"User {username} not found. Could not update shell")
-                return self.render(shells_error="Could not find your user to update it", shells_active=True)
+                return "Invalid user received. Please contact us for assistance", 500
 
             # Modify the user now
             success = conn.modify(
@@ -220,9 +223,9 @@ class ChangeShell(ShellsView):
             )
             if not success:
                 self.logger.error(f"Error changing shell for {username}")
-                return self.render(shells_error=conn.last_error, shells_active=True)
+                return conn.last_error, 500
             self.logger.debug(f"Shell changed successfully for {username} to {shell_path}")
-            return flask.redirect(flask.url_for('shells'))
+            return "", 200
 
 
 class CreateDB(AbstractDBView):

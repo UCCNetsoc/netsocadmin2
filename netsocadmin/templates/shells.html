@@ -1,6 +1,7 @@
 {% extends "page-skeleton.html" %}
 {% block head %}
-	{{ super() }}
+    {{ super() }}
+    <script src="../static/javascript/shellTools.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -13,17 +14,12 @@
             <div class="card-content">
                 <div class="card-title teal-title">Select a Login Shell</div>
                 <br/>
-                {% if shells_error %}
-                    <p class="red-text">{{ shells_error }}</p>
-                {% elif shells_success %}
-                    <p class="teal-text">Shell was changed successfully</p>
-                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
-                {% else %}
-                    <p>You can now choose from one of the following login shells to use on Leela</p>
-                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
-                {% endif %}
+                <p class="red-text" id="shell-error"></p>
+                <p class="teal-text" id="shell-success">Shell was changed successfully</p>
+                <p>You can now choose from one of the following login shells to use on Leela</p>
+                <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
                 <br />
-                <form action="/change-shell" method="POST">
+                <form>
                     <div class="input-field col s12">
                         <select name="shell">
                             {% for shell in login_shells %}
@@ -31,7 +27,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <button class="btn waves-effect waves-light" type="submit">
+                    <button class="btn waves-effect waves-light" onclick="changeShell(event)">
                         Change my Shell!
                         <i class="mdi-content-send right"></i>
                     </button>
