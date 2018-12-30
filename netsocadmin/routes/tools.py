@@ -36,6 +36,8 @@ __all__ = [
 class ProtectedView(View):
     # Decorate all subclasses with the following decorators
     decorators = [login_tools.protected_page]
+    # Specify which method(s) are allowed to be used to access the route
+    methods = ["GET"]    
 
 
 # Super classes
@@ -45,8 +47,6 @@ class ToolView(ProtectedView):
     """
     # Logger instance (should be defined in each sub class to use correct naming)
     logger: Optional[logging.Logger] = None
-    # Specify which method(s) are allowed to be used to access the route
-    methods = ["GET"]
     # What template file this view uses
     template_file: Optional[str] = None
 
