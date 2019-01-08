@@ -47,7 +47,6 @@ The UCC Netsoc SysAdmin Team
         )
     else:
         response = type("Response", (object,), {"status_code": 200})
-    
     return str(response.status_code).startswith("20")
 
 
