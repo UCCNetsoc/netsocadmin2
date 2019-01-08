@@ -19,7 +19,7 @@ __all__ = [
 
 class CompleteSignup(View):
     """
-    Route: register
+    Route: /completeregistration
         This is the route which is run by the registration form
         and should only be available through POST. It adds the
         given data to the Netsoc LDAP database.
@@ -94,7 +94,8 @@ class CompleteSignup(View):
 
         # initialise the user's home directories so they can use netsoc admin
         # without ever having to SSH into the server.
-        register_tools.initialise_directories(user, info["password"])
+        if not config.FLASK_CONFIG["debug"]:
+            register_tools.initialise_directories(user, info["password"])
 
         # registration complete, remove their token
         register_tools.remove_token(email)
@@ -176,7 +177,7 @@ class Signup(View):
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request")
-        # Make sure they haven't forget the URL
+        # Make sure they haven't forged the URL
         email = flask.request.args.get("e")
         token = flask.request.args.get("t")
         return self.render(email, token, not register_tools.good_token(email, token))

@@ -113,7 +113,7 @@ class Backup(ToolView):
             self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
         # Retrieve the backup and send it to the user
-        backups_base_dir = os.path.join(backup_tools.BACKUPS_DIR, username, timeframe)
+        backups_base_dir = os.path.join(config.BACKUPS_DIR, username, timeframe)
         return flask.send_from_directory(backups_base_dir, f"{backup_date}.tgz")
 
 
@@ -155,7 +155,7 @@ class ChangeShell(ToolView):
                 return self.render(shells_error="Could not find your user to update it", shells_active=True)
 
             # Modify the user now
-            success = conn.modfy(
+            success = conn.modify(
                 dn=f"cn={username},cn={group},dc=netsoc,dc=co",
                 changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
             )

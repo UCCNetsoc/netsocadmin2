@@ -14,6 +14,7 @@ app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
+# pylint: disable=E1101
 app.logger.setLevel(logging.DEBUG)
 
 logging.getLogger("netsocadmin").setLevel(logging.DEBUG)
@@ -28,13 +29,13 @@ def index():
     """
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
-
+    # pylint: disable=E1101
     app.logger.debug("Received index page request")
     return flask.render_template("index.html")
 
 
 # ------------------------------Server Signup Routes------------------------------#
-app.add_url_rule('/completeregistration', view_func=routes.Confirmation.as_view('completeregistration'))
+app.add_url_rule('/completeregistration', view_func=routes.CompleteSignup.as_view('completeregistration'))
 app.add_url_rule('/sendconfirmation', view_func=routes.Confirmation.as_view('sendconfirmation'))
 app.add_url_rule('/signup', view_func=routes.Signup.as_view('signup'))
 app.add_url_rule('/username', view_func=routes.Username.as_view('username'))

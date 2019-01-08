@@ -47,6 +47,7 @@ The UCC Netsoc SysAdmin Team
         )
     else:
         response = type("Response", (object,), {"status_code": 200})
+    
     return str(response.status_code).startswith("20")
 
 
@@ -70,12 +71,12 @@ username: {user}
 password: {password}
 
 Please note that you must log into the server at least once before the web portal will work for you.
-If you need any help on this, contact adamgillessen@gmail.com.
+If you need any help on this, contact netsoc@uccsocieties.ie, or via the help section on https://admin.netsoc.co.
 
 To log in, run:
     ssh {user}@leela.netsoc.co
 and enter your password when prompted.
-If you are using windows, go to http://www.putty.org/ and download the SSH client.
+If you are using Windows, go to http://www.putty.org/ and download the SSH client.
 
 Please change your password when you first log-in to something you'll remember!
 
@@ -192,6 +193,7 @@ def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         # creates initial password for user. They will be asked to change
         # this when they first log in.
         password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+        # pylint: disable=E1101
         crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         info["password"] = password
         info["crypt_password"] = crypt_password
