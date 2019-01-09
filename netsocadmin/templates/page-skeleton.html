@@ -5,10 +5,10 @@
 	<title>Netsoc Admin</title>
 	<meta name="theme-color" content="#4db6ac">
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">      
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="shortcut icon" href="/static/favicon.ico">
 	<link rel="canonical" href="https://admin.netsoc.co" />
-	
+
 	<meta property="og:title" content="UCC Netsoc Admin" />
 	<meta property="og:url" content="https://admin.netsoc.co" />
 	<meta property="og:image" content="/static/banner-icon.svg" />
@@ -30,11 +30,11 @@
 			"sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
 		}
 	</script>
-	
+
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script> 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
 
 	{# makes the mobile menu appear #}
 	<script>
@@ -48,17 +48,9 @@
 		body {
 			background-color: #eee;
 		}
-
-		{% if show_logout_button %}
 		li a.logout-button {
 			display: inline-block;
 		}
-		{% else %}
-		li a.logout-button {
-			display: none;
-		}
-		{% endif %}
-
 		.error-msg {
 			color: red;
 		}
@@ -71,7 +63,7 @@
 		<nav>
 			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
 				<div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
-				
+
 				{# This is the main navbar for when the screen is big enough #}
 				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
@@ -79,10 +71,11 @@
 						<a href="https://netsoc.co/">Netsoc Home</a>
 					</li>
 					<li>
-						<a href="/sudo">Get Sudo</a>
-					</li>
-					<li>
 						<a href="/tutorials">Tutorials</a>
+					</li>
+					{% if show_logout_button == True %}
+					<li>
+						<a href="/sudo">Get Sudo</a>
 					</li>
 					<li>
 						<a href="/tools">Admin Tools</a>
@@ -90,10 +83,16 @@
 					<li>
 						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
+					{% else %}
+					<li>
+						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login</a>
+					</li>
+					{% endif %}
 				</ul>
 
 				{# This one is used when the screen is small like on mobile #}
 				<ul class="side-nav" id="mobile-demo">
+					{% if show_logout_button == True %}
 					<li>
 						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
@@ -101,10 +100,15 @@
 						<a href="/tools">Admin Tools</a>
 					</li>
 					<li>
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					<li>
 						<a href="/sudo">Get Sudo</a>
+					</li>
+					{% else %}
+					<li>
+						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login</a>
+					</li>
+					{% endif %}
+					<li>
+						<a href="/tutorials">Tutorials</a>
 					</li>
 					<li>
 						<a href="https://netsoc.co/">Netsoc Home</a>
@@ -132,7 +136,7 @@ An example usage of the template: some-page.html:
 
 {% block body %}
 	{{ super() }}
-	
+
 	<p> Some dope ass page content </p>
 {% endblock %}
 
