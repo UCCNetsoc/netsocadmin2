@@ -48,9 +48,16 @@
 		body {
 			background-color: #eee;
 		}
-		li a.logout-button {
+		li a.log-in-out-button {
 			display: inline-block;
 		}
+
+		{% if page == "login" %}
+		li a.log-in-out-button {
+			display: none;
+		}
+		{% endif %}
+
 		.error-msg {
 			color: red;
 		}
@@ -81,11 +88,11 @@
 						<a href="/tools">Admin Tools</a>
 					</li>
 					<li>
-						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
 					{% else %}
 					<li>
-						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login</a>
+						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
 					</li>
 					{% endif %}
 				</ul>
@@ -94,7 +101,7 @@
 				<ul class="side-nav" id="mobile-demo">
 					{% if show_logout_button == True %}
 					<li>
-						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
 					</li>
 					<li>
 						<a href="/tools">Admin Tools</a>
@@ -104,7 +111,7 @@
 					</li>
 					{% else %}
 					<li>
-						<a class="logout-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login</a>
+						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
 					</li>
 					{% endif %}
 					<li>

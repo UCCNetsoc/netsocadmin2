@@ -31,7 +31,10 @@ def index():
         return flask.redirect("/tools")
     # pylint: disable=E1101
     app.logger.debug("Received index page request")
-    return flask.render_template("index.html")
+    return flask.render_template(
+        "index.html",
+        page="login",
+    )
 
 
 # ------------------------------Server Signup Routes------------------------------#

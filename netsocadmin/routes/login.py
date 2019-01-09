@@ -31,6 +31,7 @@ class Login(View):
             self.logger.debug(f"{flask.request.form['username']} entered incorrect password")
             return flask.render_template(
                 "index.html",
+                page="login",
                 error_message="Username or password was incorrect",
             )
         # Initialise the user's directory if running on leela
