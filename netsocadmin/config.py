@@ -38,7 +38,7 @@ LDAP_USER_GROUP_ID = 422
 TUTORIAL_FOLDER = "./tutorials"
 
 # the root directory with all of the backups in it
-BACKUPS_DIR = "./dev/backups"
+BACKUPS_DIR = "../dev/backups"
 
 # local uri db name
 TOKEN_DB_NAME = ".uri.db"  # should end with .db for .gitignore
