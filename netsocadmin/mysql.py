@@ -92,8 +92,8 @@ def create_user(username: str) -> str:
     :returns string the generated password for the new user
     """
     # make sure username is valid
-    if not re.match(r"^[a-zA-Z0-9]+$", username):
-        raise BadUsernameError(f"invalid username '{username}', must be lowercase letters only")
+    if not re.match(r"^[a-z0-9-_]+$", username):
+        raise BadUsernameError(f"invalid username '{username}', must be alphanumeric, underscores and hyphens only")
     try:
         con = _mysql_connection()
         with con.cursor() as cur:
@@ -144,8 +144,8 @@ def delete_user(username: str):
     :raises UserError if the operation fails.
     """
     # make sure username is valid
-    if not re.match(r"[a-z]", username):
-        raise BadUsernameError(f"invalid username '{username}', must be lowercase letters only")
+    if not re.match(r"[a-z0-9-_]", username):
+        raise BadUsernameError(f"invalid username '{username}', must be alphanumeric, underscores and hyphens only")
     try:
         con = _mysql_connection()
         with con.cursor() as cur:
