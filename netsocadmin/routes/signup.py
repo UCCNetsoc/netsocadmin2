@@ -76,7 +76,10 @@ class CompleteSignup(View):
             self.logger.debug(f"Failed to add user to LDAP: {info}")
             # clean db of token so they have to start again
             register_tools.remove_token(email)
-            return flask.render_template("index.html", page="login", error_message="An error occured. Please try again or contact us")
+            return flask.render_template(
+                "index.html", 
+                page="login",
+                error_message="An error occured. Please try again or contact us")
 
         # add all info to Netsoc MySQL DB
         info["name"] = flask.request.form["name"]
@@ -86,12 +89,18 @@ class CompleteSignup(View):
         info["email"] = email
         if not register_tools.add_netsoc_database(info):
             self.logger.debug("Failed to add data to mysql db")
-            return flask.render_template("index.html", page="login", error_message="An error occured. Please try again or contact us")
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="An error occured. Please try again or contact us")
 
         # send user's details to them
         if not register_tools.send_details_email(email, user, info["password"]):
             self.logger.debug("Failed to send confirmation email")
-            return flask.render_template("index.html", page="login", error_message="An error occured. Please try again or contact us")
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="An error occured. Please try again or contact us")
 
         # initialise the user's home directories so they can use netsoc admin
         # without ever having to SSH into the server.
@@ -126,7 +135,10 @@ class Confirmation(View):
         email = flask.request.form['email']
         if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z0-9]+@uccsocieties.ie", email):
             self.logger.debug(f"Email {email} is not a valid UCC email")
-            return flask.render_template("index.html", page="login", error_message="Must be a UCC Umail or Society email address")
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="Must be a UCC Umail or Society email address")
 
         # make sure email has not already been used to make an account
         if email not in config.EMAIL_WHITELIST and register_tools.has_account(email):
@@ -148,7 +160,10 @@ class Confirmation(View):
         confirmation_sent = register_tools.send_confirmation_email(email, out_email)
         if not confirmation_sent:
             self.logger.debug("Confirmation email failed to send")
-            return flask.render_template("index.html", page="login", error_message="An error occured. Please try again or contact us")
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="An error occured. Please try again or contact us")
 
         caption = "Thank you!"
         message = f"Your confirmation link has been sent to {email}"
