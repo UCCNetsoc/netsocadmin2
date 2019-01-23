@@ -77,7 +77,7 @@ class CompleteSignup(View):
             # clean db of token so they have to start again
             register_tools.remove_token(email)
             return flask.render_template(
-                "index.html", 
+                "index.html",
                 page="login",
                 error_message="An error occured. Please try again or contact us")
 
