@@ -61,6 +61,24 @@ class CompleteSignup(View):
             )
 
         user = flask.request.form["uid"]
+        if user != user.lower():
+            self.logger.debug(f"username {user} contained uppercase characters")
+            return flask.render_template(
+                "form.html",
+                email_address=email,
+                token=uri,
+                error_message="The requested username contains uppercase characters.\
+                 Please enter a username in lowercase",
+            )
+
+        if len(user) > 15:
+            return flask.render_template(
+                "form.html",
+                email_address=email,
+                token=uri,
+                error_message="The requested username is too long. Maximum length is 15 characters",
+            )
+
         if register_tools.has_username(user):
             self.logger.debug(f"Username {user} not available")
             return flask.render_template(

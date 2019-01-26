@@ -26,8 +26,9 @@ class Login(View):
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request")
+        user = flask.request.form["username"].lower()
         # Validate the login request
-        if not login_tools.is_correct_password(flask.request.form["username"], flask.request.form["password"]):
+        if not login_tools.is_correct_password(user, flask.request.form["password"]):
             self.logger.debug(f"{flask.request.form['username']} entered incorrect password")
             return flask.render_template(
                 "index.html",
@@ -36,10 +37,10 @@ class Login(View):
             )
         # Initialise the user's directory if running on leela
         if not config.FLASK_CONFIG["debug"]:
-            register_tools.initialise_directories(flask.request.form["username"], flask.request.form["password"])
+            register_tools.initialise_directories(user, flask.request.form["password"])
         # Set the session info to reflect that the user is logged in and redirect back to /
         flask.session[config.LOGGED_IN_KEY] = True
-        flask.session["username"] = flask.request.form["username"]
+        flask.session["username"] = user
         self.logger.debug(f"{flask.request.form['username']} successfully logged in")
         return flask.redirect("/")
 
