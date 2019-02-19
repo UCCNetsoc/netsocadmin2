@@ -23,4 +23,4 @@ VOLUME ["/backups", "/home/users"]
 
 # not actually used, just for documentaion
 EXPOSE 5050
-ENTRYPOINT ["python3", "netsoc_admin.py"]
+ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
