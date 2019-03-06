@@ -7,7 +7,7 @@ import requests
 
 import config
 
-sysadmin_tag = '<@&318907623476822016>'
+sysadmin_tag = '<@&547450539726864384>'
 
 
 def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
