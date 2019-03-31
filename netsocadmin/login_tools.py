@@ -5,7 +5,7 @@ import crypt
 import functools
 import hmac
 import typing
-
+import logging
 import flask
 import ldap3
 
@@ -24,6 +24,19 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
             return flask.render_template("index.html", error_message="Please log in to view this page")
         return view_func(*args, **kwargs)
     return protected_view_func
+
+
+def sentry_wrapper(view_func):
+    @functools.wraps(view_func)
+    def wrapper(*args, **kwargs):
+        try:
+            return view_func(*args, **kwargs)
+        except Exception as e:
+            logging.getLogger('test').error('test')
+            from netsoc_admin import sentry
+            logging.getLogger('test').error(sentry.captureException())
+            raise e
+    return wrapper
 
 
 def is_logged_in():

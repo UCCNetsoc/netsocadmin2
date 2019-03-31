@@ -35,7 +35,7 @@ class ToolView(View):
     Super class for all of the routes that render the tools template
     """
     # Decorate all subclasses with the following decorators
-    decorators = [login_tools.protected_page]
+    decorators = [login_tools.protected_page, login_tools.sentry_wrapper]
     # Logger instance (should be defined in each sub class to use correct naming)
     logger: Optional[logging.Logger] = None
     # Specify which method(s) are allowed to be used to access the route
@@ -320,6 +320,7 @@ class ToolIndex(ToolView):
     logger = logging.getLogger("netsocadmin.tools")
 
     def dispatch_request(self) -> str:
+        raise Exception("bitch banana")
         self.logger.debug("Received request")
         return self.render()
 

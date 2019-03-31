@@ -8,8 +8,11 @@ import flask
 import login_tools
 import routes
 import logging
+from raven.contrib.flask import Sentry
 
 app = flask.Flask("netsocadmin")
+sentry = Sentry(app, dsn=config.SENTRY_DSN)
+
 app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
