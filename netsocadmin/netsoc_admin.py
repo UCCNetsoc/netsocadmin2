@@ -3,11 +3,13 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
-import config
+import logging
+
 import flask
+
+import config
 import login_tools
 import routes
-import logging
 
 app = flask.Flask("netsocadmin")
 app.secret_key = config.SECRET_KEY
@@ -36,6 +38,13 @@ def index():
         page="login",
     )
 
+@app.errorhandler(404)
+def not_found(e):
+    return flask.render_template("404.html"), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return flask.render_template("500.html"), 500
 
 # ------------------------------Server Signup Routes------------------------------#
 app.add_url_rule('/completeregistration', view_func=routes.CompleteSignup.as_view('completeregistration'))

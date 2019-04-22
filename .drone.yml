@@ -19,11 +19,23 @@ pipeline:
     when:
       event: push
 
-  build_and_push:
+  build_dev:
+    image: plugins/docker
+    tag: dev-env
+    dockerfile: Dockerfile
+    target: dev
+    repo: docker.netsoc.co/public/netsocadmin
+    registry: docker.netsoc.co
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: [push, tag]
+      branch: master 
+
+  build_prod:
     image: plugins/docker
     tag: latest
     dockerfile: Dockerfile
-    repo: docker.netsoc.co/netsocadmin
+    repo: docker.netsoc.co/netsoc/netsocadmin
     registry: docker.netsoc.co
     secrets: [ docker_username, docker_password ]
     when:

@@ -4,6 +4,7 @@ Contains functions which are used during the login and logout process.
 import crypt
 import functools
 import hmac
+import logging
 import typing
 
 import flask
@@ -11,6 +12,8 @@ import ldap3
 
 import config
 
+logger = logging.getLogger("netsocadmin.login")
+ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
     """
@@ -38,7 +41,7 @@ def is_correct_password(username: str, password: str) -> bool:
     is_correct_password tells you whether or not a given password
     is the password has which is on file in the Netsoc MySQL database.
     """
-    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+    logger.info("login attempt from {username}")
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         username = ldap3.utils.conv.escape_filter_chars(username)
         success = conn.search(

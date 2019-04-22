@@ -1,26 +1,46 @@
-FROM python:alpine3.7
+FROM python:alpine3.7 as dev
 LABEL maintainer="netsoc@netsoc.co"
 
-COPY . /netsocadmin
+VOLUME [ "/backups", "/home/users" ]
 
-RUN apk update && apk upgrade
+# not actually used, just for documentaion
+EXPOSE 5050
 
-RUN apk add --no-cache curl pkgconfig python3-dev openssl-dev libffi-dev musl-dev make gcc openssh
+COPY requirements.txt /netsocadmin/requirements.txt
+
+RUN apk update
+
+RUN apk add --no-cache pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
 
 # install all python requirements
 RUN pip3 install -r /netsocadmin/requirements.txt
 
-# this will be the mount point for the user home directories
-RUN mkdir /home/users
+COPY . /netsocadmin
+
+WORKDIR /netsocadmin/netsocadmin
+
+CMD [ "python3", "netsoc_admin.py" ]
+
+FROM python:alpine3.7
+
+RUN apk update && \
+    apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
 
 # the server SSH's to leela in order to initialise user home directories
-RUN mkdir ~/.ssh
-RUN ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
+RUN mkdir ~/.ssh && \
+    ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
-WORKDIR /netsocadmin/netsocadmin/
+COPY --from=dev /netsocadmin /netsocadmin
 
-VOLUME ["/backups", "/home/users"]
+RUN pip3 install -r /netsocadmin/requirements.txt && \
+    pip3 install gunicorn
 
+<<<<<<< HEAD
 # not actually used, just for documentaion
 EXPOSE 5050
 ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+=======
+WORKDIR /netsocadmin/netsocadmin
+
+CMD [ "gunicorn", "-b", "0.0.0.0:5050", "netsoc_admin:app" ]
+>>>>>>> Made gud dockerfile with gunicorn for prod

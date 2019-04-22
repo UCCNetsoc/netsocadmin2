@@ -31,21 +31,21 @@ LDAP_AUTH = {
     "user": "cn=admin,dc=netsoc,dc=co"
 }
 
-LDAP_HOST = "localhost:389"
+LDAP_HOST = "auth:389"
 LDAP_USER_GROUP_ID = 422
 
 # location of the markdown tutorials
 TUTORIAL_FOLDER = "./tutorials"
 
 # the root directory with all of the backups in it
-BACKUPS_DIR = "../dev/backups"
+BACKUPS_DIR = "/backups"
 
 # local uri db name
 TOKEN_DB_NAME = ".uri.db"  # should end with .db for .gitignore
 
 # mysql db details
 MYSQL_DETAILS = {
-    "host": "localhost",
+    "host": "db",
     "user": "root",
     "password": "netsoc",
     "db": "netsoc_admin",
@@ -68,11 +68,3 @@ SYSADMIN_EMAILS = []
 
 # used for making the ssh connection to the server
 SERVER_HOSTNAME = "localhost"
-
-WORDPRESS_CONFIG = {
-    "db": {
-        "user": "me",
-        "password": "password123",
-        "host": "mysql.mydomain.com",
-    },
-}

@@ -1,19 +1,18 @@
-from jinja2 import Environment, PackageLoader
-import requests
-import pymysql
-import ldap3
-
-import config
 import logging
-
+import os
 import random
 import string
-from pathlib import Path
-import wget
 import subprocess
-import os
+from pathlib import Path
 
-# fileConfig(config.WORDPRESS_CONFIG["package"]["logging_config"])
+import ldap3
+import pymysql
+import requests
+import wget
+from jinja2 import Environment, PackageLoader
+
+import config
+
 logger = logging.getLogger(__name__)
 
 """
