@@ -1,21 +1,22 @@
 """File containing classes that represent all of the routes that are related to the `tools.html` template"""
-# python
-import ldap3
 import logging
 import os
 import re
-from typing import Tuple, Optional, Union
+from typing import Optional, Tuple, Union
+
 # lib
 import flask
+# python
+import ldap3
 from flask.views import View
+
 # local
 import backup_tools
 import config
-import mysql
 import help_post
 import login_tools
+import mysql
 import wordpress_install
-
 
 __all__ = [
     "Backup",
@@ -108,7 +109,8 @@ class Backup(ToolView):
     def dispatch_request(self, username: str, timeframe: str, backup_date: str) -> str:
         self.logger.debug("Received request")
         # Validate the parameters
-        if (not re.match(r"^[a-z0-9-_]+[a-z0-9]$", username) or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or
+        if (not re.match(r"^[a-z0-9-_]+[a-z0-9]$", username) or
+            not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) or
                 timeframe not in ["weekly", "monthly"]):
             self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)

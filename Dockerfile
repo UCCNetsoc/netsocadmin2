@@ -35,12 +35,6 @@ COPY --from=dev /netsocadmin /netsocadmin
 RUN pip3 install -r /netsocadmin/requirements.txt && \
     pip3 install gunicorn
 
-<<<<<<< HEAD
-# not actually used, just for documentaion
-EXPOSE 5050
-ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
-=======
 WORKDIR /netsocadmin/netsocadmin
 
 CMD [ "gunicorn", "-b", "0.0.0.0:5050", "netsoc_admin:app" ]
->>>>>>> Made gud dockerfile with gunicorn for prod

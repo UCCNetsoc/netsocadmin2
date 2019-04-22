@@ -15,6 +15,7 @@ import config
 logger = logging.getLogger("netsocadmin.login")
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
+
 def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
     """
     protected_page is a route function decorator which will check that a user
