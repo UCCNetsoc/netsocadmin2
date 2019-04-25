@@ -8,7 +8,8 @@ steps:
       - pip3 install flake8
       - flake8
     when:
-      event: push
+      event: 
+        - push
 
 - build_dev:
     image: plugins/docker
@@ -25,8 +26,10 @@ steps:
     - name: docker
       path: /var/run/docker.sock
     when:
-      event: [push, tag]
-      branch: master 
+      event: 
+        - push
+      branch: 
+        - master 
 
 - build_prod:
     image: plugins/docker
@@ -42,8 +45,10 @@ steps:
     - name: docker
       path: /var/run/docker.sock
     when:
-      event: [ push, tag ]
-      branch: master
+      event: 
+        - push
+      branch: 
+        - master 
 
 - discord_notif:
     image: appleboy/drone-discord
@@ -63,5 +68,7 @@ steps:
           Netsoc Admin failed to build. Build num {{build.number}}.
         {{/success}}    
     when:
-      event: [ push, tag ]
-      branch: master      
+      event: 
+        - push
+      branch: 
+        - master 
