@@ -2,31 +2,12 @@
 from .login import Login, Logout
 from .signup import CompleteSignup, Confirmation, Signup, Username
 from .sudo import CompleteSudo, Sudo
-from .tools.backups import (
-    BackupsView,
-    Backup,
-)
-from .tools.shells import (
-    ShellsView,
-    ChangeShell,
-)
-from .tools.mysql import (
-    MySQLView,
-    DeleteDB,
-    CreateDB,
-    ResetPassword,
-)
-from .tools.wordpress import (
-    WordpressView,
-    WordpressInstall,
-)
-from .tools.help import (
-    HelpView,
-    Help,
-)
-from .tools.index import (
-    ToolIndex,
-)
+from .tools.backups import Backup, BackupsView
+from .tools.help import Help, HelpView
+from .tools.index import ToolIndex
+from .tools.mysql import CreateDB, DeleteDB, MySQLView, ResetPassword
+from .tools.shells import ChangeShell, ShellsView
+from .tools.wordpress import WordpressInstall, WordpressView
 from .tutorials import Tutorials
 
 __all__ = [
