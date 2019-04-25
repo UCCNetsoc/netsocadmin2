@@ -1,6 +1,8 @@
-pipeline:
-  lint:
-    group: prebuild
+kind: pipeline
+name: default
+
+steps:
+- lint:
     image: python:3.7
     commands:
       - pip3 install flake8
@@ -8,52 +10,58 @@ pipeline:
     when:
       event: push
 
-  run_tests:
-    group: prebuild
-    image: python:3.7
-    commands:
-      - apt-get update
-      - apt-get -qq install alien build-essential libssl-dev libffi-dev tox -y
-      - make install
-      - make test
-    when:
-      event: push
-
-  build_dev:
+- build_dev:
     image: plugins/docker
-    tag: dev-env
-    dockerfile: Dockerfile
-    target: dev
-    repo: docker.netsoc.co/public/netsocadmin
-    registry: docker.netsoc.co
-    secrets: [ docker_username, docker_password ]
+    settings:
+      tag: dev-env
+      target: dev
+      repo: docker.netsoc.co/public/netsocadmin
+      registry: docker.netsoc.co
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    volumes:
+    - name: docker
+      path: /var/run/docker.sock
     when:
       event: [push, tag]
       branch: master 
 
-  build_prod:
+- build_prod:
     image: plugins/docker
-    tag: latest
-    dockerfile: Dockerfile
-    repo: docker.netsoc.co/netsoc/netsocadmin
-    registry: docker.netsoc.co
-    secrets: [ docker_username, docker_password ]
+    settings:
+      tag: latest
+      repo: docker.netsoc.co/public/netsocadmin
+      registry: docker.netsoc.co
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    volumes:
+    - name: docker
+      path: /var/run/docker.sock
     when:
-      event: [push, tag]
+      event: [ push, tag ]
       branch: master
 
-  discord-notif:
+- discord_notif:
     image: appleboy/drone-discord
-    username: Netsoc CI
-    avatar_url: https://noahsc.xyz/public_images/drone.png
-    secrets: [ discord_webhook_id, discord_webhook_token ]
-    color: "#42f483"
-    message: >
-      {{#success build.status}}
-        Netsoc Admin successfully built and pushed. Build num {{build.number}}.
-      {{else}}
-        Netsoc Admin failed to build. Build num {{build.number}}.
-      {{/success}}    
+    environment:
+      WEBHOOK_ID:
+        from_secret: discord_webhook_id
+      WEBHOOK_TOKEN:
+        from_secret: discord_webhook_token
+    settings:
+      username: Netsoc CI
+      avatar_url: https://noahsc.xyz/public_images/drone.png
+      color: "#42f483"
+      message: >
+        {{#success build.status}}
+          Netsoc Admin successfully built and pushed. Build num {{build.number}}.
+        {{else}}
+          Netsoc Admin failed to build. Build num {{build.number}}.
+        {{/success}}    
     when:
-      event: [push, tag]
+      event: [ push, tag ]
       branch: master      
