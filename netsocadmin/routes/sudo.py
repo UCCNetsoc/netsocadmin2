@@ -1,12 +1,13 @@
 # stdlib
 import logging
+
 # lib
 import flask
 from flask.views import View
+
 # local
 import help_post
 import login_tools
-
 
 __all__ = [
     "CompleteSudo",

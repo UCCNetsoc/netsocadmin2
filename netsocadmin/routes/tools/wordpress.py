@@ -1,14 +1,19 @@
-from .index import ToolView
-import flask
-import wordpress_install
 import logging
 from typing import Tuple
+
+import flask
+
 import config
+import wordpress_install
+
+from .index import ToolView
 
 
 class WordpressView(ToolView):
     template_file = "wordpress.html"
 
+    page_title = "Install WordPress"
+    
     def dispatch_request(self):
         return self.render(
             wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),

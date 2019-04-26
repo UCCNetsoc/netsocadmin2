@@ -1,13 +1,18 @@
-from .index import ToolView
-import mysql
-import flask
-from typing import Tuple
-import login_tools
 import logging
+from typing import Tuple
+
+import flask
+
+import login_tools
+import mysql
+
+from .index import ToolView
 
 
 class MySQLView(ToolView):
     template_file = "mysql.html"
+
+    page_title = "Manage MySQL"
 
     def dispatch_request(self):
         return self.render(databases=mysql.list_dbs(flask.session["username"]))

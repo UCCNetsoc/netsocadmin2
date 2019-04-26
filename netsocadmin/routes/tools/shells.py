@@ -1,12 +1,17 @@
-from .index import ToolView, ProtectedView
-import ldap3
-import config
-import flask
 import logging
+
+import flask
+import ldap3
+
+import config
+
+from .index import ProtectedView, ToolView
 
 
 class ShellsView(ToolView):
     template_file = "shells.html"
+
+    page_title = "Change Login Shell"
 
     def dispatch_request(self, **data):
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)

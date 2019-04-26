@@ -19,7 +19,8 @@ app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 # pylint: disable=E1101
 app.logger.setLevel(logging.DEBUG)
 
-logging.getLogger("netsocadmin").setLevel(logging.DEBUG)
+logger = logging.getLogger("netsocadmin")
+logger.setLevel(logging.DEBUG)
 
 
 @app.route('/')
@@ -32,7 +33,7 @@ def index():
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
     # pylint: disable=E1101
-    app.logger.debug("Received index page request")
+    logger.debug("Received index page request")
     return flask.render_template(
         "index.html",
         page="login",

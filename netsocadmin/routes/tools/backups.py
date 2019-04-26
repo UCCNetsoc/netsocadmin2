@@ -1,13 +1,18 @@
-from .index import ToolView
 import logging
-import re
-import flask
 import os
+import re
+
+import flask
+
 import backup_tools
+
+from .index import ToolView
 
 
 class BackupsView(ToolView):
     template_file = "backups.html"
+
+    page_title = "Manage Backups"
 
     def dispatch_request(self):
         return self.render(

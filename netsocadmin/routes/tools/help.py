@@ -1,7 +1,10 @@
-from .index import ToolView
 import logging
+
 import flask
+
 import help_post
+
+from .index import ToolView
 
 
 class HelpView(ToolView):

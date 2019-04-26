@@ -3,9 +3,11 @@
 # python
 import logging
 from typing import Optional, Union
+
 # lib
 import flask
 from flask.views import View
+
 # local
 import login_tools
 
@@ -27,6 +29,8 @@ class ToolView(ProtectedView):
     # What template file this view uses
     template_file: Optional[str] = None
 
+    page_title = ""
+
     def render(self, **data: Union[str, bool]) -> str:
         """
         Method to render the tools template with the default vars and any extra data as decided by the route
@@ -36,6 +40,7 @@ class ToolView(ProtectedView):
             self.template_file,
             is_logged_in=login_tools.is_logged_in(),
             username=flask.session["username"],
+            page_title=self.page_title,
             **data,
         )
 
@@ -51,6 +56,8 @@ class ToolIndex(ToolView):
     logger = logging.getLogger("netsocadmin.tools")
 
     template_file = "tools.html"
+
+    page_title = "Welcome to Netsoc Admin   "
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request for tools")

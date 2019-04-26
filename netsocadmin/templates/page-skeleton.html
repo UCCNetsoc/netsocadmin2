@@ -31,11 +31,12 @@
 		}
 	</script>
 	
-	<link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="../static/css/main.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
 	<script>
 		$(document).ready(function(){
@@ -47,6 +48,14 @@
 	</script>
 
 	<style>
+        html {
+            font-weight: 400;
+        }
+
+        code {
+            font-family: monospace !important;
+        }
+
 		body {
 			background-color: #eee;
 		}
@@ -68,117 +77,171 @@
 		}
 
 		.teal-line {
-		  display: block;
-		  height: 1px;
-		  border: 0;
-		  border-top: 1px solid #009688;
-		  margin: 1em 0;
-		  padding: 0;
-		}
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #009688;
+            margin: 1em 0;
+            padding: 0;
+        }
+        
 		.teal-title {
-			background: #4db6ac;
-			width: 100%;
+            background: #4db6ac;
+            margin: 0.5em auto;
+			width: 60%;
 			display: block;
-			padding: 0.1em;
+			padding: 0.5em;
 			color: white;
 			border: 1px solid #44a299;
 			text-align: center;
-		}
-	</style>
+        }
+        
+        .side-nav li a {
+            display: inline-block !important;
+        }
+
+        main {
+            {% if is_logged_in %}
+            margin-right: 40px;
+            margin-left: 280px;
+            {% else %}
+            margin: 0 auto;
+            {% endif %}
+            max-width: 90%;
+        }
+        
+        .fab, .fas, .fab a, .fas a {
+            font-weight: 600 !important;
+            /* color: rgb(105, 105, 105) !important; */
+        }
+
+        .z-depth-1, .card {
+            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.08), 0 2px 10px 0 rgba(0,0,0,0.06) !important;
+        }
+
+        .card-title {
+            font-weight: 600 !important;
+        }
+
+        nav h4 {
+            margin: 0 0 0 8em;
+        }
+
+    </style>
+
 	{% endblock %}
 </head>
 <body>
-	{# This is the navbar ontop of every page. All pages will need this. #}
-	<ul id="dropdown1" class="dropdown-content">
-		<li><a href="/tools/mysql">MySQL</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/backups">Backups</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/wordpress">Wordpress</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/shells">Login Shell</a></li>
-	</ul>
-	<ul id="dropdown2" class="dropdown-content">
-		<li><a href="/tools/mysql">MySQL</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/backups">Backups</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/wordpress">Wordpress</a></li>
-		<li class="divider"></li>
-		<li><a href="/tools/shells">Login Shell</a></li>
-	</ul>
-	<div class="navbar-fixed" style="margin-bottom: 1em">
-		<nav>
-			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
-				<div class="brand-logo"><a target="_blank" href='https://netsoc.co/rk'><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></a></div>
-				
-				{# This is the main navbar for when the screen is big enough #}
-				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li title="Brings you to the homepage of Netsoc Admin">
-						<a href="/tools">Home</a>
-					</li>
-					<li title="Apply for sudo on one of our servers">
-						<a href="/sudo">Get Sudo</a>
-					</li>
-					<li title="Need help? Fill in the help form">
-						<a href="/help">Help</a>
-					</li>
-					<li title="Occasionally updated list of tutorials and talks">
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					{% if is_logged_in %}
-					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
-						<a class="dropdown-button" href="#" data-activates="dropdown1">
-							<b>Admin Tools</b><i class="mdi-navigation-arrow-drop-down right"></i>
-						</a>
-					</li>
-					<li>
-						<a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-					</li>
-					{% else %}
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
-					</li>
-					{% endif %}
-				</ul>
-
-				{# This one is used when the screen is small like on mobile #}
-				<ul class="side-nav" id="mobile-demo">
-					{% if show_logout_button == True %}
-					<li>
-                        <a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-                    </li>
-					<li>
-						<a href="/sudo">Get Sudo</a>
-					</li>
-					<li title="Brings you to the homepage of Netsoc Admin">
-						<a href="/tools">Home</a>
-					</li>
-					{% endif %}
-					<li>
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					<li title="Need help? Fill in the help form">
-						<a href="/help">Help</a>
-					</li>
-					<li title="Occasionally updated list of tutorials and talks">
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					{% if is_logged_in %}
-					<li title="Collection of tools and administrative services for YOUR Netsoc experience">
-						<a class="dropdown-button1" href="#" data-activates="dropdown2">
-							<b>Admin Tools</b>
-							<i class="mdi-navigation-arrow-drop-down right"></i>
-						</a>
-					</li>
-					{% endif %}
-				</ul>
-			</div>
-		</nav>
-	</div>
-
-	{% block body %}{% endblock %}
+    <header {% if is_logged_in %} style="padding-left: 240p" {% endif %}>
+        {# This is the navbar ontop of every page. All pages will need this. #}
+        <div class="navbar">
+            <nav>
+                <div class="nav-wrapper teal lighten-2" style="padding-right: 5%; padding-left: 10%">                    
+                    <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                    <span class="brand-logo"> {{ page_title }}</span>
+                    {# This is the main navbar for when the screen is big enough #}
+                    <ul class="right hide-on-med-and-down">
+                        <li title="Brings you to the homepage of Netsoc Admin">
+                            <a href="/tools">Home</a>
+                        </li>
+                        <li title="Apply for sudo on one of our servers">
+                            <a href="/sudo">Get Sudo</a>
+                        </li>
+                        <li title="Need help? Fill in the help form">
+                            <a href="/help">Help</a>
+                        </li>
+                        <li title="Occasionally updated list of tutorials and talks">
+                            <a href="/tutorials">Tutorials</a>
+                        </li>
+                        {% if is_logged_in %}
+                        <li>
+                            <a class="logout-button btn waves-effect waves-light  purple lighten-3 white-text" href="/logout">Logout</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="log-in-out-button btn-large waves-effect waves-light  purple lighten-3 white-text" href="/">Login/Signup</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+    
+                    {# This one is used when the screen is small like on mobile #}
+                    <ul class="side-nav" id="mobile-demo">
+                        {% if show_logout_button == True %}
+                        <li>
+                            <a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
+                        </li>
+                        <li>
+                            <a href="/sudo">Get Sudo</a>
+                        </li>
+                        <li title="Brings you to the homepage of Netsoc Admin">
+                            <a href="/tools">Home</a>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <a href="/tutorials">Tutorials</a>
+                        </li>
+                        <li title="Need help? Fill in the help form">
+                            <a href="/help">Help</a>
+                        </li>
+                        <li title="Occasionally updated list of tutorials and talks">
+                            <a href="/tutorials">Tutorials</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+    {% if is_logged_in %}
+    <ul id="slide-out" class="side-nav fixed z-depth-1">
+        <li title="netsoc.co/rk" style="margin-bottom: 1em;">
+            <div class="brand-logo"><a target="_blank" href='https://netsoc.co/rk'>
+                <img src="https://netsoc.co/rk/style/images/horizontal.png" style="margin-top: 1em; width: 110%; margin-left: -1.4em;"/></a>
+            </div>
+        </li>
+        <li title="The homepage of Netsoc Admin">
+            <a style="width: 100%" href="/tools">
+                <i class="fas fa-home">
+                    <span style="margin-left: 1em">Home</span>
+                </i>
+            </a>
+        </li>
+        <li title="Create and delete MySQL Databases and reset your password">
+            <a style="width: 100%" href="/tools/mysql">
+                <i class="fas fa-database">
+                    <span style="margin-left: 1em">MySQL</span>
+                </i>
+            </a>
+        </li>
+        <li title="List and download backups of your home directory">
+            <a style="width: 100%" href="/tools/backups">
+                <i class="fas fa-hdd">
+                    <span style="margin-left: 1em">Backups</span>
+                </i>
+            </a>
+        </li>
+        <li title="Install Wordpress">
+            <a style="width: 100%" href="/tools/wordpress">
+                <i class="fab fa-wordpress">
+                    <span style="margin-left: 1em">WordPress</span>
+                </i>
+            </a>
+        </li>
+        <li title="Change your login shell">
+            <a style="width: 100%" href="/tools/shells">
+                <i class="fas fa-desktop">
+                    <span style="margin-left: 1em">Login Shell</span>
+                </i>
+            </a>
+        </li>
+    </ul>
+    {% endif %}
+    <main>
+        <div class="container-flex">
+            <div class="row">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </main>
 </body>
 </html>
 
