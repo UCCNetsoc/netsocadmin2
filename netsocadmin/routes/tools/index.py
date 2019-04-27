@@ -11,41 +11,32 @@ from flask.views import View
 # local
 import login_tools
 
+from ..view import TemplateView
+
 
 class ProtectedView(View):
+    """
+    Super class for all of the protected routes that dont render a template
+    """
     # Decorate all subclasses with the following decorators
     decorators = [login_tools.protected_page]
-    # Specify which method(s) are allowed to be used to access the route
+    # Specify the default method(s) that are allowed to be used to access the route
+    # This can be overriden on a per view basis
     methods = ["GET"]
 
 
-# Super classes
-class ToolView(ProtectedView):
+class ProtectedToolView(TemplateView):
     """
-    Super class for all of the routes that render the tools template
+    Super class for all of the protected routes that render the tools template
     """
-    # Logger instance (should be defined in each sub class to use correct naming)
-    logger: Optional[logging.Logger] = None
-    # What template file this view uses
-    template_file: Optional[str] = None
-
-    page_title = ""
-
-    def render(self, **data: Union[str, bool]) -> str:
-        """
-        Method to render the tools template with the default vars and any extra data as decided by the route
-        :param data: Some extra data to be passed to the template
-        """
-        return flask.render_template(
-            self.template_file,
-            is_logged_in=login_tools.is_logged_in(),
-            username=flask.session["username"],
-            page_title=self.page_title,
-            **data,
-        )
+    # Decorate all subclasses with the following decorators
+    decorators = [login_tools.protected_page]
+    # Specify the default method(s) that are allowed to be used to access the route
+    # This can be overriden on a per view basis
+    methods = ["GET"]
 
 
-class ToolIndex(ToolView):
+class ToolIndex(ProtectedToolView):
     """
     Route: tools
         This is the main page where the server tools that users can avail of are
@@ -57,7 +48,7 @@ class ToolIndex(ToolView):
 
     template_file = "tools.html"
 
-    page_title = "Welcome to Netsoc Admin   "
+    page_title = "Welcome to Netsoc Admin"
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request for tools")

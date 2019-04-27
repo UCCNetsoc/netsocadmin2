@@ -10,12 +10,15 @@
 
     <div class='card'>
         <div class="card-content">
-            <span class="card-title teal-title" style="margin-bottom: 1em">Apply for <code> sudo</code> privileges on a Netsoc server</span>
+            <div class="card-title" style="margin-bottom: 1em">Apply for <code> sudo</code> privileges on a Netsoc server</div>
 
             <p>We have decided to open up one of our servers to the public. "But wait, Netsoc already do that".</p>
             <p>While we give free server space and web-hosting to all UCC students, we don't allow students to have <code> sudo</code> privileges on the server. If they did, they could break the whole server in an instant.</p>
-
-            <h2 class="header-text">Enter <code> feynman</code></h2>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <div class="card-title">Enter <code> feynman</code></div>
 
             <p>We are giving <code> sudo</code> priviliges to all those who wish it (and we deem responsible enough to have it).</p>
 
@@ -29,6 +32,8 @@
                 </li>
                 <li class="collection-item">
                     You are <em>not</em> being given <code> sudo</code> so that that you can restart or shutdown the server, uninstall applications that others might be using, lock us (the Netsoc SysAdmin Team) out of the server or anything else malicious that will effect the experience of others.
+                    <br/>
+                    (Even if you lock us out, we still have physical access to the server if needs be).
                 </li>
             </ul>
 
@@ -36,7 +41,7 @@
             <p>Give us your email address to contact you on and we will get in touch with you. We just want to get a feel for you and your intentions with the server. Try to have an idea of what you would set up or do with the server when you approach us. We just have to protect our own :)</p>
             <p style="margin-bottom: 3em">Once we feel that you're all good,  we will make an account for you and give you privileges. You will then be SSHing to <code> feynman.netsoc.co</code></p>
 
-            <form method="POST" action="/completesudoapplication" accept-charset="UTF-8">
+            <form class="container" method="POST" action="/completesudoapplication" accept-charset="UTF-8">
                 <div class="input-field">
                     <label for="email">Username</label>
                     <input disabled="disabled" name="username" type="text" value="{{ username }}">

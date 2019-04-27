@@ -6,10 +6,10 @@ import flask
 import login_tools
 import mysql
 
-from .index import ToolView
+from .index import ProtectedToolView
 
 
-class MySQLView(ToolView):
+class MySQLView(ProtectedToolView):
     template_file = "mysql.html"
 
     page_title = "Manage MySQL"
@@ -20,7 +20,7 @@ class MySQLView(ToolView):
 
 class AbstractDBView(MySQLView):
     """
-    Extend the ToolView with methods that help abstract some of the work out of the db related views
+    Extend the ProtectedToolView with methods that help abstract some of the work out of the db related views
     """
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]

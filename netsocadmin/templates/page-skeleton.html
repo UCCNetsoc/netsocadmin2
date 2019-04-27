@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	{% block head %}
-	<title>Netsoc Admin</title>
-	<meta name="theme-color" content="#4db6ac">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" href="/static/favicon.ico">
-	<link rel="canonical" href="https://admin.netsoc.co" />
 
-	<meta property="og:title" content="UCC Netsoc Admin" />
-	<meta property="og:url" content="https://admin.netsoc.co" />
-	<meta property="og:image" content="/static/banner-icon.svg" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:site_name" content="UCC Netsoc Admin" />
-	<meta property="fb:admins" content="1385961037" />
-	<meta property="og:description" content="Manage your webspace and databases in one location." />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@UCCNetsoc" />
-	<meta name="twitter:title" content="UCC Netsoc Admin" />
-	<meta name="twitter:description" content="Manage your webspace and databases in one location." />
-	<script type="application/ld+json">
+<head>
+    {% block head %}
+    <title>Netsoc Admin</title>
+    <meta name="theme-color" content="#4db6ac">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="canonical" href="https://admin.netsoc.co" />
+
+    <meta property="og:title" content="UCC Netsoc Admin" />
+    <meta property="og:url" content="https://admin.netsoc.co" />
+    <meta property="og:image" content="/static/banner-icon.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="UCC Netsoc Admin" />
+    <meta property="fb:admins" content="1385961037" />
+    <meta property="og:description" content="Manage your webspace and databases in one location." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@UCCNetsoc" />
+    <meta name="twitter:title" content="UCC Netsoc Admin" />
+    <meta name="twitter:description" content="Manage your webspace and databases in one location." />
+    <script type="application/ld+json">
 		{
 			"@context" : "http://schema.org",
 			"@type" : "Organization",
@@ -30,24 +31,25 @@
 			"sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
 		}
 	</script>
-	
+
     <link rel="stylesheet" href="../static/css/main.css">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
-	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
-	<script>
-		$(document).ready(function(){
-			$(".button-collapse").sideNav();
-			$('select').material_select();
-			$(".dropdown-button").dropdown({hover: false, belowOrigin: true});
-			$(".dropdown-button1").dropdown({hover: false, belowOrigin: false});
-		})
-	</script>
+    <script>
+        $(document).ready(function () {
+            $(".button-collapse").sideNav();
+            $('select').material_select();
+            $(".dropdown-button").dropdown({ hover: false, belowOrigin: true });
+            $(".dropdown-button1").dropdown({ hover: false, belowOrigin: false });
+        })
+    </script>
 
-	<style>
+    <style>
         html {
             font-weight: 400;
         }
@@ -56,27 +58,19 @@
             font-family: monospace !important;
         }
 
-		body {
-			background-color: #eee;
-		}
+        code a {
+            font-weight: 700;
+        }
 
-		{% if is_logged_in %}
-		li a.logout-button {
-			display: inline-block;
-		}
-        {% endif %}
+        body {
+            background-color: #eee;
+        }
 
-		{% if page == "login" %}
-		li a.log-in-out-button {
-			display: none;
-		}
-		{% endif %}
+        .error-msg {
+            color: red;
+        }
 
-		.error-msg {
-			color: red;
-		}
-
-		.teal-line {
+        .teal-line {
             display: block;
             height: 1px;
             border: 0;
@@ -84,20 +78,17 @@
             margin: 1em 0;
             padding: 0;
         }
-        
-		.teal-title {
-            background: #4db6ac;
-            margin: 0.5em auto;
-			width: 60%;
-			display: block;
-			padding: 0.5em;
-			color: white;
-			border: 1px solid #44a299;
-			text-align: center;
-        }
-        
+
         .side-nav li a {
             display: inline-block !important;
+        }
+
+        main a {
+            color: #003E70;
+        }
+
+        main a:hover {
+            text-decoration: underline;
         }
 
         main {
@@ -109,14 +100,22 @@
             {% endif %}
             max-width: 90%;
         }
-        
-        .fab, .fas, .fab a, .fas a {
+
+        .card-title code {
+            font-weight: 700;
+        }
+
+        .fab,
+        .fas,
+        .fab a,
+        .fas a {
             font-weight: 600 !important;
             /* color: rgb(105, 105, 105) !important; */
         }
 
-        .z-depth-1, .card {
-            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.08), 0 2px 10px 0 rgba(0,0,0,0.06) !important;
+        .z-depth-1,
+        .card {
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.08), 0 2px 10px 0 rgba(0, 0, 0, 0.06) !important;
         }
 
         .card-title {
@@ -126,63 +125,49 @@
         nav h4 {
             margin: 0 0 0 8em;
         }
-
     </style>
 
-	{% endblock %}
+    {% endblock %}
 </head>
+
 <body>
-    <header {% if is_logged_in %} style="padding-left: 240p" {% endif %}>
+    <header style="margin-bottom: 2em;">
         {# This is the navbar ontop of every page. All pages will need this. #}
         <div class="navbar">
             <nav>
-                <div class="nav-wrapper teal lighten-2" style="padding-right: 5%; padding-left: 10%">                    
+                <div class="nav-wrapper teal lighten-2" style="padding-right: 5%; padding-left: 260px">
                     <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
                     <span class="brand-logo"> {{ page_title }}</span>
+
                     {# This is the main navbar for when the screen is big enough #}
                     <ul class="right hide-on-med-and-down">
-                        <li title="Brings you to the homepage of Netsoc Admin">
-                            <a href="/tools">Home</a>
-                        </li>
-                        <li title="Apply for sudo on one of our servers">
-                            <a href="/sudo">Get Sudo</a>
-                        </li>
-                        <li title="Need help? Fill in the help form">
-                            <a href="/help">Help</a>
+                        <li title="The Netsoc Website">
+                            <a target="_blank" href="https://netsoc.co/rk">Netsoc Website</a>
                         </li>
                         <li title="Occasionally updated list of tutorials and talks">
                             <a href="/tutorials">Tutorials</a>
                         </li>
                         {% if is_logged_in %}
                         <li>
-                            <a class="logout-button btn waves-effect waves-light  purple lighten-3 white-text" href="/logout">Logout</a>
+                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
+                                href="/logout">Logout</a>
                         </li>
                         {% else %}
                         <li>
-                            <a class="log-in-out-button btn-large waves-effect waves-light  purple lighten-3 white-text" href="/">Login/Signup</a>
+                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
+                                href="/">Login/Signup</a>
                         </li>
                         {% endif %}
                     </ul>
-    
+
                     {# This one is used when the screen is small like on mobile #}
                     <ul class="side-nav" id="mobile-demo">
-                        {% if show_logout_button == True %}
+                        {% if is_logged_in == True %}
                         <li>
-                            <a class="logout-button btn waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-                        </li>
-                        <li>
-                            <a href="/sudo">Get Sudo</a>
-                        </li>
-                        <li title="Brings you to the homepage of Netsoc Admin">
-                            <a href="/tools">Home</a>
+                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
+                                href="/logout">Logout</a>
                         </li>
                         {% endif %}
-                        <li>
-                            <a href="/tutorials">Tutorials</a>
-                        </li>
-                        <li title="Need help? Fill in the help form">
-                            <a href="/help">Help</a>
-                        </li>
                         <li title="Occasionally updated list of tutorials and talks">
                             <a href="/tutorials">Tutorials</a>
                         </li>
@@ -191,13 +176,16 @@
             </nav>
         </div>
     </header>
+
     {% if is_logged_in %}
     <ul id="slide-out" class="side-nav fixed z-depth-1">
-        <li title="netsoc.co/rk" style="margin-bottom: 1em;">
+        <li title="netsoc.co/rk">
             <div class="brand-logo"><a target="_blank" href='https://netsoc.co/rk'>
-                <img src="https://netsoc.co/rk/style/images/horizontal.png" style="margin-top: 1em; width: 110%; margin-left: -1.4em;"/></a>
+                    <img src="https://netsoc.co/rk/style/images/horizontal.png"
+                        style="margin-top: 1em; width: 110%; margin-left: -1.4em;" /></a>
             </div>
         </li>
+        <li class="divider" style="margin-bottom: 1em;"></li>
         <li title="The homepage of Netsoc Admin">
             <a style="width: 100%" href="/tools">
                 <i class="fas fa-home">
@@ -233,16 +221,31 @@
                 </i>
             </a>
         </li>
+        <li title="Apply for Sudo on one of our servers!">
+            <a style="width: 100%" href="/sudo">
+                <i class="fas fa-users-cog">
+                    <span style="margin-left: 1em">Get Sudo</span>
+                </i>
+            </a>
+        </li>
+        <li title="Come here if you need help with any of our services">
+            <a style="width: 100%" href="/help">
+                <i class="fas fa-life-ring">
+                    <span style="margin-left: 1em">Help</span>
+                </i>
+            </a>
+        </li>
     </ul>
     {% endif %}
     <main>
-        <div class="container-flex">
+        <div>
             <div class="row">
                 {% block body %}{% endblock %}
             </div>
         </div>
     </main>
 </body>
+
 </html>
 
 {#

@@ -5,10 +5,10 @@ import ldap3
 
 import config
 
-from .index import ProtectedView, ToolView
+from .index import ProtectedView, ProtectedToolView
 
 
-class ShellsView(ToolView):
+class ShellsView(ProtectedToolView):
     template_file = "shells.html"
 
     page_title = "Change Login Shell"

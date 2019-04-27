@@ -6,58 +6,58 @@
 {% block body %}
 	{{ super() }}
 	
-	{# This stuff is for the backup tab #}
-    <div class="card">
-        <div class="card-content">
-            {# Tab headers #}
-            <div>
-                <ul class="tabs">
-                    <li class="col s6 tab"><a class="active teal-text lighten-2" href="#weekly-backups"> Weekly </a></li>
-                    <li class="col s6 tab"><a class="teal-text lighten-2" href="#monthly-backups"> Monthly </a></li>
-                    <div class="indicator teal lighten-2" style="z-index:1"></div>
-                </ul>
+    {# Weekly body #}
+    <div class="col s6">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">Weekly Backups</div>
+                <div id="weekly-backups">
+                    {% if weekly_backups|length > 0 %}
+                        <ul class="collection" style="max-height: 20em; overflow-y:scroll;">
+                            {% for b in weekly_backups %}
+                                <li class="collection-item">
+                                    <div>
+                                        {{ b }}
+                                        <a class="activator secondary-content" href="/backup/{{ username }}/weekly/{{ b }}">
+                                            <i class="material-icons">cloud_download</i>
+                                        </a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <br/>
+                        <p> No backups were found. If you have had your account for over a week, please contact us.</p><br>
+                    {% endif %}
+                </div>
             </div>
+        </div>
+    </div>
 
-            {# Weekly body #}
-            <div id="weekly-backups">
-                {% if weekly_backups|length > 0 %}
-                    <ul class="collection" style="max-height: 20em; overflow-y:scroll;">
-                        {% for b in weekly_backups %}
-                            <li class="collection-item">
-                                <div>
-                                    {{ b }}
-                                    <a class="activator secondary-content" href="/backup/{{ username }}/weekly/{{ b }}">
-                                        <i class="material-icons">cloud_download</i>
-                                    </a>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <br/>
-                    <p> No backups were found. If you have had your account for over a week, please contact us.</p><br>
-                {% endif %}
-            </div>
-
-            {# Monthly body #}
-            <div id="monthly-backups">
-                {% if monthly_backups|length > 0 %}
-                    <ul class="collection" style="max-height: 20em; overflow-y:scroll;">
-                        {% for b in monthly_backups %}
-                            <li class="collection-item">
-                                <div>
-                                    {{ b }}
-                                    <a class="activator secondary-content" href="/backup/{{ username }}/monthly/{{ b }}">
-                                        <i class="material-icons">cloud_download</i>
-                                    </a>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <br />
-                    <p> No backups were found. If you have had your account for over a month, please contact us.</p><br>
-                {% endif %}
+    {# Monthly body #}
+    <div class="col s6">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">Monthly Backups</div>
+                <div id="monthly-backups">
+                    {% if monthly_backups|length > 0 %}
+                        <ul class="collection" style="max-height: 20em; overflow-y:scroll;">
+                            {% for b in monthly_backups %}
+                                <li class="collection-item">
+                                    <div>
+                                        {{ b }}
+                                        <a class="activator secondary-content" href="/backup/{{ username }}/monthly/{{ b }}">
+                                            <i class="material-icons">cloud_download</i>
+                                        </a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <br />
+                        <p> No backups were found. If you have had your account for over a month, please contact us.</p><br>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

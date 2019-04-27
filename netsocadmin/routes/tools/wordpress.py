@@ -6,10 +6,10 @@ import flask
 import config
 import wordpress_install
 
-from .index import ToolView
+from .index import ProtectedToolView
 
 
-class WordpressView(ToolView):
+class WordpressView(ProtectedToolView):
     template_file = "wordpress.html"
 
     page_title = "Install WordPress"
@@ -21,7 +21,7 @@ class WordpressView(ToolView):
         )
 
 
-class WordpressInstall(ToolView):
+class WordpressInstall(ProtectedToolView):
     """
     Route: wordpressinstall
         This endpoint only allows a GET method.

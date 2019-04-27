@@ -5,11 +5,12 @@ import re
 import flask
 
 import backup_tools
+import config
 
-from .index import ToolView
+from .index import ProtectedToolView
 
 
-class BackupsView(ToolView):
+class BackupsView(ProtectedToolView):
     template_file = "backups.html"
 
     page_title = "Manage Backups"
@@ -21,7 +22,7 @@ class BackupsView(ToolView):
         )
 
 
-class Backup(ToolView):
+class Backup(ProtectedToolView):
     """
     Route: /backup/{username}/{timeframe}/{backup_date}
         This route returns the requested backup.
@@ -43,5 +44,5 @@ class Backup(ToolView):
             self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
         # Retrieve the backup and send it to the user
-        backups_base_dir = os.path.join(backup_tools.BACKUPS_DIR, username, timeframe)
+        backups_base_dir = os.path.join(config.BACKUPS_DIR, username, timeframe)
         return flask.send_from_directory(backups_base_dir, f"{backup_date}.tgz")

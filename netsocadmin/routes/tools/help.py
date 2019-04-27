@@ -4,11 +4,13 @@ import flask
 
 import help_post
 
-from .index import ToolView
+from .index import ProtectedToolView
 
 
-class HelpView(ToolView):
+class HelpView(ProtectedToolView):
     template_file = "help.html"
+
+    page_title = "Help"
 
     def dispatch_request(self, **data):
         return self.render(**data)
