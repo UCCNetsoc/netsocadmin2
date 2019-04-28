@@ -12,7 +12,7 @@ from .index import ProtectedToolView
 class WordpressView(ProtectedToolView):
     template_file = "wordpress.html"
 
-    page_title = "Install WordPress"
+    page_title = "WordPress"
 
     def dispatch_request(self):
         return self.render(

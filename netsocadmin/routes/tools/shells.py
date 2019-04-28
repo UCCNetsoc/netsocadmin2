@@ -5,13 +5,13 @@ import ldap3
 
 import config
 
-from .index import ProtectedView, ProtectedToolView
+from .index import ProtectedToolView, ProtectedView
 
 
 class ShellsView(ProtectedToolView):
     template_file = "shells.html"
 
-    page_title = "Change Login Shell"
+    page_title = "Login Shell"
 
     def dispatch_request(self, **data):
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)

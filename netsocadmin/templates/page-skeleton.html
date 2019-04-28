@@ -44,8 +44,7 @@
         $(document).ready(function () {
             $(".button-collapse").sideNav();
             $('select').material_select();
-            $(".dropdown-button").dropdown({ hover: false, belowOrigin: true });
-            $(".dropdown-button1").dropdown({ hover: false, belowOrigin: false });
+            $('.dropdown-trigger').dropdown({ hover: false, belowOrigin: true });
         })
     </script>
 
@@ -140,7 +139,7 @@
 
         .z-depth-1,
         .card {
-            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.08), 0 2px 10px 0 rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04), 0 2px 10px 0 rgba(0, 0, 0, 0.02) !important;
         }
 
         .card-title {
@@ -172,15 +171,23 @@
                         <li title="Occasionally updated list of tutorials and talks">
                             <a href="/tutorials">Tutorials</a>
                         </li>
+                        <li title="Netsoc Blog">
+                            <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
+                        </li>
                         {% if is_logged_in %}
                         <li>
-                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
-                                href="/logout">Logout</a>
+                            <a class="dropdown-trigger btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile_menu">{{ username }}</a>
+                            <ul id="profile_menu" class="dropdown-content">
+                                <li><a href="/logout">Logout</a></li>
+                                <li class="divider" tabindex="-1"></li>
+                                <li><a href="#!">Profile</a></li>
+                                <!-- <li class="divider" tabindex="-1"></li>
+                                <li><a href="#!">Change Password</a></li> -->
+                            </ul>
                         </li>
                         {% else %}
                         <li>
-                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
-                                href="/">Login/Signup</a>
+                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text" href="/">Login/Signup</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -189,8 +196,7 @@
                     <ul class="side-nav" id="mobile-demo">
                         {% if is_logged_in == True %}
                         <li>
-                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text"
-                                href="/logout">Logout</a>
+                            <a class="btn waves-effect waves-light red accent-2 white-text" href="#"" data-target="">{{ username }}</a>
                         </li>
                         {% endif %}
                         <li title="Occasionally updated list of tutorials and talks">
@@ -200,6 +206,7 @@
                 </div>
             </nav>
         </div>
+        
     {% if is_logged_in %}
     <ul id="slide-out" class="side-nav fixed z-depth-1">
         <li title="netsoc.co/rk">
