@@ -24,6 +24,7 @@ class MySQLView(ProtectedToolView):
     def dispatch_request(self):
         return self.render()
 
+
 class AbstractDBView(MySQLView):
     """
     Extend the ProtectedToolView with methods that help abstract some of the work out of the db related views
@@ -50,7 +51,7 @@ class AbstractDBView(MySQLView):
         # Check that the username / password combination is correct
         if not login_tools.is_correct_password(username, password):
             return False, f"Wrong username or password for user {username}."
-        if dbname != None and len(flask.session["username"] + "_" + dbname) > 64:
+        if dbname is not None and len(flask.session["username"] + "_" + dbname) > 64:
             return False, "Database name too long"
         # We good
         return True, ""

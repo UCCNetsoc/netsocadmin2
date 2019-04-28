@@ -81,6 +81,7 @@ def list_dbs(user: str) -> List[str]:
             con.close()
     return databases
 
+
 def create_user(username: str) -> str:
     """
     create_user adds a new user to the MySQL DBMS if and only if
