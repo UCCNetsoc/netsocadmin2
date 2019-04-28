@@ -1,5 +1,5 @@
 import logging
-from typing import Tuple
+from typing import Tuple, Union
 
 import flask
 
@@ -14,9 +14,15 @@ class MySQLView(ProtectedToolView):
 
     page_title = "Manage MySQL"
 
-    def dispatch_request(self):
-        return self.render(databases=mysql.list_dbs(flask.session["username"]))
+    def render(self, **data: Union[str, bool]) -> str:
+        return super().render(
+            databases=mysql.list_dbs(flask.session["username"]),
+            limit=64 - len(flask.session["username"] + "_"),
+            **data,
+        )
 
+    def dispatch_request(self):
+        return self.render()
 
 class AbstractDBView(MySQLView):
     """
@@ -44,6 +50,8 @@ class AbstractDBView(MySQLView):
         # Check that the username / password combination is correct
         if not login_tools.is_correct_password(username, password):
             return False, f"Wrong username or password for user {username}."
+        if dbname != None and len(flask.session["username"] + "_" + dbname) > 64:
+            return False, "Database name too long"
         # We good
         return True, ""
 
@@ -68,14 +76,14 @@ class CreateDB(AbstractDBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
-            self.logger.error(f"Invalid username and password: {msg}")
-            return self.render(mysql_error=msg, mysql_active=True)
+            self.logger.error(f"Invalid create DB request: {msg}")
+            return self.render(mysql_create_error=msg, mysql_delete_error="", mysql_active=True)
         # Try to create the database
         try:
             mysql.create_database(username, dbname, False)
         except mysql.DatabaseAccessError as e:
             self.logger.error(f"Database error {e.__cause__}")
-            return self.render(mysql_error=e.__cause__, mysql_active=True)
+            return self.render(mysql_create_error="e.__cause__", mysql_delete_error="", mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
         self.logger.debug(f"Successfully created database for {username} named {dbname}")
         return flask.redirect("/tools/mysql")
@@ -102,13 +110,13 @@ class DeleteDB(AbstractDBView):
         valid, msg = self.validate(username, password, dbname)
         if not valid:
             self.logger.error(f"Invalid username and password: {msg}")
-            return self.render(mysql_error=msg, mysql_active=True)
+            return self.render(mysql_delete_error=msg, mysql_create_error="", mysql_active=True)
         # Try to create the database
         try:
             mysql.create_database(username, dbname, True)
         except mysql.DatabaseAccessError as e:
             self.logger.error(f"Database error {e.__cause__}")
-            return self.render(mysql_error=e.__cause__, mysql_active=True)
+            return self.render(mysql_delete_error=e.__cause__, mysql_create_error="", mysql_active=True)
         # Success (probably should do more than just redirect to / ...)
         return flask.redirect("/tools/mysql")
 
@@ -133,14 +141,8 @@ class ResetPassword(AbstractDBView):
         valid, msg = self.validate(username, password)
         if not valid:
             self.logger.error(f"Invalid username and password: {msg}")
-            return self.render(mysql_error=msg, mysql_active=True)
-        # Try to create the database
-        try:
-            mysql.delete_user(username)
-            new_password = mysql.create_user(username)
-        except mysql.DatabaseAccessError as e:
-            self.logger.error(f"Database error {e.__cause__}")
-            return self.render(mysql_error=e.__cause__, mysql_active=True)
-        else:
-            self.logger.debug("Successfully changed password")
-            return self.render(new_mysql_password=new_password, mysql_active=True)
+            return self.render(mysql_pass_error=msg, mysql_active=True)
+        mysql.delete_user(username)
+        new_password = mysql.create_user(username)
+        self.logger.debug("Successfully changed password")
+        return self.render(new_mysql_password=new_password, mysql_active=True)

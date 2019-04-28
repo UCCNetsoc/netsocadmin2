@@ -8,7 +8,7 @@ import flask
 import help_post
 import login_tools
 
-from .index import ProtectedToolView, ProtectedView
+from .index import ProtectedToolView
 
 
 class CompleteSudo(ProtectedToolView):

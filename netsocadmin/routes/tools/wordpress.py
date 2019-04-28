@@ -13,7 +13,7 @@ class WordpressView(ProtectedToolView):
     template_file = "wordpress.html"
 
     page_title = "Install WordPress"
-    
+
     def dispatch_request(self):
         return self.render(
             wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),

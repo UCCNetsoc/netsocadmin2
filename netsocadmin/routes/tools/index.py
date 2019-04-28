@@ -2,10 +2,8 @@
 
 # python
 import logging
-from typing import Optional, Union
 
 # lib
-import flask
 from flask.views import View
 
 # local

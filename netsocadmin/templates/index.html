@@ -37,59 +37,61 @@
 
 {% block body %}
     {{ super() }}
-    <div class="container">
-        <div class="card-panel">
-            <img src="/static/banner-icon.svg" class="responsive-img">
-            <!-- Tab headers -->
-            <div class="col s12">
-                <ul class="tabs">
-                    <li class="col s6 tab"><a class="active teal-text lighten-2" href="#login"> Log In </a></li>
-                    <li class="col s6 tab"><a class="teal-text lighten-2" href="#signup"> Sign Up </a></li>
-                    <div class="indicator teal lighten-2" style="z-index:1"></div>
-                </ul>
-            </div>
-            <!-- Tab bodies -->
-            <div id="signup" class="col s12">
-                <form method="POST" action="/sendconfirmation" class="col row s12">
-                    <br>
-                    <div class="row">
-                        <div class="input-field">
-                            <label for="email">Student or Society Email</label>
-                            <input autocomplete="off" name="email" type="text" id="email">
+    <div class="row">
+        <div class="container">
+            <div class="card-panel">
+                <img src="/static/banner-icon.svg" class="responsive-img">
+                <!-- Tab headers -->
+                <div class="col s12">
+                    <ul class="tabs">
+                        <li class="col s6 tab"><a class="active teal-text lighten-2" href="#login"> Log In </a></li>
+                        <li class="col s6 tab"><a class="teal-text lighten-2" href="#signup"> Sign Up </a></li>
+                        <div class="indicator teal lighten-2" style="z-index:1"></div>
+                    </ul>
+                </div>
+                <!-- Tab bodies -->
+                <div id="signup" class="col s12">
+                    <form method="POST" action="/sendconfirmation" class="col row s12">
+                        <br>
+                        <div class="row">
+                            <div class="input-field">
+                                <label for="email">Student or Society Email</label>
+                                <input autocomplete="off" name="email" type="text" id="email">
+                            </div>
                         </div>
-                    </div>
-                    <button class="btn waves-effect waves-light" type="submit">
-                        Send Verification
-                        <i class="mdi-content-send right"></i>
-                    </button>
-                </form>
-            </div>
-            <div id="login" class="col s12">
-                <form method="POST" action="/login" class="col row s12">
-                    <br>
-                    <div class="row">
-                        <div class="input-field">
-                            <label for="username">Server Username</label>
-                            <input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
-                        </div>
-    
-                        <div class="input-field">
-                            <label for="password">Server Password</label>
-                            <input autocomplete="off" name="password" type="password" id="password">
-                        </div>
-                    </div>
-                    <div style="display: flex; flex-direction: row; justify-content: space-between">
                         <button class="btn waves-effect waves-light" type="submit">
-                            Login<i class="mdi-content-send right"></i>
+                            Send Verification
+                            <i class="mdi-content-send right"></i>
                         </button>
-                        <div>
-                            <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
-                            <input type="checkbox" id="show_pass" onclick="showPassword()">
+                    </form>
+                </div>
+                <div id="login" class="col s12">
+                    <form method="POST" action="/login" class="col row s12">
+                        <br>
+                        <div class="row">
+                            <div class="input-field">
+                                <label for="username">Server Username</label>
+                                <input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
+                            </div>
+        
+                            <div class="input-field">
+                                <label for="password">Server Password</label>
+                                <input autocomplete="off" name="password" type="password" id="password">
+                            </div>
                         </div>
+                        <div style="display: flex; flex-direction: row; justify-content: space-between">
+                            <button class="btn waves-effect waves-light" type="submit">
+                                Login<i class="mdi-content-send right"></i>
+                            </button>
+                            <div>
+                                <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
+                                <input type="checkbox" id="show_pass" onclick="showPassword()">
+                            </div>
+                        </div>
+                    </form>
+                    <div style="padding: 0 1em;" class="error-message red-text row s6">
+                        <i> {{ error_message }} </i>
                     </div>
-                </form>
-                <div style="padding: 0 1em;" class="error-message red-text row s6">
-                    <i> {{ error_message }} </i>
                 </div>
             </div>
         </div>

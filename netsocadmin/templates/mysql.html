@@ -1,88 +1,137 @@
 {% extends "page-skeleton.html" %}
 {% block head %}
-	{{ super() }}
-    <script type="text/javascript" src="../static/javascript/databaseTools.js"></script>
+    {{ super() }}
+    
+    <style>
+    .inline {
+        display: inline-block;
+    }
+    </style>
+
 {% endblock %}
 
 {% block body %}
 	{{ super() }}
 
     {# This stuff is the MySQL tab #}
-    <div class="card">
-        <div class="card-content">
-            {% if databases|length > 0 %}
-                <ul class="collection">
-                    {% for db in databases %}
-                        <li class="collection-item">
-                            <div>
-                                {{ db }}
-                                <div onclick="databaseForm('{{ db }}')" class="activator secondary-content">
-                                    <i class="material-icons">delete</i>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <br />
-                <p> No Databases to show &nbsp;&nbsp; O_o </p><br>
-            {% endif %}
-
-            <a class="activator left btn waves-effect waves-light" onclick="passwordReset(false)">Reset MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></a>
-            <a class="activator right btn-floating halfway-fab waves-effect waves-light teal"><i class="material-icons">add</i></a>
-            <br><br>
-            <span style="display:block;" class="error-msg">{{ mysql_error }}</span>
-            {% if new_mysql_password %}
-            <p style="color:green;">Your new MySQL password: {{ new_mysql_password }}</p>
-            {% endif %}
-        </div>
-
-        {# card reveals are what come up when you click something with class "activator".
-        The Javascript in the header does the necessary things to pick the correct form
-        and change the form as need be. Normally, there is only one "card-reveal" so this
-        is a bit of a hack #}
-        <div class="card-reveal" style="overflow: hidden;">
-            <div id="database-change-form">
-                    <span id="database-form-title">New Database:</span>
-                    <i class="material-icons right">close</i>
-                </span>
-                <form action="/createdb" method="POST">
-                    <div class="input-field">
-                        <input autocomplete="off" id="mysql-username" type="text" name="username">
-                        <label for="mysql-username">Server username</label>
-                    </div>
-                    <div class="input-field">
-                        <input autocomplete="off" id="mysql-password" type="password" name="password">
-                        <label for="mysql-password">Server password</label>
-                    </div>
-                    <div class="input-field">
-                        <input autocomplete="off" id="dbname" type="text" name="dbname">
-                        <label for="dbname">Database name</label>
-                    </div>
-                    <button class="btn waves-effect waves-light" type="submit">
-                        <span id="database-form-button-text"> Create </span>
-                        <i class="mdi-content-send right"></i>
-                    </button>
-                </form>
+    <div class="row">
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Database List:</span>
+                    {% if databases|length > 0 %}
+                        <ul class="collection" style="max-height: 7.5em; overflow-y: scroll">
+                            {% for db in databases %}
+                                <li class="collection-item">
+                                    <div>
+                                        {{ db }}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No Databases to show &nbsp;&nbsp; O_o </p>
+                        <br/>
+                    {% endif %}
+                </div>
             </div>
-            <div id="password-reset-form" style="display: none;">
-                    <span>Reset MySQL Password:</span>
-                    <i class="material-icons right">close</i>
-                </span>
-                <form action="/resetpw" method="POST">
-                    <div class="input-field" method="POST">
-                        <input autocomplete="off" id="username" type="text" name="username">
-                        <label for="username">Server username</label>
+        </div>
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">Reset Password:</span>
+                    <div>Regenerates a random password for your MySQL account</div>
+                    <span style="display:block;" class="error-msg">{{ mysql_pass_error }}</span>
+                    <form action="/resetpw" method="POST">
+                        <div class="input-field col s6">
+                            <input autocomplete="off" type="text" name="username">
+                            <label for="mysql-username">Server username</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input autocomplete="new-password" type="password" name="password">
+                            <label for="mysql-password">Server password</label>
+                        </div>
+                        <button type="submit" class="activator btn waves-effect waves-light">Reset MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></button>
+                    </form>
+                    {% if new_mysql_password %}
+                    <br/>
+                    <p style="color:green;">Your new MySQL password: {{ new_mysql_password }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <div id="database-change-form">
+                        <span class="card-title">New Database:</span>
+                        <div>Create a database. All databases are prefixed with <code>{{ username }}_</code></div>
+                        <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
+                        <form action="/createdb" method="POST">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username">
+                                <label for="mysql-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password">
+                                <label for="mysql-password">Server password</label>
+                            </div>
+                            <div class="input-field col s1">
+                                <input disabled autocomplete="off" type="text" value="{{ username }}_">
+                                <label for="prefix">Prefix</label>
+                            </div>
+                            <div class="input-field col s11">
+                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}">
+                                <label for="dbname">Database name</label>
+                            </div>
+                            <div>
+                                <button class="btn waves-effect waves-light" type="submit">
+                                    <span id="database-form-button-text"> Create </span>
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <div class="input-field">
-                        <input autocomplete="off" id="password" type="password" name="password">
-                        <label for="password">Server password</label>
+                </div>
+            </div>
+        </div>
+        <div class="col s6">
+            <div class="card">
+                <div class="card-content">
+                    <div id="database-change-form">
+                        <span class="card-title">Delete Database:</span>
+                        <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
+                        <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
+                        <form action="/deletedb" method="POST">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username">
+                                <label for="mysql-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password">
+                                <label for="mysql-password">Server password</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <select name="dbname">
+                                    <option value="" disabled selected>Choose database to delete</option>
+                                    {% for db in databases %}
+                                    <option value="{{ db }}">{{ db }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Database to delete</label>
+                            </div>
+                            <div>
+                                <button class="btn waves-effect waves-light" type="submit">
+                                    <span id="database-form-button-text"> Delete </span>
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                    <button class="btn waves-effect waves-light" type="submit">
-                        <span id="database-form-button-text"> Reset </span>
-                        <i class="mdi-content-send right"></i>
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>

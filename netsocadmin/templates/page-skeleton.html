@@ -64,10 +64,26 @@
 
         body {
             background-color: #eee;
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;            
         }
 
         .error-msg {
             color: red;
+        }
+
+        footer {
+            margin-left: 240px;
+            background-color: rgba(0, 0, 0, 0.0) !important;
+        }
+
+        footer a {
+            margin-right: 1em;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
         }
 
         .teal-line {
@@ -99,10 +115,19 @@
             margin: 0 auto;
             {% endif %}
             max-width: 90%;
+            flex: 1 0 auto;
         }
 
         .card-title code {
             font-weight: 700;
+        }
+
+        .row .col:first-child {
+            padding: 0 0.75rem 0 0;
+        }
+
+        .row .col:last-child {
+            padding: 0 0 0 0.75rem;
         }
 
         .fab,
@@ -175,8 +200,6 @@
                 </div>
             </nav>
         </div>
-    </header>
-
     {% if is_logged_in %}
     <ul id="slide-out" class="side-nav fixed z-depth-1">
         <li title="netsoc.co/rk">
@@ -237,13 +260,29 @@
         </li>
     </ul>
     {% endif %}
+    </header>
     <main>
         <div>
-            <div class="row">
-                {% block body %}{% endblock %}
-            </div>
+            {% block body %}{% endblock %}
         </div>
     </main>
+    <footer class="page-footer black-text">
+        <div class="row footer-copyright" style="margin-bottom: 0">
+            <div class="col s4 left">
+                <div class="container">
+                    <span class="black-text">© 2019 UCC Networking Society</span>
+                </div>
+            </div>
+            <div class="col s4 right">
+                <div class="container">
+                    <a class="black-text" href="https://www.facebook.com/NetsocUCC/">Facebook</a>
+                    <a class="black-text" href="https://twitter.com/UCCNetsoc">Twitter</a>
+                    <a class="black-text" href="https://github.com/UCCNetworkingSociety">GitHub</a>
+                    <a class="black-text" href="https://www.instagram.com/uccnetsoc/">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>

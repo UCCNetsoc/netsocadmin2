@@ -81,7 +81,6 @@ def list_dbs(user: str) -> List[str]:
             con.close()
     return databases
 
-
 def create_user(username: str) -> str:
     """
     create_user adds a new user to the MySQL DBMS if and only if
@@ -108,8 +107,9 @@ def create_user(username: str) -> str:
             password = "".join(random.choice(chars) for _ in range(random.randint(10, 15)))
             sql = """CREATE USER %s@'%%' IDENTIFIED BY %s;"""
             cur.execute(sql, (username, password,))
-            sql = """CREATE USER %s@'localhost' IDENTIFIED BY %s;"""
-            cur.execute(sql, (username, password,))
+            if not config.FLASK_CONFIG["debug"]:
+                sql = """CREATE USER %s@'localhost' IDENTIFIED BY %s;"""
+                cur.execute(sql, (username, password,))
 
             # grant the user permissions on all databases of the form
             # "<username>_something".
@@ -118,11 +118,12 @@ def create_user(username: str) -> str:
             # makes the pattern `'username'_%`.
             username_pattern = con.escape(f"{username}").strip("'")
             database_pattern = username_pattern + "%%%%"
-            sql = f"""
-                GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
-                INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE
-                    ON `{database_pattern}`.* TO %s@'localhost';"""
-            cur.execute(sql, username)
+            if not config.FLASK_CONFIG["debug"]:
+                sql = f"""
+                    GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
+                    INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE
+                        ON `{database_pattern}`.* TO %s@'localhost';"""
+                cur.execute(sql, username)
             sql = f"""
                 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES,
                 INDEX, ALTER, EXECUTE, CREATE ROUTINE, ALTER ROUTINE
