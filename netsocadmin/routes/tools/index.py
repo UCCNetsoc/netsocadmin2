@@ -46,7 +46,7 @@ class ToolIndex(ProtectedToolView):
 
     template_file = "tools.html"
 
-    page_title = "Welcome to Netsoc Admin"
+    page_title = "Netsoc Admin"
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request for tools")
