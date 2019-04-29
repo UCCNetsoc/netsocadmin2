@@ -1,16 +1,13 @@
+#shell-error, #shell-success {
+    display: none;
+}
+
 #wordpress-image {
 	height: 180px; 
 	padding: 5px; 
 	text-align:center; 
 	display: block; 
 	margin: 30px auto;
-}
-
-#wordpress-install-container {
-	min-height: 400px;
-	width:60%;
-	margin: 2% auto;
-	padding-bottom: 3%;
 }
 
 #wordpress-install-button {

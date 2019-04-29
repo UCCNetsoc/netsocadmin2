@@ -1,0 +1,55 @@
+{% extends "page-skeleton.html" %}
+{% block head %}
+	{{ super() }}
+
+    <script type="text/javascript" src="../static/javascript/wordpressInstall.js"></script>
+    
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+    <div class="row">
+        <div class="card">
+            <div class="card-content">
+                <div class="card-title">Install Wordpress</div>
+                <img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/>
+    
+                {% if wordpress_exists %}
+    
+                <p id="wordpress-link">WordPress is installed.
+                    <b>Visit your WordPress site
+                    <a href="{{ wordpress_link }}" target="_blank">here</a></b>
+                </p>
+    
+                {% else %}
+    
+                <p id="wordpress-install-description">Click here to install WordPress to your <code>public_html</code></p>
+    
+                <button class="btn waves-effect waves-light" id="wordpress-install-button" onclick="installWordpress()">
+                    <span>Install</span>
+                    <i class="mdi-content-send right"></i>
+                </button>
+    
+                <p id="wordpress-setup-link">WordPress is installed.
+                    <b>Visit your WordPress site
+                    <a href="{{ WORDPRESS_LINK }}" target="_blank">here</a></b>
+                </p>
+    
+                <p id="wordpress-setup-fail">Wordpress didn't install correctly. Please email us at netsoc@uccsocieties.com</p>
+    
+                <div class="progress" id="wordpress-progress">
+                        <div class="indeterminate"></div>
+                </div>
+    
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card">
+            <div class="card-content">
+                <p>More coming soon...</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

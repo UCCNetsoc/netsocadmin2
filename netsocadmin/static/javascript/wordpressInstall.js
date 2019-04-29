@@ -5,8 +5,6 @@ function installWordpress() {
 	Reveals the progress bar. 
 	Sends a HTTP GET reqeust to the server, telling it to install wordpress to the user's directory
 	(Uses the /wordpressinstall API endpoint)
-	Progress bar times out after 15 seconds and reveals 
-	Changes text to be relevant during install and after install, so as to reveal wordpress link.
 	*/
 
 	document.getElementById("wordpress-install-button").style.display = "none";

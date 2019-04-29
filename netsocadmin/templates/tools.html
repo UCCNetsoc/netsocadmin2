@@ -1,339 +1,62 @@
-	{% extends "page-skeleton.html" %}
-
-{% block head %}
-	{{ super() }}
-	<script type="text/javascript" src="static/javascript/wordpressInstall.js"></script>
-	<script type="text/javascript" src="static/javascript/databaseTools.js"></script>
-	<link rel="stylesheet" href="static/css/wordpress.css"></link>
-	<style>
-		.teal-line {
-		  display: block;
-		  height: 1px;
-		  border: 0;
-		  border-top: 1px solid #009688;
-		  margin: 1em 0;
-		  padding: 0;
-		}
-		.teal-title {
-			background: #4db6ac;
-			width: 100%;
-			display: block;
-			padding: 0.1em;
-			color: white;
-			border: 1px solid #44a299;
-			text-align: center;
-		}
-	</style>
-{% endblock %}
+{% extends "page-skeleton.html" %}
 
 {% block body %}
-	{{ super() }}
-	{# these are the tab headers just under the navbar. Each header must have a corresponding
-	div.col.s12 below #}
-	<div class="col s12">
-		<ul class="tabs z-depth-1">
-			<div class="indicator teal lighten-2" style="z-index:1">{# this changes the tab colors #}</div>
-			<li class="tab">
-				<a class="{% if home_active %} active {% endif %}teal-text lighten-2" href="#home">Home</a>
-			</li>
-			<li class="tab">
-				<a class="{% if mysql_active %} active {% endif %}teal-text lighten-2" href="#mysql">MySQL</a>
-			</li>
-			<li class="tab">
-				<a class="{% if backup_active %} active {% endif %}teal-text lighten-2" href="#backups">Backups</a>
-			</li>
-			<li class="tab">
-				<a class="{% if wordpress_active %} active {% endif %}teal-text lighten-2" href="#wordpress">Wordpress</a>
-			</li>
-            <li class="tab">
-				<a class="{% if shells_active %} active {% endif %}teal-text lighten-2" href="#shells">Login Shell</a>
-			</li>
-			<li class="tab">
-				<a class="{% if help_active %} active {% endif %}teal-text lighten-2" href="#help">Help</a>
-			</li>
-		</ul>
-	</div>
+    {{ super() }}
 
-	{# This tab is for the landing page section of the site which displays services offered #}
-	<div id="home" class="container">
-		<div class='card z-depth-3' style='margin-top:2%;'>
-			<div id="home" class="card-content">
-				<span class="card-title teal-title">What We Offer</span>
-				<hr class="teal-line" />
-				<span class="card-title">Free server space</span>
-				<p>You can create a free account on one of our servers. What you do with it is all up to you!</p><br />
-				<p>Please do read the <code>ACCEPTABLE_USAGE_POLICY</code> file in your home directory. If you are found to be in violation of this, we will stop whatever you are doing and possibly remove your account.</p>
-				<hr class="teal-line" />
-				<span class="card-title">Free web hosting</span>
-				<p>Your <code>public_html</code> folder in you home-directory will be the root of you website. This website can be found at <code>"http://&lt;yourusername&gt;.netsoc.co"</code>.</p><br />
-				<p>Please contact us if you wish to have your own domain name point to this site instead. </p>
-				<hr class="teal-line" />
-				<span class="card-title">MySQL Databases</span>
-				<p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p><br />
-				<p>Your MySQL databases can be found at <code>mysql.netsoc.co</code>. Your MySQL username will be your server username. To create new databases, remove databases or reset your MySQL password, please see the MYSQL tab in your admin tools.</p><br />
-				<p>Please note, the name of your database will be prefixed with your username and an underscore. So if your username is <code>john</code>, your database names will be of the form "john_&lt;rest of name here&gt;".</p>
-				<hr class="teal-line" />
-				<span class="card-title">Home Directory Backups</span>
-				<p>We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. </p><br />
-				<p>If you need to recover a backup, see the <code>BACKUPS</code> tab in your admin tools.</p>
-				<hr class="teal-line" />
-			</div>
-		</div>
-	</div>
-
-	{# This stuff is the MySQL tab #}
-	<div id="mysql" class="container">
-		<div class="card z-depth-3" style="min-height: 400px;margin-top:2%;padding-bottom: 3%;">
-			<div class="card-content">
-				<span class="card-title teal-title">MySQL Databases</span>
-				{% if databases|length > 0 %}
-					<ul class="collection">
-						{% for db in databases %}
-							<li class="collection-item">
-								<div>
-									{{ db }}
-									<div onclick="databaseForm('{{ db }}')" class="activator secondary-content">
-										<i class="material-icons">delete</i>
-									</div>
-								</div>
-							</li>
-						{% endfor %}
-					</ul>
-				{% else %}
-					<br />
-					<p> No Databases to show &nbsp;&nbsp; O_o </p><br>
-				{% endif %}
-
-				<a class="activator left btn waves-effect waves-light" onclick="passwordReset(false)">Reset MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></a>
-				<a class="activator right btn-floating halfway-fab waves-effect waves-light teal"><i class="material-icons">add</i></a>
-				<br><br>
-				<span style="display:block;" class="error-msg">{{ mysql_error }}</span>
-				{% if new_mysql_password %}
-				<p style="color:green;">Your new MySQL password: {{ new_mysql_password }}</p>
-				{% endif %}
-			</div>
-
-			{# card reveals are what come up when you click something with class "activator".
-			The Javascript in the header does the necessary things to pick the correct form
-			and change the form as need be. Normally, there is only one "card-reveal" so this
-			is a bit of a hack #}
-			<div class="card-reveal" style="overflow: hidden;">
-				<div id="database-change-form">
-					<span class="card-title teal-title" onclick="databaseForm('')">
-						<span id="database-form-title">New Database:</span>
-						<i class="material-icons right">close</i>
-					</span>
-					<form action="/createdb" method="POST">
-						<div class="input-field">
-							<input autocomplete="off" id="username" type="text" name="username">
-							<label for="username">Server username</label>
-						</div>
-						<div class="input-field">
-							<input autocomplete="off" id="mysql-password" type="password" name="password">
-							<label for="mysql-password">Server password</label>
-						</div>
-						<div class="input-field">
-							<input autocomplete="off" id="dbname" type="text" name="dbname">
-							<label for="dbname">Database name</label>
-						</div>
-						<button class="btn waves-effect waves-light" type="submit">
-							<span id="database-form-button-text"> Create </span>
-							<i class="mdi-content-send right"></i>
-						</button>
-					</form>
-				</div>
-				<div id="password-reset-form" style="display: none;">
-					<span class="card-title teal-title" onclick="passwordReset(true)">
-						<span>Reset MySQL Password:</span>
-						<i class="material-icons right">close</i>
-					</span>
-					<form action="/resetpw" method="POST">
-						<div class="input-field" method="POST">
-							<input autocomplete="off" id="username" type="text" name="username">
-							<label for="username">Server username</label>
-						</div>
-						<div class="input-field">
-							<input autocomplete="off" id="password" type="password" name="password">
-							<label for="password">Server password</label>
-						</div>
-						<button class="btn waves-effect waves-light" type="submit">
-							<span id="database-form-button-text"> Reset </span>
-							<i class="mdi-content-send right"></i>
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	{# This stuff is for the backup tab #}
-	<div id="backups" class="container">
-		<div class="card z-depth-3" style="min-height:400px;margin-top:2%;padding-bottom: 3%;">
-			<div class="card-content">
-				<span class="card-title teal-title">Home Directory Backups</span>
-
-				{# Tab headers #}
-				<div class="col s12">
-					<ul class="tabs">
-						<li class="col s6 tab"><a class="active teal-text lighten-2" href="#weekly-backups"> Weekly </a></li>
-						<li class="col s6 tab"><a class="teal-text lighten-2" href="#monthly-backups"> Monthly </a></li>
-						<div class="indicator teal lighten-2" style="z-index:1"></div>
-					</ul>
-				</div>
-
-				{# Weekly body #}
-				<div id="weekly-backups" class="col s12">
-					{% if weekly_backups|length > 0 %}
-						<ul class="collection" style="max-height: 20em; overflow-y:scroll;">
-							{% for b in weekly_backups %}
-								<li class="collection-item">
-									<div>
-										{{ b }}
-										<a class="activator secondary-content" href="/backup/{{ username }}/weekly/{{ b }}">
-											<i class="material-icons">cloud_download</i>
-										</a>
-									</div>
-								</li>
-							{% endfor %}
-						</ul>
-					{% else %}
-						<br />
-						<p> No backups were found. If you have had your account for over a week, please contact us.</p><br>
-					{% endif %}
-				</div>
-
-				{# Monthly body #}
-				<div id="monthly-backups" class="col s12">
-					{% if monthly_backups|length > 0 %}
-						<ul class="collection" style="max-height: 20em; overflow-y:scroll;">
-							{% for b in monthly_backups %}
-								<li class="collection-item">
-									<div>
-										{{ b }}
-										<a class="activator secondary-content" href="/backup/{{ username }}/monthly/{{ b }}">
-											<i class="material-icons">cloud_download</i>
-										</a>
-									</div>
-								</li>
-							{% endfor %}
-						</ul>
-					{% else %}
-						<br />
-						<p> No backups were found. If you have had your account for over a month, please contact us.</p><br>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	</div>
-
-	{# This stuff is the Wordpress tab #}
-	<div id="wordpress" class="container">
-		<div class="card z-depth-3" id="wordpress-install-container">
-			<div class="card-content">
-				<span class="card-title teal-title">Manage Your WordPress Site</span>
-				<img src="/static/wordpress-logo-stacked-rgb.png" id="wordpress-image"/>
-
-				{% if wordpress_exists %}
-
-				<p id="wordpress-link">WordPress is installed.
-					<b>Visit your WordPress site
-					<a href="{{ wordpress_link }}" target="_blank">here</a></b>
-				</p>
-
-				{% else %}
-
-				<p id="wordpress-install-description">Would you like to install wordpress to your web space?</p>
-
-				<button class="btn waves-effect waves-light" id="wordpress-install-button" onclick="installWordpress()">
-					<span>Install</span>
-					<i class="mdi-content-send right"></i>
-				</button>
-
-				<p id="wordpress-setup-link">WordPress is installed.
-					<b>Visit your WordPress site
-					<a href="{{ WORDPRESS_LINK }}" target="_blank">here</a></b>
-				</p>
-
-				<p id="wordpress-setup-fail">Wordpress didn't install correctly. Please email us at netsoc@uccsocieties.com</p>
-
-				<div class="progress" id="wordpress-progress">
-						<div class="indeterminate"></div>
-				</div>
-
-				{% endif %}
-			</div>
-		</div>
-	</div>
-
-    {# This tab is for the user to select a login shell for use on the servers #}
-    {# There are 5 to choose from: bash, csh, fish, ksh, zsh #}
-    <div id="shells" class="container">
-        <div class="card z-depth-3" style="margin-top:2%;">
-            <div class="card-content">
-                <div class="card-title teal-title">Select a Login Shell</div>
-                <br />
-                {% if shells_error %}
-                    <p class="red-text">{{ shells_error }}</p>
-                {% elif shells_success %}
-                    <p class="teal-text">Shell was changed successfully</p>
-                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
-                {% else %}
-                    <p>You can now choose from one of the following login shells to use on Leela</p>
-                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
-                {% endif %}
-                <br />
-                <form action="/change-shell" method="POST">
-                    <div class="input-field col s12">
-                        <select name="shell">
-                            {% for shell in login_shells %}
-                                <option value="{{ shell[0] }}">{{ shell[1] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <button class="btn waves-effect waves-light" type="submit">
-						Change my Shell!
-						<i class="mdi-content-send right"></i>
-					</button>
-                </form>
-            </div>
+    {# This tab is for the landing page section of the site which displays services offered #}
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">Free server space</span>
+            <p>You have a free account on one of our servers, automatically created when you signed up on this website. What you do with it is all up to you!</p>
+            <br/>
+            <p>Please do read the <code>ACCEPTABLE_USAGE_POLICY</code> file in your home directory. If you are found to be in violation of this, we will stop whatever you are doing and possibly remove your account.</p>
         </div>
     </div>
-
-	{# This tab is for the help section that will relay the message to SysAdmins #}
-	<div id="help" class="container">
-		<div class='card z-depth-3' style='margin-top:2%;'>
-			<div id="help" class="card-content">
-				<span class="card-title teal-title">Got an issue? Need help?</span>
-				<br />
-				{% if help_error %}
-					<p class='red-text'>{{ help_error }}</p>
-				{% endif %}
-
-				{% if help_success %}
-					<p class='teal-text'>Help is on the way!</p>
-				{% else %}
-					<p>Fill in the form below and one of the awesome Netsoc SysAdmins will get back to you ASAP!</p>
-				{% endif %}
-				<form action='/help' method='post'>
-					<div class='input-field row'>
-						<label for='subject'>Subject</label>
-						<input type='text' name='subject' id='subject'>
-					</div>
-					<div class='input-field row'>
-						<label for='email'>Your e-mail</label>
-						<input type='text' name='email' id='email'>
-					</div>
-					<div class='input-field row s12'>
-						<label for='body'>Message</label>
-						<textarea cols="20" rows="40" class="materialize-textarea" name='message' id='message'></textarea>
-					</div>
-
-					<button class="btn waves-effect waves-light" type="submit">
-						Send 'er away!
-						<i class="mdi-content-send right"></i>
-					</button>
-				</form>
-			</div>
-		</div>
-	</div>
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">Free web hosting</span>
+            <p>Your <code>public_html</code> folder in you home-directory will be the root of your website. This website can be found at <code><a target="_blank" href="http://{{ username }}.netsoc.co">http://{{ username }}.netsoc.co</a></code>.</p>
+            <br/>
+            <p>Please contact us if you wish to have your own domain name point to this site instead. </p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">WordPress Installation</span>
+            <p>We have a one-click solution for installing WordPress to your home directory. You can find it on this site.</p><br/>
+            <p>Your own WordPress installation can then be found at <code><a target="_blank" href="http://{{ username }}.netsoc.co/wordpress">http://{{ username }}.netsoc.co/wordpress</a></code></p>
+        </div>
+    </div>    
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">MySQL Databases</span>
+            <p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p><br/>
+            <p>Your MySQL databases can be found at <code>mysql.netsoc.co</code>. Your MySQL username will be your server username. To create new databases, remove databases or reset your MySQL password, please see the MySQL tab in your admin tools.</p>
+            <br/>
+            <p>Please note, the name of your database will be prefixed with your username and an underscore. So if your username is <code>john</code>, your database names will be of the form "<code>john_&lt;rest of name here&gt;</code>".</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">Home Directory Backups</span>
+            <p>We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. </p>
+            <br/>
+            <p style="padding-bottom: 1em">If you need to recover a backup, see the <code>BACKUPS</code> tab in your admin tools.</p>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-content">
+            <span class="card-title">Minecraft Server</span>
+            <p>Accessible at <code><a target="_blank" href="https://minecraft.netsoc.co">minecraft.netsoc.co</a></code> is a public Minecraft Server.</p>
+            <p>Checkout the website by clicking the link. Online viewable maps can be found on the website.</p>
+            <br/>
+            <p>Featuring: </p>
+                <ul style="list-style-position: inside;">
+                    <li style="list-style-type: disc;">Economy</li>
+                    <li style="list-style-type: disc;">Factions</li>
+                    <li style="list-style-type: disc;">Shops</li>
+                    <li style="list-style-type: disc;">And more!</li>
+                </ul>
+        </div>
+    </div>
 {% endblock %}

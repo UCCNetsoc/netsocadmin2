@@ -1,13 +1,14 @@
 # stdlib
 import logging
 import re
+
 # lib
 import flask
 from flask.views import View
+
 # local
 import config
 import register_tools
-
 
 __all__ = [
     'CompleteSignup',

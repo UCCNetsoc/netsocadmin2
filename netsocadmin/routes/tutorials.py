@@ -1,14 +1,15 @@
 # stdlib
 import logging
 import os
+
 # lib
 import flask
 import markdown
 from flask.views import View
+
 # local
 import config
 import login_tools
-
 
 __all__ = [
     "Tutorials",
@@ -35,7 +36,7 @@ class Tutorials(View):
             kw = {"tutorials": self.tutorials}
         return flask.render_template(
             "tutorials.html",
-            show_logout_button=login_tools.is_logged_in(),
+            is_logged_in=login_tools.is_logged_in(),
             **kw,
         )
 

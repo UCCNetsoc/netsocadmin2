@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	{% block head %}
-	<title>Netsoc Admin</title>
-	<meta name="theme-color" content="#4db6ac">
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" href="/static/favicon.ico">
-	<link rel="canonical" href="https://admin.netsoc.co" />
 
-	<meta property="og:title" content="UCC Netsoc Admin" />
-	<meta property="og:url" content="https://admin.netsoc.co" />
-	<meta property="og:image" content="/static/banner-icon.svg" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="630" />
-	<meta property="og:site_name" content="UCC Netsoc Admin" />
-	<meta property="fb:admins" content="1385961037" />
-	<meta property="og:description" content="Manage your webspace and databases in one location." />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@UCCNetsoc" />
-	<meta name="twitter:title" content="UCC Netsoc Admin" />
-	<meta name="twitter:description" content="Manage your webspace and databases in one location." />
-	<script type="application/ld+json">
+<head>
+    {% block head %}
+    <title>Netsoc Admin</title>
+    <meta name="theme-color" content="#4db6ac">
+    <meta name="msapplication-navbutton-color" content="#4db6ac">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#4db6ac">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="canonical" href="https://admin.netsoc.co" />
+
+    <meta property="og:title" content="UCC Netsoc Admin" />
+    <meta property="og:url" content="https://admin.netsoc.co" />
+    <meta property="og:image" content="/static/banner-icon.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="UCC Netsoc Admin" />
+    <meta property="fb:admins" content="1385961037" />
+    <meta property="og:description" content="Manage your webspace and databases in one location." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@UCCNetsoc" />
+    <meta name="twitter:title" content="UCC Netsoc Admin" />
+    <meta name="twitter:description" content="Manage your webspace and databases in one location." />
+    <script type="application/ld+json">
 		{
 			"@context" : "http://schema.org",
 			"@type" : "Organization",
@@ -31,102 +34,381 @@
 		}
 	</script>
 
-	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
-	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="../static/css/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 
-	{# makes the mobile menu appear #}
-	<script>
-		$( document ).ready(function(){
-			$(".button-collapse").sideNav();
-			$('select').material_select();
-		})
-	</script>
+    <script>
+        $(document).ready(function () {
+            $(".button-collapse").sideNav();
+            $('select').material_select();
+            $('.dropdown-trigger').dropdown({ hover: false, belowOrigin: true });
+            $('.dropdown-trigger-mobile').dropdown({ hover: false, belowOrigin: true });
+        })
+    </script>
 
-	<style>
-		body {
-			background-color: #eee;
-		}
-		li a.log-in-out-button {
-			display: inline-block;
-		}
+    <style>
+        html {
+            font-weight: 400;
+        }
 
-		{% if page == "login" %}
-		li a.log-in-out-button {
-			display: none;
-		}
-		{% endif %}
+        code {
+            font-family: monospace !important;
+        }
 
-		.error-msg {
-			color: red;
-		}
-	</style>
-	{% endblock %}
+        code a {
+            font-weight: 700;
+        }
+
+        body {
+            background-color: #eee;
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;            
+        }
+
+        .error-msg {
+            color: red;
+        }
+
+        footer {
+            margin-left: 240px;
+            background-color: rgba(0, 0, 0, 0.0) !important;
+        }
+
+        footer a {
+            margin-right: 1em;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .teal-line {
+            display: block;
+            height: 1px;
+            border: 0;
+            border-top: 1px solid #009688;
+            margin: 1em 0;
+            padding: 0;
+        }
+
+        .side-nav li a {
+            display: inline-block !important;
+        }
+
+        main a {
+            color: #003E70;
+        }
+
+        main a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            {% if is_logged_in %}
+            margin-right: 40px;
+            margin-left: 280px;
+            {% else %}
+            margin: 0 auto;
+            {% endif %}
+            max-width: 90%;
+            flex: 1 0 auto;
+        }
+
+        .nav-wrapper {
+            padding-right: 5%; 
+            padding-left: 260px
+        }
+
+        .fab,
+        .fas,
+        .fab a,
+        .fas a {
+            font-weight: 600 !important;
+            /* color: rgb(105, 105, 105) !important; */
+        }
+
+        @media only screen and (min-width: 992px) {
+            .row .col:first-child {
+                padding: 0 0.75rem 0 0;
+            }
+
+            .row .col:last-child {
+                padding: 0 0 0 0.75rem;
+            }
+        }
+
+        @media only screen and (max-width: 992px) {
+            main {
+                margin: 0 auto;
+                min-width: 95%;
+            }
+
+            main > div {
+                width: 100%;
+            }
+
+            footer {
+                margin-left: initial;
+            }
+
+            .nav-wrapper {
+                padding-right: 0px; 
+                padding-left: 1em;
+            }
+
+            .fab span,
+            .fas span {
+                font-weight: 400 !important;
+                /* color: rgb(105, 105, 105) !important; */
+            }
+
+            nav .nav-wrapper ul li i {
+                font-size: 1em;
+            }
+
+            .side-nav li a {
+                display: block !important;
+            }
+
+            .side-nav a {
+                height: 40px;
+                line-height: 40px;
+            }
+
+            .fa, .fab, .fal, .far, .fas {
+                line-height: 3;
+            }
+        }
+
+        .card-title code {
+            font-weight: 700;
+        }
+
+        .z-depth-1,
+        .card {
+            box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.04), 0 2px 10px 0 rgba(0, 0, 0, 0.02) !important;
+        }
+
+        .card-title {
+            font-weight: 600 !important;
+        }
+
+        nav h4 {
+            margin: 0 0 0 8em;
+        }
+    </style>
+
+    {% endblock %}
 </head>
+
 <body>
-	{# This is the navbar ontop of every page. All pages will need this. #}
-	<div class="navbar-fixed">
-		<nav>
-			<div class="nav-wrapper teal lighten-2" style="padding-right: 5%;padding-left: 1%">
-				<div class="brand-logo"><img src="/static/inverted-icon.png" class="responsive-img" style="height: 65px; padding: 5px;"/></div>
+    <header style="margin-bottom: 2em;">
+        {# This is the navbar ontop of every page. All pages will need this. #}
+        <div class="navbar">
+            <nav>
+                <div class="nav-wrapper teal lighten-2">
+                    <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                    <span class="brand-logo"> {{ page_title }}</span>
 
-				{# This is the main navbar for when the screen is big enough #}
-				<a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li>
-						<a href="https://netsoc.co/">Netsoc Home</a>
-					</li>
-					<li>
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					{% if show_logout_button == True %}
-					<li>
-						<a href="/sudo">Get Sudo</a>
-					</li>
-					<li>
-						<a href="/tools">Admin Tools</a>
-					</li>
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-					</li>
-					{% else %}
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
-					</li>
-					{% endif %}
-				</ul>
+                    {# This is the main navbar for when the screen is big enough #}
+                    <ul class="right hide-on-med-and-down">
+                        <li title="The Netsoc Website">
+                            <a target="_blank" href="https://netsoc.co/rk">Netsoc Website</a>
+                        </li>
+                        <li title="Occasionally updated list of tutorials and talks">
+                            <a href="/tutorials">Tutorials</a>
+                        </li>
+                        <li title="Netsoc Blog">
+                            <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
+                        </li>
+                        {% if is_logged_in %}
+                        <li>
+                            <a class="dropdown-trigger btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu">{{ username }}</a>
+                            <ul id="profile-menu" class="dropdown-content">
+                                <li><a href="/logout">Logout</a></li>
+                                <li class="divider" tabindex="-1"></li>
+                                <!-- <li><a href="#!">Profile</a></li> -->
+                                <!-- <li class="divider" tabindex="-1"></li>
+                                <li><a href="#!">Change Password</a></li> -->
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="log-in-out-button btn waves-effect waves-light red accent-2 white-text" href="/">Login/Signup</a>
+                        </li>
+                        {% endif %}
+                    </ul>
 
-				{# This one is used when the screen is small like on mobile #}
-				<ul class="side-nav" id="mobile-demo">
-					{% if show_logout_button == True %}
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/logout">Logout</a>
-					</li>
-					<li>
-						<a href="/tools">Admin Tools</a>
-					</li>
-					<li>
-						<a href="/sudo">Get Sudo</a>
-					</li>
-					{% else %}
-					<li>
-						<a class="log-in-out-button btn-large waves-effect waves-light purple darken-2 white-text" href="/">Login/Signup</a>
-					</li>
-					{% endif %}
-					<li>
-						<a href="/tutorials">Tutorials</a>
-					</li>
-					<li>
-						<a href="https://netsoc.co/">Netsoc Home</a>
-					</li>
-				</ul>
-			</div>
-		</nav>
-	</div>
-
-	{% block body %}{% endblock %}
+                    {# This one is used when the screen is small like on mobile #}
+                    <ul class="side-nav" id="mobile-demo">
+                        {% if is_logged_in == True %}
+                        <li style="margin-top: 1em">
+                            <a class="dropdown-trigger-mobile btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu-mobile">{{ username }}</a>
+                            <ul id="profile-menu-mobile" class="dropdown-content">
+                                <li><a href="/logout">Logout</a></li>
+                                <li class="divider" tabindex="-1"></li>
+                                <!-- <li><a href="#!">Profile</a></li> -->
+                                <!-- <li class="divider" tabindex="-1"></li>
+                                <li><a href="#!">Change Password</a></li> -->
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin" style="margin-top: 2em">
+                            <a style="width: 100%" href="/tools">
+                                <i class="fas fa-home">
+                                    <span>Home</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and reset your password">
+                            <a style="width: 100%" href="/tools/mysql">
+                                <i class="fas fa-database">
+                                    <span>MySQL</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "backups" %} class="active" {% endif %} title="List and download backups of your home directory">
+                            <a style="width: 100%" href="/tools/backups">
+                                <i class="fas fa-hdd">
+                                    <span>Backups</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "wordpress" %} class="active" {% endif %} title="Install Wordpress">
+                            <a style="width: 100%" href="/tools/wordpress">
+                                <i class="fab fa-wordpress">
+                                    <span>WordPress</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "shells" %} class="active" {% endif %} title="Change your login shell">
+                            <a style="width: 100%" href="/tools/shells">
+                                <i class="fas fa-desktop">
+                                    <span>Login Shell</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "sudo" %} class="active" {% endif %} title="Apply for Sudo on one of our servers!">
+                            <a style="width: 100%" href="/sudo">
+                                <i class="fas fa-users-cog">
+                                    <span>Get Sudo</span>
+                                </i>
+                            </a>
+                        </li>
+                        <li {% if active == "help" %} class="active" {% endif %} title="Come here if you need help with any of our services">
+                            <a style="width: 100%" href="/help">
+                                <i class="fas fa-life-ring">
+                                    <span>Help</span>
+                                </i>
+                            </a>
+                        </li>                        
+                        <li class="divider" style="margin-top: 0.5em; margin-bottom: 0.5em"></li>
+                        <li title="The Netsoc Website">
+                            <a target="_blank" href="https://netsoc.co/rk">Netsoc Website</a>
+                        </li>
+                        <li title="Occasionally updated list of tutorials and talks">
+                            <a href="/tutorials">Tutorials</a>
+                        </li>
+                        <li title="Netsoc Blog">
+                            <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        
+    {% if is_logged_in %}
+    <ul id="slide-out" class="side-nav fixed z-depth-1">
+        <li title="netsoc.co/rk">
+            <div class="brand-logo">
+                <a target="_blank" href='https://netsoc.co/rk'>
+                    <img src="https://netsoc.co/rk/style/images/horizontal.png" style="margin-top: 1em; width: 110%; margin-left: -1.4em;" />
+                </a>
+            </div>
+        </li>
+        <li class="divider" style="margin-bottom: 1em;"></li>
+        <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin">
+            <a style="width: 100%" href="/tools">
+                <i class="fas fa-home">
+                    <span style="margin-left: 1em">Home</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and reset your password">
+            <a style="width: 100%" href="/tools/mysql">
+                <i class="fas fa-database">
+                    <span style="margin-left: 1em">MySQL</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "backups" %} class="active" {% endif %} title="List and download backups of your home directory">
+            <a style="width: 100%" href="/tools/backups">
+                <i class="fas fa-hdd">
+                    <span style="margin-left: 1em">Backups</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "wordpress" %} class="active" {% endif %} title="Install Wordpress">
+            <a style="width: 100%" href="/tools/wordpress">
+                <i class="fab fa-wordpress">
+                    <span style="margin-left: 1em">WordPress</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "shells" %} class="active" {% endif %} title="Change your login shell">
+            <a style="width: 100%" href="/tools/shells">
+                <i class="fas fa-desktop">
+                    <span style="margin-left: 1em">Login Shell</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "sudo" %} class="active" {% endif %} title="Apply for Sudo on one of our servers!">
+            <a style="width: 100%" href="/sudo">
+                <i class="fas fa-users-cog">
+                    <span style="margin-left: 1em">Get Sudo</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "help" %} class="active" {% endif %} title="Come here if you need help with any of our services">
+            <a style="width: 100%" href="/help">
+                <i class="fas fa-life-ring">
+                    <span style="margin-left: 1em">Help</span>
+                </i>
+            </a>
+        </li>
+    </ul>
+    {% endif %}
+    </header>
+    <main>
+        <div>
+            {% block body %}{% endblock %}
+        </div>
+    </main>
+    <footer class="page-footer black-text">
+        <div class="row footer-copyright" style="margin-bottom: 0">
+            <div class="col s12 m4 left">
+                <div class="container">
+                    <span class="black-text">© 2019 UCC Networking Society</span>
+                </div>
+            </div>
+            <div class="col s12 m4 right hide-on-med-and-down">
+                <div class="container">
+                    <a class="black-text" href="https://www.facebook.com/NetsocUCC/">Facebook</a>
+                    <a class="black-text" href="https://twitter.com/UCCNetsoc">Twitter</a>
+                    <a class="black-text" href="https://github.com/UCCNetworkingSociety">GitHub</a>
+                    <a class="black-text" href="https://www.instagram.com/uccnetsoc/">Instagram</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </body>
+
 </html>
 
 {#
@@ -146,5 +428,4 @@ An example usage of the template: some-page.html:
 
 	<p> Some dope ass page content </p>
 {% endblock %}
-
 #}

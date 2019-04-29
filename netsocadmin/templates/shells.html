@@ -1,0 +1,81 @@
+{% extends "page-skeleton.html" %}
+{% block head %}
+    {{ super() }}
+    <script src="../static/javascript/shellTools.js"></script>
+
+    <style>
+    @media only screen and (min-width: 992px) {
+        body > main > div > div:nth-child(1) > div {
+            padding: 0 !important;
+        }
+    }
+    </style>
+{% endblock %}
+
+{% block body %}
+	{{ super() }}
+	
+	{# This tab is for the user to select a login shell for use on the servers #}
+    {# There are 5 to choose from: bash, csh, fish, ksh, zsh #}
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">Try out a different shell!</div>
+                    <p>We make available various different shells for you to try out on our public server.</p>
+                    <p>Different shells can provide a vastly different experience in the terminal and we highly recommend that everyone try out something different :)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">Change Login Shell</div>
+                    <p class="red-text" id="shell-error"></p>
+                    <p class="teal-text" id="shell-success">Shell was changed successfully</p>
+                    <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
+                    <br/>
+                    <form>
+                        <div class="input-field col s12">
+                            <select name="shell">
+                                {% for shell in login_shells %}
+                                    <option value="{{ shell[0] }}" {% if curr_shell == shell[1] %} selected="selected" {% endif %}>{{ shell[1] | lower }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn waves-effect waves-light" onclick="changeShell(event)">
+                            Change my Shell!
+                            <i class="mdi-content-send right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">Info on Different Shells</div>
+                    <div class="collection">
+                        {% for shell in login_shells %}
+                            <a class="collection-item" target="_blank"
+                                {% if shell[1].lower() == 'bash' %}
+                                    href="https://www.gnu.org/software/bash/manual/html_node/What-is-Bash_003f.html"
+                                {% elif shell[1].lower() == 'csh' %}
+                                    href="https://www.mkssoftware.com/docs/man1/csh.1.asp"
+                                {% elif shell[1].lower() == 'ksh' %}
+                                    href="http://www.kornshell.com/"
+                                {% elif shell[1].lower() == 'fish' %}
+                                    href="https://fishshell.com/"
+                                {% elif shell[1].lower() == 'zsh' %}
+                                    href="https://www.zsh.org/"
+                                {% endif %}
+                            >{{ shell[1] | lower }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

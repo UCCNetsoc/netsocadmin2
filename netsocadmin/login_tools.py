@@ -39,8 +39,8 @@ def is_logged_in():
 
 def is_correct_password(username: str, password: str) -> bool:
     """
-    is_correct_password tells you whether or not a given password
-    is the password has which is on file in the Netsoc MySQL database.
+    is_correct_password tells you whether or not a given username + password
+    combo are correct
     """
     logger.info("login attempt from {username}")
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:

@@ -1,48 +1,47 @@
 # stdlib
 import logging
+
 # lib
 import flask
-from flask.views import View
+
 # local
 import help_post
-import login_tools
+
+from .index import ProtectedToolView
 
 
-__all__ = [
-    "CompleteSudo",
-    "Sudo",
-]
+class Sudo(ProtectedToolView):
+    """
+    Route: /sudo
+        This route will render the page for applying for sudo privilages.
+    """
+    # Logger instance
+    logger = logging.getLogger("netsocadmin.sudo")
+
+    page_title = "Apply for Sudo"
+
+    template_file = "sudo.html"
+
+    active = "sudo"
+
+    def dispatch_request(self) -> str:
+        self.logger.debug("Received request")
+        return self.render()
 
 
-class CompleteSudo(View):
+class CompleteSudo(Sudo):
     """
     Route: /completesudoapplication
         This is run by the sudo-signup form in sudo.html.
         It will send an email to the SysAdmin team as well as to the discord server notifying us that a request for
             sudo on feynman has been made.
     """
-    # Decorate all methods with this
-    decorators = [login_tools.protected_page]
     # Logger instance
     logger = logging.getLogger("netsocadmin.completesudoapplication")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
-    def render(self, error=False) -> str:
-        """Render the template with appropriate messages for whether or not there's an error"""
-        if error:
-            caption = "There was a problem :("
-            message = "Please email netsoc@uccsocieties.ie instead!"
-        else:
-            caption = "Success!"
-            message = "A confirmation email has been sent to you. We will be in touch shortly." + \
-                "<br/>Return to <a href='/tools'>tools page</a>."
-        return flask.render_template(
-            "message.html",
-            show_logout_button=login_tools.is_logged_in(),
-            caption=caption,
-            message=message,
-        )
+    template_file = "message.html"
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request")
@@ -69,24 +68,15 @@ class CompleteSudo(View):
             discord_failed = True
             self.logger.error(f"Failed to send message to Discord: {e}")
 
+        if discord_failed and email_failed:
+            caption = "There was a problem :("
+            message = "Please email netsoc@uccsocieties.ie instead!"
+        else:
+            caption = "Success!"
+            message = "A confirmation email has been sent to you. We will be in touch shortly." + \
+                "<br/>Return to <a href='/tools'>tools page</a>."
         # Return an appropriate response depending on whether or not the message sent
-        return self.render(email_failed and discord_failed)
-
-
-class Sudo(View):
-    """
-    Route: /sudo
-        This route will render the page for applying for sudo privilages.
-    """
-    # Decorate all methods with this
-    decorators = [login_tools.protected_page]
-    # Logger instance
-    logger = logging.getLogger("netsocadmin.sudo")
-
-    def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
-        return flask.render_template(
-            "sudo.html",
-            show_logout_button=login_tools.is_logged_in(),
-            username=flask.session["username"],
+        return self.render(
+            caption=caption,
+            message=message,
         )
