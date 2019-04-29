@@ -2,6 +2,14 @@
 {% block head %}
     {{ super() }}
     <script src="../static/javascript/shellTools.js"></script>
+
+    <style>
+    @media only screen and (min-width: 992px) {
+        body > main > div > div:nth-child(1) > div {
+            padding: 0 !important;
+        }
+    }
+    </style>
 {% endblock %}
 
 {% block body %}
