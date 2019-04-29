@@ -13,6 +13,8 @@ class ShellsView(ProtectedToolView):
 
     page_title = "Login Shell"
 
+    active = "shells"
+
     def dispatch_request(self, **data):
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
         with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:

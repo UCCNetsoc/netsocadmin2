@@ -14,6 +14,8 @@ class WordpressView(ProtectedToolView):
 
     page_title = "WordPress"
 
+    active = "wordpress"
+
     def dispatch_request(self):
         return self.render(
             wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),

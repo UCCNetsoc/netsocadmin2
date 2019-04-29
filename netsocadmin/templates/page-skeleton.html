@@ -259,49 +259,49 @@
                             </ul>
                         </li>
                         {% endif %}
-                        <li title="The homepage of Netsoc Admin" style="margin-top: 2em">
+                        <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin" style="margin-top: 2em">
                             <a style="width: 100%" href="/tools">
                                 <i class="fas fa-home">
                                     <span>Home</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="Create and delete MySQL Databases and reset your password">
+                        <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and reset your password">
                             <a style="width: 100%" href="/tools/mysql">
                                 <i class="fas fa-database">
                                     <span>MySQL</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="List and download backups of your home directory">
+                        <li {% if active == "backups" %} class="active" {% endif %} title="List and download backups of your home directory">
                             <a style="width: 100%" href="/tools/backups">
                                 <i class="fas fa-hdd">
                                     <span>Backups</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="Install Wordpress">
+                        <li {% if active == "wordpress" %} class="active" {% endif %} title="Install Wordpress">
                             <a style="width: 100%" href="/tools/wordpress">
                                 <i class="fab fa-wordpress">
                                     <span>WordPress</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="Change your login shell">
+                        <li {% if active == "shells" %} class="active" {% endif %} title="Change your login shell">
                             <a style="width: 100%" href="/tools/shells">
                                 <i class="fas fa-desktop">
                                     <span>Login Shell</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="Apply for Sudo on one of our servers!">
+                        <li {% if active == "sudo" %} class="active" {% endif %} title="Apply for Sudo on one of our servers!">
                             <a style="width: 100%" href="/sudo">
                                 <i class="fas fa-users-cog">
                                     <span>Get Sudo</span>
                                 </i>
                             </a>
                         </li>
-                        <li title="Come here if you need help with any of our services">
+                        <li {% if active == "help" %} class="active" {% endif %} title="Come here if you need help with any of our services">
                             <a style="width: 100%" href="/help">
                                 <i class="fas fa-life-ring">
                                     <span>Help</span>
@@ -333,49 +333,49 @@
             </div>
         </li>
         <li class="divider" style="margin-bottom: 1em;"></li>
-        <li title="The homepage of Netsoc Admin">
+        <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin">
             <a style="width: 100%" href="/tools">
                 <i class="fas fa-home">
                     <span style="margin-left: 1em">Home</span>
                 </i>
             </a>
         </li>
-        <li title="Create and delete MySQL Databases and reset your password">
+        <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and reset your password">
             <a style="width: 100%" href="/tools/mysql">
                 <i class="fas fa-database">
                     <span style="margin-left: 1em">MySQL</span>
                 </i>
             </a>
         </li>
-        <li title="List and download backups of your home directory">
+        <li {% if active == "backups" %} class="active" {% endif %} title="List and download backups of your home directory">
             <a style="width: 100%" href="/tools/backups">
                 <i class="fas fa-hdd">
                     <span style="margin-left: 1em">Backups</span>
                 </i>
             </a>
         </li>
-        <li title="Install Wordpress">
+        <li {% if active == "wordpress" %} class="active" {% endif %} title="Install Wordpress">
             <a style="width: 100%" href="/tools/wordpress">
                 <i class="fab fa-wordpress">
                     <span style="margin-left: 1em">WordPress</span>
                 </i>
             </a>
         </li>
-        <li title="Change your login shell">
+        <li {% if active == "shells" %} class="active" {% endif %} title="Change your login shell">
             <a style="width: 100%" href="/tools/shells">
                 <i class="fas fa-desktop">
                     <span style="margin-left: 1em">Login Shell</span>
                 </i>
             </a>
         </li>
-        <li title="Apply for Sudo on one of our servers!">
+        <li {% if active == "sudo" %} class="active" {% endif %} title="Apply for Sudo on one of our servers!">
             <a style="width: 100%" href="/sudo">
                 <i class="fas fa-users-cog">
                     <span style="margin-left: 1em">Get Sudo</span>
                 </i>
             </a>
         </li>
-        <li title="Come here if you need help with any of our services">
+        <li {% if active == "help" %} class="active" {% endif %} title="Come here if you need help with any of our services">
             <a style="width: 100%" href="/help">
                 <i class="fas fa-life-ring">
                     <span style="margin-left: 1em">Help</span>

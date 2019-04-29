@@ -15,6 +15,8 @@ class BackupsView(ProtectedToolView):
 
     page_title = "Manage Backups"
 
+    active = "backups"
+
     def dispatch_request(self):
         return self.render(
             monthly_backups=backup_tools.list_backups(flask.session["username"], "monthly"),

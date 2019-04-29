@@ -48,6 +48,8 @@ class ToolIndex(ProtectedToolView):
 
     page_title = "Netsoc Admin"
 
+    active = "home"
+
     def dispatch_request(self) -> str:
         self.logger.debug("Received request for tools")
         return self.render()

@@ -18,6 +18,8 @@ class TemplateView(View):
 
     page_title = ""
 
+    active = ""
+
     def render(self, **data: Union[str, bool]) -> str:
         """
         Method to render the tools template with the default vars and any extra data as decided by the route
@@ -28,5 +30,6 @@ class TemplateView(View):
             is_logged_in=login_tools.is_logged_in(),
             username=flask.session["username"],
             page_title=self.page_title,
+            active=self.active,
             **data,
         )

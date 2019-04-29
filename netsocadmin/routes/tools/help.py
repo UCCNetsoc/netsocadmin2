@@ -12,6 +12,8 @@ class HelpView(ProtectedToolView):
 
     page_title = "Help"
 
+    active = "help"
+
     def dispatch_request(self, **data):
         return self.render(**data)
 

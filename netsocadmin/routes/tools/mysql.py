@@ -13,6 +13,8 @@ class MySQLView(ProtectedToolView):
     template_file = "mysql.html"
 
     page_title = "Manage MySQL"
+    
+    active = "mysql"
 
     def render(self, **data: Union[str, bool]) -> str:
         return super().render(
