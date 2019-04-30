@@ -35,7 +35,7 @@ steps:
   image: plugins/docker
   settings:
     tag: latest
-    repo: docker.netsoc.co/public/netsocadmin
+    repo: docker.netsoc.co/netsoc/netsocadmin
     registry: docker.netsoc.co
     username:
       from_secret: docker_username
