@@ -30,7 +30,8 @@ class Login(View):
         self.logger.debug("Received request")
         user = flask.request.form["username"].lower()
         # Validate the login request
-        if not login_tools.is_correct_password(user, flask.request.form["password"]):
+        login_user = login_tools.LoginUser(user, flask.request.form["password"])
+        if not login_tools.is_correct_password(login_user):
             self.logger.debug(f"{flask.request.form['username']} entered incorrect password")
             return flask.render_template(
                 "index.html",
@@ -43,6 +44,7 @@ class Login(View):
         # Set the session info to reflect that the user is logged in and redirect back to /
         flask.session[config.LOGGED_IN_KEY] = True
         flask.session["username"] = user
+        flask.session["admin"] = login_user.is_admin()
         self.logger.debug(f"{flask.request.form['username']} successfully logged in")
         return flask.redirect("/")
 

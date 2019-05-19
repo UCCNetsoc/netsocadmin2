@@ -3,9 +3,6 @@ import os
 # flask app secret key
 SECRET_KEY = os.urandom(64)
 
-# sysadmin email blacklist for testing.
-EMAIL_WHITELIST = []
-
 # Config for flask
 FLASK_CONFIG = {
     "host": "0.0.0.0",
@@ -64,7 +61,14 @@ USERNAME_BLACKLIST = [
 # the URL which the netsoc discord bot can be reached at
 DISCORD_WEBHOOK_ADDRESS = "https://apitester.com"
 
-SYSADMIN_EMAILS = []
+SYSADMIN_EMAILS = [
+    "john@netsoc.co"
+]
+
+# sysadmin email blacklist for testing.
+EMAIL_WHITELIST = [
+    "john@netsoc.co"
+]
 
 # used for making the ssh connection to the server
 SERVER_HOSTNAME = "localhost"

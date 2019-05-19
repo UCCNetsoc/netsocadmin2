@@ -9,13 +9,13 @@ import sqlite3
 import string
 import typing
 
-import db
 import ldap3
 import paramiko
 import pymysql
-import mail_helper
 
 import config
+import db
+import mail_helper
 
 
 def send_confirmation_email(email: str, server_url: str) -> bool:
@@ -60,6 +60,7 @@ def send_details_email(email: str, user: str, password: str) -> bool:
     :param password the password which you log into the servers with
     :returns True if the email has been sent succesfully, False otherwise
     """
+
     message_body = f"""
 Hello,
 
