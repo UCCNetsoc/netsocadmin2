@@ -14,6 +14,7 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 * Facility to contact a sysadmin
 * WordPress installer
 * Tutorials
+* Change your login shell
 
 ### We will have
 
@@ -24,17 +25,15 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 ## Installation
 
-### For development environment, please look further below
-
-**NOTE** if this is for production, use Portainer. It provides a `Recreate` button that can automatically pull the latest image and make a new container with the same settings
+### For developing locally, please look further below
 
 To build the docker image:
 
 1. Create a `netsocadmin/config.py` following the same format as of that in `netsocadmin/config.py`. This file configures the netsoc admin server itself.
-2. In this directory, run:
+2. In this directory, run the following for a non development image:
 
 ```bash
-docker build -t netsocadmin .
+docker build -t docker.netsoc.co/netsoc/netsocadmin .
 ```
 
 To run the docker image:
@@ -49,31 +48,9 @@ docker run \
     docker.netsoc.co/netsocadmin:latest
 ```
 
-## Dev Environment
+## Developer Environment
 
-### To Run
-
-To bring up the external services needed for NetsocAdmin to run (LDAP and MySQL), run `docker-compose -f docker-compose-dev.yml up -d`.
-
-Then you can run `cd netsocadmin` followed by `python3 netsoc_admin.py` to run the actual netsoc admin.
-Please ensure you have Python3.6+ for this.
-Also note that you must run the script from inside the `netsocadmin` directory or else flask won't be able to find the templates!
-
-Go to `http://localhost:5050` and away you go!
-
-To shut down the services afterwards, run `docker-compose -f docker-compose-dev.yml down`.
-
-### Dev Env User Details
-
-Admin User details:
-
-* username: `john`
-* password: `johns-password`
-
-Normal User details:
-
-* username: `sofia`
-* password: `sofias-password`
+Please checkout our [Netsoc Developer Environment](https://github.com/UCCNetworkingSociety/dev-env)
 
 ### Note
 
