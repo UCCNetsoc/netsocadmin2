@@ -28,7 +28,7 @@ class TemplateView(View):
         return flask.render_template(
             self.template_file,
             is_logged_in=login_tools.is_logged_in(),
-            username=flask.session["username"],
+            username=flask.session["username"] if "username" in flask.session else None,
             page_title=self.page_title,
             active=self.active,
             **data,

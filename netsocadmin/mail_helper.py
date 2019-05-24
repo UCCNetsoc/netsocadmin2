@@ -1,10 +1,12 @@
 from typing import List
+
 import sendgrid
-from sendgrid.helpers.mail import Email, Content, Mail
+from sendgrid.helpers.mail import Content, Email, Mail
+
 import config
 
 
-def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List[str] = None) -> int:
+def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List[str] = None) -> object:
     sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
     from_email = Email(from_mail)
     subject = "Account Registration"
