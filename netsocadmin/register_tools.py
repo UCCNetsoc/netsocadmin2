@@ -187,9 +187,8 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
             search_filter="(objectClass=account)",
             attributes=["uidNumber", "uid"],
         )
-        if not success:
-            if conn.last_error is not None:
-                raise LDAPException(conn.last_error)
+        if not success and conn.last_error is not None:
+            raise LDAPException(conn.last_error)
 
         last = None
         for account in conn.entries:

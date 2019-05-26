@@ -18,6 +18,8 @@ SHELL_PATHS = {
     "zsh": "/usr/bin/zsh"
 }
 
+VALID_USERNAME = r"^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$"
+
 # key of the cookie given to maintain sessions
 # corresponding value should be true or false
 LOGGED_IN_KEY = str(os.urandom(32))

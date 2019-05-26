@@ -51,7 +51,8 @@ class AbstractDBView(MySQLView):
         if not all(fields):
             return False, "Please specify all fields."
         # Check that the username / password combination is correct
-        if not login_tools.is_correct_password(username, password):
+        login_user = login_tools.LoginUser(username, password)
+        if not login_tools.is_correct_password(login_user):
             return False, f"Wrong username or password for user {username}."
         if dbname is not None and len(flask.session["username"] + "_" + dbname) > 64:
             return False, "Database name too long"
@@ -112,7 +113,7 @@ class DeleteDB(AbstractDBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
-            self.logger.error(f"Invalid username and password: {msg}")
+            self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_delete_error=msg, mysql_create_error="", mysql_active=True)
         # Try to create the database
         try:
@@ -143,7 +144,7 @@ class ResetPassword(AbstractDBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password)
         if not valid:
-            self.logger.error(f"Invalid username and password: {msg}")
+            self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_pass_error=msg, mysql_active=True)
         mysql.delete_user(username)
         new_password = mysql.create_user(username)

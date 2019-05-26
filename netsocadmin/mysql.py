@@ -92,7 +92,7 @@ def create_user(username: str) -> str:
     :returns string the generated password for the new user
     """
     # make sure username is valid
-    if not re.match(r"^[a-z0-9-_]+[a-z0-9]$", username):
+    if not re.match(config.VALID_USERNAME, username):
         raise BadUsernameError(f"invalid username '{username}', must be alphanumeric, underscores and hyphens only")
     try:
         con = _mysql_connection()
@@ -146,7 +146,7 @@ def delete_user(username: str):
     :raises UserError if the operation fails.
     """
     # make sure username is valid
-    if not re.match(r"^[a-z0-9-_]+[a-z0-9]$", username):
+    if not re.match(config.VALID_USERNAME, username):
         raise BadUsernameError(f"invalid username '{username}', must be alphanumeric, underscores and hyphens only")
     try:
         con = _mysql_connection()
@@ -190,9 +190,12 @@ def create_database(username: str, dbname: str, delete: bool = False) -> str:
             user_dbname = dbname
             if not dbname.startswith(f"{username}_"):
                 user_dbname = f"{username}_{user_dbname}"
-            if not re.match(r"[a-zA-Z0-9]+\_[a-zA-Z0-9]+", user_dbname):
+            else:
+                dbname = dbname[len(username) + 1:]
+            if not re.match(r"^[a-zA-Z0-9]+[a-zA-Z0-9_\-]*[a-zA-Z0-9]+$", dbname):
                 raise Exception(
-                    f"database {user_dbname} is not valid, must use digits, lower or upper letters")
+                    f"database {user_dbname} is not valid, \
+                    must use digits, lower or upper letters, hypens or underscores")
 
             # make sure deleting or creating is a valid thing to do
             userdbs = list_dbs(username)

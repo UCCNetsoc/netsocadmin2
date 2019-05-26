@@ -24,7 +24,7 @@
                     err.innerText = "Invalid request"
                 } else if (req.responseText !== "Available") {
                     err.innerText = "Username not available";
-                } else if (! /^[a-z0-9][a-z0-9-_]+[a-z0-9]$/.test(uid)) {
+                } else if (! /^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/.test(uid)) {
                     err.innerText = "Username must be all lower case letters, numbers, hyphens or underscores only"
                 } else {
                     good.innerText = "Username available!"
@@ -81,7 +81,7 @@
                     <div>
                         <div class="input-field">
                             <label for="uid">Username (lowercase-only)</label>
-                            <input pattern="^[a-z0-9][a-z0-9-_]+[a-z0-9]$" autocomplete="off" class="example" name="uid" type="text" id="uid" maxlength="15">
+                            <input pattern="^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$" autocomplete="off" class="example" name="uid" type="text" id="uid" maxlength="15">
                         </div>
                         <br/>
                         <button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>
