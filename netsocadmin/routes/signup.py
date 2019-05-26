@@ -35,6 +35,8 @@ class CompleteSignup(View):
         # make sure token is valid
         email = flask.request.form["email"]
         uri = flask.request.form["_token"]
+        mysql_conn = None
+
         if not register_tools.good_token(email, uri):
             self.logger.debug(f"Invalid token {uri} for email {email}")
             return flask.render_template(
@@ -49,9 +51,6 @@ class CompleteSignup(View):
             flask.request.form["_token"],
             flask.request.form["uid"],
             flask.request.form["name"],
-            flask.request.form["student_id"],
-            flask.request.form["course"],
-            flask.request.form["graduation_year"],
         )
         if not all(form_fields):
             return flask.render_template(
@@ -80,54 +79,70 @@ class CompleteSignup(View):
                 error_message="The requested username is too long. Maximum length is 15 characters",
             )
 
-        if register_tools.has_username(user):
-            self.logger.debug(f"Username {user} not available")
-            return flask.render_template(
-                "form.html",
-                email_address=email,
-                token=uri,
-                error_message="The requested username is not available",
-            )
+        try:
+            if register_tools.is_in_ldap(user):
+                self.logger.debug(f"Username {user} not available")
+                return flask.render_template(
+                    "form.html",
+                    email_address=email,
+                    token=uri,
+                    error_message="The requested username is not available",
+                )
 
-        # add user to ldap db
-        success, info = register_tools.add_ldap_user(user)
-        if not success:
-            self.logger.debug(f"Failed to add user to LDAP: {info}")
-            # clean db of token so they have to start again
+            # add user to ldap db
+            info = register_tools.add_ldap_user(user)
+
+            # add all info to Netsoc MySQL DB
+            info["name"] = flask.request.form["name"]
+            info["email"] = email
+            mysql_conn = register_tools.add_netsoc_database(info)
+
+            # send user's details to them
+            if not register_tools.send_details_email(email, user, info["password"]):
+                self.logger.debug("Failed to send confirmation email")
+
+            # initialise the user's home directories so they can use netsoc admin
+            # without ever having to SSH into the server.
+            if not config.FLASK_CONFIG["debug"]:
+                register_tools.initialise_directories(user, info["password"])
+
+            # registration complete, remove their token
             register_tools.remove_token(email)
+
+            # all went well, commit changes to MySQL
+            mysql_conn.commit()
+        except register_tools.UserExistsInLDAPException:
             return flask.render_template(
                 "index.html",
                 page="login",
-                error_message="An error occured. Please try again or contact us")
-
-        # add all info to Netsoc MySQL DB
-        info["name"] = flask.request.form["name"]
-        info["student_id"] = flask.request.form["student_id"]
-        info["course"] = flask.request.form["course"]
-        info["grad_year"] = flask.request.form["graduation_year"]
-        info["email"] = email
-        if not register_tools.add_netsoc_database(info):
-            self.logger.debug("Failed to add data to mysql db")
+                error_message="A user already exists with that username.",
+            )
+        except (register_tools.LDAPException, register_tools.MySQLException) as e:
+            self.logger.error(f"ldap or mysql error when creating user: {e}")
+            # If an error occured, roll back changes
+            register_tools.remove_token(email)
+            if mysql_conn is not None:
+                mysql_conn.rollback()
+            if register_tools.is_in_ldap(user):
+                register_tools.remove_ldap_user(user)
             return flask.render_template(
                 "index.html",
                 page="login",
-                error_message="An error occured. Please try again or contact us")
-
-        # send user's details to them
-        if not register_tools.send_details_email(email, user, info["password"]):
-            self.logger.debug("Failed to send confirmation email")
-            return flask.render_template(
-                "index.html",
-                page="login",
-                error_message="An error occured. Please try again or contact us")
-
-        # initialise the user's home directories so they can use netsoc admin
-        # without ever having to SSH into the server.
-        if not config.FLASK_CONFIG["debug"]:
-            register_tools.initialise_directories(user, info["password"])
-
-        # registration complete, remove their token
-        register_tools.remove_token(email)
+                error_message="An error occured. Please try again or contact us",
+            )
+        except Exception as e:
+            self.logger.error(f"error creating user: {e}")
+            # If an error occured, roll back changes
+            register_tools.remove_token(email)
+            if mysql_conn is not None:
+                mysql_conn.rollback()
+            if register_tools.is_in_ldap(user):
+                register_tools.remove_ldap_user(user)
+            # TODO preserve stacktrace
+            raise e
+        finally:
+            if mysql_conn is not None:
+                mysql_conn.close()
 
         caption = "Thank you!"
         message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
@@ -152,7 +167,7 @@ class Confirmation(View):
         self.logger.debug("Received request")
         # make sure is ucc email
         email = flask.request.form['email']
-        if not re.match(r"[0-9]{9}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z0-9]+@uccsocieties.ie", email):
+        if not re.match(r"[0-9]{8,11}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z.0-9]+@uccsocieties.ie", email):
             self.logger.debug(f"Email {email} is not a valid UCC email")
             return flask.render_template(
                 "index.html",
@@ -176,8 +191,8 @@ class Confirmation(View):
             "admin.netsoc.co" if not config.FLASK_CONFIG["debug"]
             else f"{config.FLASK_CONFIG['host']}:{config.FLASK_CONFIG['port']}"
         )
-        confirmation_sent = register_tools.send_confirmation_email(email, out_email)
-        if not confirmation_sent:
+        confirmation_resp = register_tools.send_confirmation_email(email, out_email)
+        if not str(confirmation_resp.status_code).startswith("20"):
             self.logger.debug("Confirmation email failed to send")
             return flask.render_template(
                 "index.html",
@@ -185,14 +200,21 @@ class Confirmation(View):
                 error_message="An error occured. Please try again or contact us")
 
         caption = "Thank you!"
-        message = f"Your confirmation link has been sent to {email}"
+        if not config.FLASK_CONFIG["debug"]:
+            message = f"Your confirmation link has been sent to {email}"
+        else:
+            host = config.FLASK_CONFIG['host']
+            port = config.FLASK_CONFIG['port']
+            message = f"Confirmation URL: \
+                <a href='http://{host}:{port}/signup?t={confirmation_resp.token}&e={email}'>\
+                    http://{host}:{port}/signup?t={confirmation_resp.token}&e={email}</a>"
         self.logger.debug(f"Confirmation link sent to {email}")
         return flask.render_template("message.html", caption=caption, message=message)
 
 
 class Signup(View):
     """
-    Route: signup
+    Route: /signup
         This is the link which they will be taken to with the confirmation email.
         It checks if the token they have used is valid and corresponds to the email.
     """
@@ -245,7 +267,7 @@ class Username(View):
 
         # check db for username
         requested_username = flask.request.headers["uid"]
-        if register_tools.has_username(requested_username):
+        if register_tools.is_in_ldap(requested_username):
             self.logger.debug(f"Uid {requested_username} is in use")
             return "Not available"
         self.logger.debug(f"Username {requested_username} available")

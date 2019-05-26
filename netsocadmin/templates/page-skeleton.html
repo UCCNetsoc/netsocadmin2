@@ -76,7 +76,9 @@
         }
 
         footer {
+            {% if is_logged_in %}
             margin-left: 240px;
+            {% endif %}
             background-color: rgba(0, 0, 0, 0.0) !important;
         }
 

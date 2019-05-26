@@ -17,6 +17,8 @@ import config
 import db
 import mail_helper
 
+ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
+
 
 def send_confirmation_email(email: str, server_url: str) -> bool:
     """
@@ -46,8 +48,8 @@ The UCC Netsoc SysAdmin Team
             message_body,
         )
     else:
-        response = type("Response", (object,), {"status_code": 200})
-    return str(response.status_code).startswith("20")
+        response = type("Response", (object,), {"status_code": 200, "token": uri})
+    return response
 
 
 def send_details_email(email: str, user: str, password: str) -> bool:
@@ -156,7 +158,15 @@ def remove_token(email: str):
         conn.commit()
 
 
-def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
+class LDAPException(Exception):
+    pass
+
+
+class UserExistsInLDAPException(Exception):
+    pass
+
+
+def add_ldap_user(user: str) -> typing.Dict[str, object]:
     """
     Adds the user to the Netsoc LDAP DB.
 
@@ -166,26 +176,24 @@ def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
         info is a dictionary of information values for the mysql db. This will
             have to be added to when the user completes the form.
     """
-    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     info = {
         "uid": user,
         "gid": config.LDAP_USER_GROUP_ID,
         "home_dir": f"/home/users/{user}",
     }
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
-
-        # checks if username exists and also gets next uid number
         success = conn.search(
             search_base="cn=member,dc=netsoc,dc=co",
             search_filter="(objectClass=account)",
             attributes=["uidNumber", "uid"],
         )
-        if not success:
-            return False, conn.last_error
+        if not success and conn.last_error is not None:
+            raise LDAPException(conn.last_error)
+
         last = None
         for account in conn.entries:
             if account["uid"] == user:
-                return False, conn.last_error
+                raise UserExistsInLDAPException(f"{user} exists in LDAP")
             last = account["uidNumber"]
         next_uid = int(str(last)) + 1
         info["uid_num"] = next_uid
@@ -216,17 +224,33 @@ def add_ldap_user(user: str) -> typing.Tuple[bool, typing.Dict[str, object]]:
             "loginShell":    "/bin/bash",
             "userPassword":  crypt_password,
         }
+
         success = conn.add(
             f"cn={user},cn=member,dc=netsoc,dc=co",
             object_class,
             attributes,
         )
         if not success:
-            return False, conn.last_error
-    return True, info
+            raise LDAPException(conn.last_error)
+    return info
 
 
-def add_netsoc_database(info: typing.Dict[str, str]) -> bool:
+def remove_ldap_user(user: str) -> bool:
+    """
+    Removes a user from LDAP
+
+    :param user the username
+    :returns True if successful
+    """
+    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+        return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
+
+
+class MySQLException(Exception):
+    pass
+
+
+def add_netsoc_database(info: typing.Dict[str, str]) -> pymysql.Connection:
     """
     Adds a user's details to the Netsoc MySQL database.
 
@@ -234,30 +258,25 @@ def add_netsoc_database(info: typing.Dict[str, str]) -> bool:
         collected during signup to go in the database.
     :returns Boolean True if the data was succesfully added
     """
-    conn = pymysql.connect(**config.MYSQL_DETAILS)
-    with conn.cursor() as c:
-        sql = \
-            """
-            INSERT INTO users
-                (uid, name, password, gid, home_directory, uid_number,
-                student_id, course, graduation_year, email)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-            """
-        row = (
-            info["uid"],
-            info["name"],
-            info["crypt_password"],
-            info["gid"],
-            info["home_dir"],
-            info["uid_num"],
-            info["student_id"],
-            info["course"],
-            info["grad_year"],
-            info["email"],
-        )
-        c.execute(sql, row)
-    conn.commit()
-    return True
+    try:
+        conn = pymysql.connect(**config.MYSQL_DETAILS)
+        conn.begin()
+        with conn.cursor() as c:
+            sql = \
+                """
+                INSERT INTO users
+                    (uid, name, email)
+                VALUES (%s, %s, %s);
+                """
+            row = (
+                info["uid"],
+                info["name"],
+                info["email"],
+            )
+            c.execute(sql, row)
+        return conn
+    except Exception as e:
+        raise MySQLException(e)
 
 
 def has_account(email: str) -> bool:
@@ -277,16 +296,15 @@ def has_account(email: str) -> bool:
     return False
 
 
-def has_username(username: str) -> bool:
+def is_in_ldap(username: str) -> bool:
     """
-    Tells whether or not a username is already used on the server.
+    Tells us whether or not a username is already used on the server.
 
     :param username the username being queried about
     :returns True if the username exists, False otherwise
     """
     if username in config.USERNAME_BLACKLIST:
         return True
-    ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         username = ldap3.utils.conv.escape_filter_chars(username)
         return conn.search(

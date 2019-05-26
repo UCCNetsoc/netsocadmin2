@@ -9,8 +9,10 @@ from .tools.shells import ChangeShell, ShellsView
 from .tools.sudo import CompleteSudo, Sudo
 from .tools.wordpress import WordpressInstall, WordpressView
 from .tutorials import Tutorials
+from .view import TemplateView
 
 __all__ = [
+    "TemplateView",
     # Login / Logout
     "Login",
     "Logout",

@@ -5,18 +5,18 @@ import os
 # lib
 import flask
 import markdown
-from flask.views import View
 
 # local
 import config
-import login_tools
+
+from .view import TemplateView
 
 __all__ = [
     "Tutorials",
 ]
 
 
-class Tutorials(View):
+class Tutorials(TemplateView):
     """
     Route: /tutorials
         This route will render the tutorials page. Note that the markdown tutorial files are read when the application
@@ -25,19 +25,16 @@ class Tutorials(View):
     # Logger instance
     logger = logging.getLogger("netsocadmin.tutorials")
 
+    template_file = "tutorials.html"
+
     def __init__(self):
         self.tutorials = []
         self.populate_tutorials()
 
     def render(self, error=False) -> str:
-        if error:
-            kw = {"error": "No tutorials to show!"}
-        else:
-            kw = {"tutorials": self.tutorials}
-        return flask.render_template(
-            "tutorials.html",
-            is_logged_in=login_tools.is_logged_in(),
-            **kw,
+        return super().render(
+            error="No tutorials to show!" if error else "",
+            tutorials=self.tutorials,
         )
 
     def populate_tutorials(self):

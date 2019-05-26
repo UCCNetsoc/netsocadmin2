@@ -64,7 +64,7 @@ class ChangeShell(ProtectedView):
             for group in groups:
                 success = conn.search(
                     search_base=f"cn={group},dc=netsoc,dc=co",
-                    search_filter=f"(&(uid={username}))",
+                    search_filter=f"(&(objectClass=account)(uid={username}))",
                 )
                 if success:
                     found = True
