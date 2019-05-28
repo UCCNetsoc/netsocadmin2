@@ -71,7 +71,8 @@ Thank you for registering with UCC Netsoc! Your server log-in details are as fol
 username: {user}
 password: {password}
 
-We also provide MySQL free of charge. You can access it with any MySQL client at mysql.netsoc.co with the following details:
+We also provide MySQL free of charge.
+You can access it with any MySQL client at mysql.netsoc.co with the following details:
 
 username: {user}
 password: {mysql_pass}
@@ -91,7 +92,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
 
-P.S. We are always changing and improving our services, with new features and services being added all the time. 
+P.S. We are always changing and improving our services, with new features and services being added all the time.
 Follow us on social media or join our discord at https://discord.gg/qPUmuYw to keep up to date with our latest updates!
     """
     if not config.FLASK_CONFIG['debug']:
