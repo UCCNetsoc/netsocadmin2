@@ -8,6 +8,7 @@ from flask.views import View
 
 # local
 import config
+import mysql
 import register_tools
 
 __all__ = [
@@ -97,8 +98,10 @@ class CompleteSignup(View):
             info["email"] = email
             mysql_conn = register_tools.add_netsoc_database(info)
 
+            mysql_pass = mysql.create_user(user)
+
             # send user's details to them
-            if not register_tools.send_details_email(email, user, info["password"]):
+            if not register_tools.send_details_email(email, user, info["password"], mysql_pass):
                 self.logger.debug("Failed to send confirmation email")
 
             # initialise the user's home directories so they can use netsoc admin
@@ -125,6 +128,7 @@ class CompleteSignup(View):
                 mysql_conn.rollback()
             if register_tools.is_in_ldap(user):
                 register_tools.remove_ldap_user(user)
+            mysql.delete_user(user)
             return flask.render_template(
                 "index.html",
                 page="login",

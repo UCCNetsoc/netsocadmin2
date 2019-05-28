@@ -52,7 +52,7 @@ The UCC Netsoc SysAdmin Team
     return response
 
 
-def send_details_email(email: str, user: str, password: str) -> bool:
+def send_details_email(email: str, user: str, password: str, mysql_pass: str) -> bool:
     """
     Sends an email once a user has registered succesfully confirming
     the details they have signed up with.
@@ -69,11 +69,16 @@ Hello,
 Thank you for registering with UCC Netsoc! Your server log-in details are as follows:
 
 username: {user}
-
 password: {password}
 
-Please note that you must log into the server at least once before the web portal will work for you.
-If you need any help on this, contact netsoc@uccsocieties.ie, or via the help section on https://admin.netsoc.co.
+We also provide MySQL free of charge. You can access it with any MySQL client at mysql.netsoc.co with the following details:
+
+username: {user}
+password: {mysql_pass}
+
+You can reset your MySQL password at https://admin.netsoc.co/tools/mysql.
+
+If you need any help, please contact netsoc@uccsocieties.ie, or via the help section on https://admin.netsoc.co/help.
 
 To log in, run:
     ssh {user}@leela.netsoc.co
@@ -85,6 +90,9 @@ Please change your password when you first log-in to something you'll remember!
 Yours,
 
 The UCC Netsoc SysAdmin Team
+
+P.S. We are always changing and improving our services, with new features and services being added all the time. 
+Follow us on social media or join our discord at https://discord.gg/qPUmuYw to keep up to date with our latest updates!
     """
     if not config.FLASK_CONFIG['debug']:
         response = mail_helper.send_mail(
@@ -256,7 +264,7 @@ def add_netsoc_database(info: typing.Dict[str, str]) -> pymysql.Connection:
 
     :param info a dictionary containing all the information
         collected during signup to go in the database.
-    :returns Boolean True if the data was succesfully added
+    :returns Connection object to rollback the transaction if needed
     """
     try:
         conn = pymysql.connect(**config.MYSQL_DETAILS)
