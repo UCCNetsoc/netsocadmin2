@@ -77,7 +77,7 @@ You can access it with any MySQL client at mysql.netsoc.co with the following de
 username: {user}
 password: {mysql_pass}
 
-You can reset your MySQL password at https://admin.netsoc.co/tools/mysql.
+You can change your MySQL password at https://admin.netsoc.co/tools/mysql.
 
 If you need any help, please contact netsoc@uccsocieties.ie, or via the help section on https://admin.netsoc.co/help.
 

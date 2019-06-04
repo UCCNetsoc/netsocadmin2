@@ -125,15 +125,15 @@ class DeleteDB(AbstractDBView):
         return flask.redirect("/tools/mysql")
 
 
-class ResetPassword(AbstractDBView):
+class ChangePassword(AbstractDBView):
     """
-    Route: resetpw
-        This route must be accessed via post. It is used to reset the user's
+    Route: changepw
+        This route must be accessed via post. It is used to change the user's
         MySQL account password.
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.resetpw")
+    logger = logging.getLogger("netsocadmin.changepw")
 
     def dispatch_request(self) -> str:
         self.logger.debug("Received request")
@@ -141,11 +141,13 @@ class ResetPassword(AbstractDBView):
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
+        new_password = flask.request.form.get("new-password", "")
         # Check that all fields are valid
         valid, msg = self.validate(username, password)
         if not valid:
             self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_pass_error=msg, mysql_active=True)
-        new_password = mysql.update_password(username)
+        mysql.update_password(username, new_password)
         self.logger.debug("Successfully changed password")
-        return self.render(new_mysql_password=new_password, mysql_active=True)
+        return self.render(success="1", mysql_active=True)
+

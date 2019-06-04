@@ -76,7 +76,7 @@ app.add_url_rule(
 app.add_url_rule('/change-shell', view_func=routes.ChangeShell.as_view('change_shell'))
 app.add_url_rule('/createdb', view_func=routes.CreateDB.as_view('createdb'))
 app.add_url_rule('/deletedb', view_func=routes.DeleteDB.as_view('deletedb'))
-app.add_url_rule('/resetpw', view_func=routes.ResetPassword.as_view('resetpw'))
+app.add_url_rule('/changepw', view_func=routes.ChangePassword.as_view('changepw'))
 app.add_url_rule('/wordpressinstall', view_func=routes.WordpressInstall.as_view('wordpressinstall'))
 app.add_url_rule('/tools', view_func=routes.ToolIndex.as_view('tools'))
 app.add_url_rule('/tools/wordpress', view_func=routes.WordpressView.as_view('wordpress'))

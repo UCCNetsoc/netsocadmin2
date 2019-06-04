@@ -140,14 +140,13 @@ def create_user(username: str) -> str:
         con.close()
 
 
-def update_password(username: str) -> str:
+def update_password(username: str, password: str):
     """
-    update_password changes a user's in the MySQL DBMS to a new random password
+    update_password changes a user's in the MySQL DBMS to a given password
     if and only if a user of that name does already exists.
 
     :param username the requested username whose password to update.
     :raises UserError if the operation fails.
-    :returns string the generated password for the new user
     """
     if not re.match(config.VALID_USERNAME, username):
         raise BadUsernameError(f"invalid username '{username}', must be alphanumeric, underscores and hyphens only")
@@ -161,21 +160,18 @@ def update_password(username: str) -> str:
             if not cur.rowcount:
                 raise Exception(f"username {username} doesn't exist")
 
-            # create new password
-            chars = string.ascii_letters + string.digits
-            password = "".join(random.choice(chars) for _ in range(random.randint(10, 15)))
             sql = """ALTER USER %s@'%%' IDENTIFIED BY %s;"""
             cur.execute(sql, (username, password,))
             if not config.FLASK_CONFIG["debug"]:
                 sql = """ALTER USER %s@'localhost' IDENTIFIED BY %s;"""
                 cur.execute(sql, (username, password,))
             con.commit()
-            return password
     except Exception as e:
         con.rollback()
         raise UserError(f"failed to change password for user {username}") from e
     finally:
         con.close()
+
 
 def delete_user(username: str):
     """
