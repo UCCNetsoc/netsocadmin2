@@ -146,7 +146,6 @@ class ResetPassword(AbstractDBView):
         if not valid:
             self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_pass_error=msg, mysql_active=True)
-        mysql.delete_user(username)
-        new_password = mysql.create_user(username)
+        new_password = mysql.update_password(username)
         self.logger.debug("Successfully changed password")
         return self.render(new_mysql_password=new_password, mysql_active=True)
