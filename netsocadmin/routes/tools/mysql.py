@@ -150,4 +150,3 @@ class ChangePassword(AbstractDBView):
         mysql.update_password(username, new_password)
         self.logger.debug("Successfully changed password")
         return self.render(success="1", mysql_active=True)
-
