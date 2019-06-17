@@ -15,6 +15,7 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 * WordPress installer
 * Tutorials
 * Change your login shell
+* FreeIPA
 
 ### We will have
 
