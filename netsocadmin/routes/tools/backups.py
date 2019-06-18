@@ -39,12 +39,10 @@ class Backup(ProtectedToolView):
     logger = logging.getLogger("netsocadmin.backup")
 
     def dispatch_request(self, username: str, timeframe: str, backup_date: str) -> str:
-        self.logger.debug("Received request")
         # Validate the parameters
         if not re.match(config.VALID_USERNAME, username) \
             or not re.match(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}", backup_date) \
                 or timeframe not in ["weekly", "monthly"]:
-            self.logger.debug(f"Received invalid arguments: {username}, {timeframe}, {backup_date}")
             return flask.abort(400)
         # Retrieve the backup and send it to the user
         backups_base_dir = os.path.join(config.BACKUPS_DIR, username, timeframe)

@@ -12,16 +12,17 @@
             var email = document.getElementById("email").value;
             var uid = document.getElementById("uid").value;
 
+            var err = document.getElementById("taken-error");
+            var good = document.getElementById("good-name");
+
             // make AJAX request
 			var req = new XMLHttpRequest();
 			req.onreadystatechange = () => {
 				if(req.readyState !== 4) return;
-                var err = document.getElementById("taken-error");
-                var good = document.getElementById("good-name");
                 err.innerText = "";
                 good.innerText = "";
                 if (req.status !== 200) {
-                    err.innerText = "Invalid request"
+                    err.innerText = "Error checking username :("
                 } else if (req.responseText !== "Available") {
                     err.innerText = "Username not available";
                 } else if (! /^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/.test(uid)) {

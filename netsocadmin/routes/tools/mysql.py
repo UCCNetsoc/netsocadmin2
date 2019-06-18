@@ -16,12 +16,22 @@ class MySQLView(ProtectedToolView):
 
     active = "mysql"
 
+    logger = logging.getLogger("netsocadmin.mysql")
+
     def render(self, **data: Union[str, bool]) -> str:
-        return super().render(
-            databases=mysql.list_dbs(flask.session["username"]),
-            limit=64 - len(flask.session["username"] + "_"),
-            **data,
-        )
+        try:
+            return super().render(
+                databases=mysql.list_dbs(flask.session["username"]),
+                limit=64 - len(flask.session["username"] + "_"),
+                **data,
+            )
+        except mysql.DatabaseAccessError as e:
+            self.logger.error(f"error loading database view: {e}")
+            return super().render(
+                databases=["error fetching databases"],
+                limit=64 - len(flask.session["username"] + "_"),
+                **data,
+            )
 
     def dispatch_request(self):
         return self.render()
@@ -71,8 +81,7 @@ class CreateDB(AbstractDBView):
     logger = logging.getLogger("netsocadmin.createdb")
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
-        self.logger.debug(f"Form: {flask.request.form}")
+        self.logger.debug(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -80,16 +89,19 @@ class CreateDB(AbstractDBView):
         # Check that all fields are valid
         valid, msg = self.validate(username, password, dbname)
         if not valid:
-            self.logger.error(f"Invalid create DB request: {msg}")
+            self.logger.error(f"invalid create DB request: {msg}")
             return self.render(mysql_create_error=msg, mysql_delete_error="", mysql_active=True)
         # Try to create the database
         try:
             mysql.create_database(username, dbname, False)
         except mysql.DatabaseAccessError as e:
-            self.logger.error(f"Database error {e.__cause__}")
-            return self.render(mysql_create_error="e.__cause__", mysql_delete_error="", mysql_active=True)
+            self.logger.error(f"database error: {e}")
+            return self.render(
+                mysql_create_error="There was an error creating your Database",
+                mysql_delete_error="", mysql_active=True,
+            )
         # Success (probably should do more than just redirect to / ...)
-        self.logger.debug(f"Successfully created database for {username} named {dbname}")
+        self.logger.debug(f"successfully created database for {username} named {dbname}")
         return flask.redirect("/tools/mysql")
 
 
@@ -104,8 +116,7 @@ class DeleteDB(AbstractDBView):
     logger = logging.getLogger("netsocadmin.deletedb")
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
-        self.logger.debug(f"Form: {flask.request.form}")
+        self.logger.debug(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -119,8 +130,11 @@ class DeleteDB(AbstractDBView):
         try:
             mysql.create_database(username, dbname, True)
         except mysql.DatabaseAccessError as e:
-            self.logger.error(f"Database error {e.__cause__}")
-            return self.render(mysql_delete_error=e.__cause__, mysql_create_error="", mysql_active=True)
+            self.logger.error(f"database error {e.__cause__}")
+            return self.render(
+                mysql_delete_error="There was an error deleting your Database",
+                mysql_create_error="", mysql_active=True,
+            )
         # Success (probably should do more than just redirect to / ...)
         return flask.redirect("/tools/mysql")
 
@@ -136,8 +150,7 @@ class ChangePassword(AbstractDBView):
     logger = logging.getLogger("netsocadmin.changepw")
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
-        self.logger.debug(f"Form: {flask.request.form}")
+        self.logger.debug(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -148,5 +161,5 @@ class ChangePassword(AbstractDBView):
             self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_pass_error=msg, mysql_active=True)
         mysql.update_password(username, new_password)
-        self.logger.debug("Successfully changed password")
+        self.logger.debug(f"successfully changed mysql password for {username}")
         return self.render(success="1", mysql_active=True)

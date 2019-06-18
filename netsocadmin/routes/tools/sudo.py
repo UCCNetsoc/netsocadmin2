@@ -25,7 +25,6 @@ class Sudo(ProtectedToolView):
     active = "sudo"
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         return self.render()
 
 
@@ -36,15 +35,14 @@ class CompleteSudo(Sudo):
         It will send an email to the SysAdmin team as well as to the discord server notifying us that a request for
             sudo on feynman has been made.
     """
-    # Logger instance
+
     logger = logging.getLogger("netsocadmin.completesudoapplication")
-    # Specify which method(s) are allowed to be used to access the route
+
     methods = ["POST"]
 
     template_file = "message.html"
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         # Get the details from the form data
         email = flask.request.form["email"]
         reason = flask.request.form["reason"]
@@ -54,19 +52,22 @@ class CompleteSudo(Sudo):
 
         # Try to send the email
         try:
-            help_post.send_sudo_request_email(username, email)
+            email_resp = help_post.send_sudo_request_email(username, email)
+            if not str(email_resp.status_code).startswith("20"):
+                self.logger.error(f"non 20x status code for help email: {email_resp.status_code} - {email_resp.body}")
+            email_failed = not str(email_resp.status_code).startswith("20")
         except Exception as e:
             email_failed = True
-            self.logger.error(f"Failed to send email: {e}")
+            self.logger.error(f"failed to send email: {e}")
 
         # Try to send a message to the Discord
         try:
             subject = "Feynman Account Request"
             msg = f"This user wants an account on Feynman pls.\nReason: {reason}"
-            help_post.send_help_webhook(username, email, subject, msg)
+            discord_failed = help_post.send_help_webhook(username, email, subject, msg)
         except Exception as e:
             discord_failed = True
-            self.logger.error(f"Failed to send message to Discord: {e}")
+            self.logger.error(f"failed to fire discord webhook: {e}")
 
         if discord_failed and email_failed:
             caption = "There was a problem :("

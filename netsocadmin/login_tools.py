@@ -30,7 +30,7 @@ class LoginUser:
             attributes=["userPassword", "uid", "gidNumber"],
         )
         if not success or len(conn.entries) != 1:
-            raise Exception("couldnt search from ldap")
+            raise Exception(f"couldnt search from ldap: {conn.last_error}")
         entry = conn.entries[0]
         self.ldap_pass = entry["userPassword"].value.decode()
         self.group = entry["gidNumber"].value
@@ -54,7 +54,8 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
     @functools.wraps(view_func)
     def protected_view_func(*args, **kwargs):
         if config.LOGGED_IN_KEY not in flask.session or not flask.session[config.LOGGED_IN_KEY]:
-            return flask.render_template("index.html", error_message="Please log in to view this page")
+            return flask.redirect("?asdf=lol")
+            return flask.render_template("index.html", error_message="")
         return view_func(*args, **kwargs)
     return protected_view_func
 
@@ -71,9 +72,11 @@ def is_correct_password(user: LoginUser) -> bool:
     is_correct_password tells you whether or not a given username + password
     combo are correct
     """
-    logger.info("login attempt from {user.username}")
+    logger.debug(f"checking password for '{user.username}''")
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         user.populate_data(conn)
+        if not user.is_pass_correct():
+            logger.debug(f"password incorrect for '{user.username}'")
         return user.is_pass_correct()
 
 

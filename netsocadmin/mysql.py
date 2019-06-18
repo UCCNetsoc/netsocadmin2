@@ -50,6 +50,9 @@ def _mysql_connection(username: str = None, password: str = None) -> pymysql.con
         user=username,
         password=password,
         cursorclass=pymysql.cursors.DictCursor,
+        read_timeout=3,
+        write_timeout=3,
+        connect_timeout=3,
     )
 
 

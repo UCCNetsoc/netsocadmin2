@@ -51,5 +51,4 @@ class ToolIndex(ProtectedToolView):
     active = "home"
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request for tools")
         return self.render()

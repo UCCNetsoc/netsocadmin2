@@ -16,11 +16,8 @@ app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
-# pylint: disable=E1101
-app.logger.setLevel(logging.DEBUG)
 
 logger = logging.getLogger("netsocadmin")
-logger.setLevel(logging.DEBUG)
 
 
 @app.route('/')
@@ -33,10 +30,11 @@ def index():
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
     # pylint: disable=E1101
-    logger.debug("Received index page request")
+    message = "Please log in to view this page" if flask.request.args.get("asdf") else ''
     return flask.render_template(
         "index.html",
         page="login",
+        error_message=message
     )
 
 

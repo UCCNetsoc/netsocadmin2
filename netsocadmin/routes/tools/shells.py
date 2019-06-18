@@ -48,7 +48,6 @@ class ChangeShell(ProtectedView):
     logger = logging.getLogger("netsocadmin.change-shell")
 
     def dispatch_request(self):
-        self.logger.debug("Received request")
         # Ensure the selected shell is in the list of allowed shells
         shell_path = config.SHELL_PATHS.get(flask.request.args.get("shell", ""), None)
         if shell_path is None:
@@ -70,16 +69,20 @@ class ChangeShell(ProtectedView):
                     found = True
                     break
             if not found:
-                self.logger.debug(f"User {username} not found. Could not update shell")
+                self.logger.debug(f"user {username} not found. Could not update shell")
                 return "Invalid user received. Please contact us for assistance", 500
 
             # Modify the user now
-            success = conn.modify(
-                dn=f"cn={username},cn={group},dc=netsoc,dc=co",
-                changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
-            )
-            if not success:
-                self.logger.error(f"Error changing shell for {username}")
-                return conn.last_error, 500
-            self.logger.debug(f"Shell changed successfully for {username} to {shell_path}")
+            try:
+                success = conn.modify(
+                    dn=f"cn={username},cn={group},dc=netsoc,dc=co",
+                    changes={"loginShell": (ldap3.MODIFY_REPLACE, [shell_path])},
+                )
+                if not success:
+                    self.logger.error(f"error changing shell for {username}: {conn.last_error}")
+                    return "failed to set shell", 500
+            except Exception as e:
+                self.logger.error(f"error changing shell for {username}: {e}")
+                return "failed to set shell", 500
+            self.logger.debug(f"shell changed successfully for {username} to {shell_path}")
             return "", 200

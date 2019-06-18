@@ -40,8 +40,8 @@
             </div>
         </div>
         <div class="col s12 m6">
-            <div class="card">
-                <div class="card-content">
+            <div class="card small">
+                <div class="card-content" style="overflow: visible">
                     <span class="card-title">Change Password:</span>
                     <div>Changes the password for your MySQL account</div>
                     <span style="display:block;" class="error-msg">{{ mysql_pass_error }}</span>
@@ -59,10 +59,13 @@
                             <label for="new-password">New password</label>
                         </div>
                         <div class="input-field col s6">
-                            <meter max="4" id="password-strength-meter"></meter>
+                            <label>Password strength</label>
+                            <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
                             <p id="password-strength-text"></p>
                         </div>
-                        <button type="submit" class="activator btn waves-effect waves-light">Change MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></button>
+                        <div class="col s12">
+                            <button type="submit" class="activator btn waves-effect waves-light">Change MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></button>
+                        </div>
                     </form>
                     {% if success %}
                     <br/>
@@ -90,11 +93,11 @@
                                 <input autocomplete="new-password" type="password" name="password">
                                 <label for="mysql-password">Server password</label>
                             </div>
-                            <div class="input-field col s12 m1">
+                            <div class="input-field col s12 m3">
                                 <input disabled autocomplete="off" type="text" value="{{ username }}_">
                                 <label for="prefix">Prefix</label>
                             </div>
-                            <div class="input-field col s12 m11">
+                            <div class="input-field col s12 m9">
                                 <input autocomplete="off" type="text" name="dbname" length="{{ limit }}">
                                 <label for="dbname">Database name</label>
                             </div>

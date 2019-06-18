@@ -32,14 +32,13 @@ class CompleteSignup(View):
     methods = ["POST"]
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         # make sure token is valid
         email = flask.request.form["email"]
         uri = flask.request.form["_token"]
         mysql_conn = None
 
         if not register_tools.good_token(email, uri):
-            self.logger.debug(f"Invalid token {uri} for email {email}")
+            self.logger.warn(f"invalid token {uri} for email {email}")
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -63,7 +62,6 @@ class CompleteSignup(View):
 
         user = flask.request.form["uid"]
         if user != user.lower():
-            self.logger.debug(f"username {user} contained uppercase characters")
             return flask.render_template(
                 "form.html",
                 email_address=email,
@@ -82,7 +80,7 @@ class CompleteSignup(View):
 
         try:
             if register_tools.is_in_ldap(user):
-                self.logger.debug(f"Username {user} not available")
+                self.logger.debug(f"username {user} not available")
                 return flask.render_template(
                     "form.html",
                     email_address=email,
@@ -102,7 +100,7 @@ class CompleteSignup(View):
 
             # send user's details to them
             if not register_tools.send_details_email(email, user, info["password"], mysql_pass):
-                self.logger.debug("Failed to send confirmation email")
+                self.logger.error(f"failed to send confirmation email")
 
             # initialise the user's home directories so they can use netsoc admin
             # without ever having to SSH into the server.
@@ -150,7 +148,7 @@ class CompleteSignup(View):
 
         caption = "Thank you!"
         message = "An email has been sent with your log-in details. Please change your password as soon as you log in."
-        self.logger.debug(f"Successfully signed up {flask.request.form['name']} and confirmation email sent")
+        self.logger.info(f"successfully signed up {flask.request.form['name']} and confirmation email sent")
         return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -168,11 +166,10 @@ class Confirmation(View):
     methods = ["POST"]
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         # make sure is ucc email
         email = flask.request.form['email']
         if not re.match(r"[0-9]{8,11}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z.0-9]+@uccsocieties.ie", email):
-            self.logger.debug(f"Email {email} is not a valid UCC email")
+            self.logger.debug(f"email {email} is not a valid UCC email")
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -180,7 +177,7 @@ class Confirmation(View):
 
         # make sure email has not already been used to make an account
         if email not in config.EMAIL_WHITELIST and register_tools.has_account(email):
-            self.logger.debug(f"Account already exists with email {email}")
+            self.logger.debug(f"account already exists with email {email}")
             return flask.render_template(
                 "message.html",
                 caption="Sorry!",
@@ -197,7 +194,7 @@ class Confirmation(View):
         )
         confirmation_resp = register_tools.send_confirmation_email(email, out_email)
         if not str(confirmation_resp.status_code).startswith("20"):
-            self.logger.debug("Confirmation email failed to send")
+            self.logger.error("confirmation email failed to send")
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -212,7 +209,7 @@ class Confirmation(View):
             message = f"Confirmation URL: \
                 <a href='http://{host}:{port}/signup?t={confirmation_resp.token}&e={email}'>\
                     http://{host}:{port}/signup?t={confirmation_resp.token}&e={email}</a>"
-        self.logger.debug(f"Confirmation link sent to {email}")
+        self.logger.debug(f"confirmation link sent to {email}")
         return flask.render_template("message.html", caption=caption, message=message)
 
 
@@ -228,7 +225,7 @@ class Signup(View):
     def render(self, email: str, token: str, error: bool = False) -> str:
         """Render the template with appropriate messages for whether or not there's an error"""
         if error:
-            self.logger.debug(f"Bad token {token} used for email {email}")
+            self.logger.warn(f"bad token {token} used for email {email}")
             template = "index.html"
             kw = {"error_message": "Your request was not valid. Please try again or contact us."}
         else:
@@ -237,7 +234,6 @@ class Signup(View):
         return flask.render_template(template, **kw)
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         # Make sure they haven't forged the URL
         email = flask.request.args.get("e")
         token = flask.request.args.get("t")
@@ -256,23 +252,22 @@ class Username(View):
     methods = ["POST"]
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         if ("email" not in flask.request.headers or "uid" not in flask.request.headers or
                 "token" not in flask.request.headers):
-            self.logger.debug("Invalid request some information missing. Aborting.")
+            self.logger.debug("invalid request some information missing, aborting.")
             return flask.abort(400)
 
         # check if request is legit
         email = flask.request.headers["email"]
         token = flask.request.headers["token"]
         if not register_tools.good_token(email, token):
-            self.logger.debug(f"Bad token {token} used for email {email}")
+            self.logger.debug(f"bad token {token} used for email {email}")
             return flask.abort(403)
 
         # check db for username
         requested_username = flask.request.headers["uid"]
         if register_tools.is_in_ldap(requested_username):
-            self.logger.debug(f"Uid {requested_username} is in use")
+            self.logger.debug(f"username {requested_username} is in use")
             return "Not available"
-        self.logger.debug(f"Username {requested_username} available")
+        self.logger.debug(f"username {requested_username} available")
         return "Available"
