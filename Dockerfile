@@ -42,4 +42,4 @@ RUN pip3 install -r /netsocadmin/requirements.txt && \
 
 WORKDIR /netsocadmin/netsocadmin
 
-CMD [ "gunicorn", "-b", "0.0.0.0:5050", "--log-config", "/netsocadmin/gunicorn.conf", "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
+CMD [ "gunicorn", "-b", "0.0.0.0:5050", "--log-config", "/netsocadmin/logging.conf", "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
