@@ -2,15 +2,15 @@
 This file takes care of sending off the data from the help section to multiple areas
 currently Discord and email of SysAdmins and the main Netsoc email
 '''
-import mail_helper
 import requests
 
 import config
+import mail_helper
 
 sysadmin_tag = '<@&547450539726864384>'
 
 
-def send_help_email(username: str, user_email: str, subject: str, message: str) -> bool:
+def send_help_email(username: str, user_email: str, subject: str, message: str) -> object:
     """
     Sends an email to the netsoc email address containing the help data,
     CC'ing all the SysAdmins and the user requesting help.
@@ -39,10 +39,10 @@ PS: Please "Reply All" to the emails so that you get a quicker response."""
         )
     else:
         response = type("Response", (object,), {"status_code": 200})
-    return str(response.status_code).startswith("20")
+    return response
 
 
-def send_sudo_request_email(username: str, user_email: str):
+def send_sudo_request_email(username: str, user_email: str) -> object:
     """
     Sends an email notifying SysAdmins that a user has requested an account on feynman.
 
@@ -70,7 +70,7 @@ PS: Please "Reply All" to the emails so that you get a quicker response.
         "[Netsoc Help] Sudo request on Feynman for " + username,
         message_body,
         [user_email] + config.SYSADMIN_EMAILS,
-    ).status_code == 200
+    )
 
 
 def send_help_webhook(username: str, email: str, subject: str, message: str) -> bool:

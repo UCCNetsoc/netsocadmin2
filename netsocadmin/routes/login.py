@@ -27,12 +27,10 @@ class Login(View):
     methods = ["POST"]
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         user = flask.request.form["username"].lower()
         # Validate the login request
         login_user = login_tools.LoginUser(user, flask.request.form["password"])
         if not login_tools.is_correct_password(login_user):
-            self.logger.debug(f"{flask.request.form['username']} entered incorrect password")
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -45,7 +43,7 @@ class Login(View):
         flask.session[config.LOGGED_IN_KEY] = True
         flask.session["username"] = user
         flask.session["admin"] = login_user.is_admin()
-        self.logger.debug(f"{flask.request.form['username']} successfully logged in")
+        self.logger.info(f"{flask.session['username']} logged in")
         return flask.redirect("/")
 
 
@@ -60,7 +58,6 @@ class Logout(View):
     methods = ["GET"]
 
     def dispatch_request(self):
-        self.logger.debug("Received request")
         # Remove the keys in the session that reflect the user
         flask.session.pop(config.LOGGED_IN_KEY, None)
         if flask.session.get("username"):

@@ -1,19 +1,23 @@
 from typing import List
 
 import sendgrid
-from sendgrid.helpers.mail import Content, Email, Mail
+from sendgrid.helpers.mail import Content, Email, From, Mail, To
 
 import config
 
 
 def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List[str] = None) -> object:
-    sg = sendgrid.SendGridAPIClient(apikey=config.SENDGRID_KEY)
-    from_email = Email(from_mail, "UCC Netsoc")
-    subject = "Account Registration"
-    to_email = Email(to_mail)
-    content = Content("text/plain", content)
-    mail = Mail(from_email, subject, to_email, content)
+    sg = sendgrid.SendGridAPIClient(config.SENDGRID_KEY)
+
+    mail = Mail()
+    mail.from_email = From(from_mail, "UCC Netsoc")
+    mail. subject = subject
+    mail.content = Content("text/plain", content)
+
+    p = sendgrid.Personalization()
+    p.add_to(To(to_mail))
     if cc:
         for email in cc:
-            mail.personalizations[0].add_cc(Email(email))
-    return sg.client.mail.send.post(request_body=mail.get())
+            p.add_cc(Email(email))
+    mail.add_personalization(p)
+    return sg.send(mail)

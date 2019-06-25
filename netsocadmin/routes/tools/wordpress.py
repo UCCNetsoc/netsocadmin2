@@ -35,7 +35,6 @@ class WordpressInstall(ProtectedToolView):
     logger = logging.getLogger("netsocadmin.wordpressinstall")
 
     def dispatch_request(self) -> Tuple[str, int]:
-        self.logger.debug("Received request")
         username = flask.session["username"]
         try:
             wordpress_install.get_wordpress(
@@ -43,8 +42,8 @@ class WordpressInstall(ProtectedToolView):
                 username,
                 config.FLASK_CONFIG["debug"]
             )
-            self.logger.error(f"Wordpress install successful for {username}")
+            self.logger.info(f"wordpress install successful for {username}")
             return username, 200
         except Exception as e:
-            self.logger.error(f"Wordpress install failed for {username} {e}")
+            self.logger.error(f"wordpress install failed for {username}: {e}")
             return username, 500

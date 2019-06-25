@@ -41,7 +41,6 @@ class Tutorials(TemplateView):
         """
         Opens the tutorials folder and parses all of the markdown tutorials contained within.
         """
-        self.logger.debug("Populating tutorials")
         for file in filter(lambda f: f.endswith(".md"), os.listdir(config.TUTORIAL_FOLDER)):
             with open(os.path.join(config.TUTORIAL_FOLDER, file)) as f:
                 # Render the markdown file
@@ -50,7 +49,6 @@ class Tutorials(TemplateView):
                 self.tutorials.append(flask.Markup(content))
 
     def dispatch_request(self) -> str:
-        self.logger.debug("Received request")
         # Re-populate the tutorials if we're in debug mode
         if config.FLASK_CONFIG["debug"]:
             self.tutorials = []

@@ -190,14 +190,14 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
         "gid": config.LDAP_USER_GROUP_ID,
         "home_dir": f"/home/users/{user}",
     }
-    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         success = conn.search(
             search_base="cn=member,dc=netsoc,dc=co",
             search_filter="(objectClass=account)",
             attributes=["uidNumber", "uid"],
         )
         if not success and conn.last_error is not None:
-            raise LDAPException(conn.last_error)
+            raise LDAPException(f"error adding ldap user: {conn.last_error}")
 
         last = None
         for account in conn.entries:
@@ -240,7 +240,7 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
             attributes,
         )
         if not success:
-            raise LDAPException(conn.last_error)
+            raise LDAPException(f"error adding ldap user: {conn.last_error}")
     return info
 
 
@@ -251,7 +251,7 @@ def remove_ldap_user(user: str) -> bool:
     :param user the username
     :returns True if successful
     """
-    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
 
 
@@ -314,7 +314,7 @@ def is_in_ldap(username: str) -> bool:
     """
     if username in config.USERNAME_BLACKLIST:
         return True
-    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         username = ldap3.utils.conv.escape_filter_chars(username)
         return conn.search(
             search_base="dc=netsoc,dc=co",
