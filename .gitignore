@@ -75,7 +75,6 @@ passwords.py
 # For those who work on mac
 .DS_Store
 
-.vscode
 lock.mdb
 
 binlog.*

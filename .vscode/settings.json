@@ -1,0 +1,6 @@
+{
+    "python.autoComplete.extraPaths": [
+        "netsocadmin"
+    ],
+    "python.linting.flake8Enabled": true
+}
