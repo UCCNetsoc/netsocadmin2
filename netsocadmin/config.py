@@ -24,14 +24,22 @@ VALID_USERNAME = r"^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$"
 # corresponding value should be true or false
 LOGGED_IN_KEY = str(os.urandom(32))
 
-# ldap shit
-LDAP_AUTH = {
-    "password": "netsoc",
-    "user": "cn=admin,dc=netsoc,dc=co"
-}
 
-LDAP_HOST = "auth:389"
-LDAP_USER_GROUP_ID = 422
+IPA_HOST = "ipa.netsoc.devenv"
+
+IPA_AUTH = {
+    "user": "admin",
+    "password": "devenvTestingPw"
+}
+IPA_NETSOC_USER_GROUP: "members"
+IPA_NETSOC_ADMIN_GROUP: "admins"
+
+LDAP_HOST = f"{IPA_HOST}:389"
+LDAP_AUTH = {
+    "password": "devenvTestingPw",
+    "user": "cn=Directory Manager"
+}
+LDAP_SEARCHDN = "cn=accounts,dc=demo1,dc=freeipa,dc=org"
 
 # location of the markdown tutorials
 TUTORIAL_FOLDER = "./tutorials"
