@@ -5,6 +5,8 @@ import crypt
 import functools
 import hmac
 import logging
+import re
+import functools
 import typing
 
 import flask
@@ -15,6 +17,21 @@ import config
 logger = logging.getLogger("netsocadmin.login")
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
+# Mapping between the crypt type found at start of pw hash and crypt enum
+crypt_methods = {
+    "CRYPT": crypt.METHOD_CRYPT,
+    "PBKDF2_SHA256": crypt.METHOD_SHA256,
+    "PBKDF2_SHA512": crypt.METHOD_SHA512,
+}
+
+crypt_type_capture_group = f"( {'|'.join(crypt_methods)} )"
+
+# Regex which matches any instance of "{CRYPT}", "{PBKDF_SHA256}", etc..
+# Text inside brackets is capture group
+# /
+crypt_type_re = re.compile(f"^{{{crypt_type_capture_group}}}")
+
+import requests
 
 class LoginUser:
     def __init__(self, username: str, password: str):
@@ -25,7 +42,7 @@ class LoginUser:
 
     def populate_data(self, conn: ldap3.Connection):
         success = conn.search(
-            search_base="dc=netsoc,dc=co",
+            search_base=config.LDAP_BASEDN,
             search_filter=f"(&(objectClass=account)(uid={self.username}))",
             attributes=["userPassword", "uid", "gidNumber"],
         )
@@ -36,10 +53,18 @@ class LoginUser:
         self.group = entry["gidNumber"].value
 
     def is_pass_correct(self) -> bool:
-        if self.ldap_pass.startswith("{crypt}") or self.ldap_pass.startswith("{CRYPT}"):
-            # strips off the "{crypt}" prefix
-            self.ldap_pass = self.ldap_pass[len("{crypt}"):]
-        return hmac.compare_digest(crypt.crypt(self.password, self.ldap_pass), self.ldap_pass)
+        match = crypt_type_re.match(self.ldap_pass.upper())
+        if match != None:
+            crypt_type = match.group(0)
+            crypt_method = crypt_methods[crypt_type]
+            print(crypt_method)
+            
+            # Strip the crypt method from the start pass so we can compare it
+            password_stripped_crypt = self.ldap_pass[len(crypt_method)+2:]
+
+            # Compare the password they supplied (also salting it with the salt we found on the hashed version
+            return hmac.compare_digest(crypt.crypt(self.password, password_stripped_crypt), password_stripped_crypt)
+        return False
 
     def is_admin(self) -> bool:
         return self.group == 420

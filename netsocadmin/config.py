@@ -39,7 +39,7 @@ LDAP_AUTH = {
     "password": "devenvTestingPw",
     "user": "cn=Directory Manager"
 }
-LDAP_SEARCHDN = "cn=accounts,dc=demo1,dc=freeipa,dc=org"
+LDAP_BASEDN = "cn=users,cn=accounts,dc=netsoc,dc=devenv"
 
 # location of the markdown tutorials
 TUTORIAL_FOLDER = "./tutorials"
