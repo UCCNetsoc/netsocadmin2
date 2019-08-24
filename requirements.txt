@@ -24,5 +24,4 @@ six==1.11.0
 subprocess.run==0.0.8
 typing==3.6.4
 urllib3==1.24.2
-Werkzeug==0.14.1
 wget==3.2
