@@ -38,8 +38,9 @@ RUN mkdir ~/.ssh && \
 COPY --from=dev /netsocadmin /netsocadmin
 
 RUN pip3 install -r /netsocadmin/requirements.txt && \
-    pip3 install gunicorn
+    pip3 install gunicorn && \
+    pip3 install gunicorn[gevent]
 
 WORKDIR /netsocadmin/netsocadmin
 
-CMD [ "gunicorn", "-b", "0.0.0.0:5050", "--log-config", "/netsocadmin/logging.conf", "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
+CMD [ "gunicorn", "-b", "0.0.0.0:5050", "--log-config", "/netsocadmin/logging.conf", "-k", "gevent", "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
