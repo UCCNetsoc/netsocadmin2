@@ -78,7 +78,7 @@ def list_dbs(user: str) -> List[str]:
                 )
             )
     except Exception as e:
-        raise DatabaseAccessError(f"failed to list databases for user '{user}'") from e
+        raise DatabaseAccessError(f"failed to list databases for user '{user}': {str(e)}") from e
     finally:
         if con:
             con.close()
@@ -138,7 +138,7 @@ def create_user(username: str) -> str:
             return password
     except Exception as e:
         con.rollback()
-        raise UserError(f"failed to create the new user {username}") from e
+        raise UserError(f"failed to create the new user {username}: {str(e)}") from e
     finally:
         con.close()
 
@@ -171,7 +171,7 @@ def update_password(username: str, password: str):
             con.commit()
     except Exception as e:
         con.rollback()
-        raise UserError(f"failed to change password for user {username}") from e
+        raise UserError(f"failed to change password for user {username}: {str(e)}") from e
     finally:
         con.close()
 
@@ -202,7 +202,7 @@ def delete_user(username: str):
             cur.execute(sql, username)
             con.commit()
     except Exception as e:
-        raise UserError(f"failed to delete username {username}") from e
+        raise UserError(f"failed to delete username {username}: {str(e)}") from e
     finally:
         con.close()
 
@@ -249,7 +249,7 @@ def create_database(username: str, dbname: str, delete: bool = False) -> str:
             cur.execute(sql)
             return user_dbname
     except Exception as e:
-        raise DatabaseAccessError(f"failed to create new database '{username}'") from e
+        raise DatabaseAccessError(f"failed to create new database '{username}': {str(e)}") from e
     finally:
         con.close()
 
