@@ -3,12 +3,10 @@ LABEL maintainer="netsoc@netsoc.co"
 
 VOLUME [ "/backups", "/home/users" ]
 
-# not actually used, just for documentaion
 EXPOSE 5050
 
-RUN apk update
-
-RUN apk add --no-cache pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
+RUN apk update && \
+    apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
 
 COPY requirements.txt /netsocadmin/requirements.txt
 # install all python requirements
@@ -27,6 +25,11 @@ CMD [ "gunicorn", \
     "netsoc_admin:app" ]
 
 FROM python:alpine3.7
+LABEL maintainer="netsoc@netsoc.co"
+
+VOLUME [ "/backups", "/home/users" ]
+
+EXPOSE 5050
 
 RUN apk update && \
     apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
