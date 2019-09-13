@@ -1,6 +1,10 @@
 kind: pipeline
 name: default
 
+volumes:
+- name: cache
+  temp: {}
+
 steps:
 - name: lint
   image: python:3.7
@@ -24,8 +28,8 @@ steps:
     password:
       from_secret: docker_password
   volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  - name: cache
+    path: /var/lib/docker  
   when:
     event: 
       - push
@@ -43,15 +47,15 @@ steps:
     password:
       from_secret: docker_password
   volumes:
-  - name: docker
-    path: /var/run/docker.sock
+  - name: cache
+    path: /var/lib/docker  
   when:
     event: 
       - push
     branch: 
-      - master 
+      - master   
 
-- name: discord_notif
+- name: discord_notif_success
   image: appleboy/drone-discord
   environment:
     WEBHOOK_ID:
@@ -60,14 +64,9 @@ steps:
       from_secret: discord_webhook_token
   settings:
     username: Netsoc CI
-    avatar_url: https://noahsc.xyz/public_images/drone.png
+    avatar_url: https://raw.githubusercontent.com/drone/brand/3051b0d85318a2a20b62927ba19fc07e24c0d751/logos/png/white/drone-logo-png-white-256.png
     color: "#42f483"
-    message: >
-      {{#success build.status}}
-        Netsoc Admin successfully built and pushed. Build num {{build.number}}.
-      {{else}}
-        Netsoc Admin failed to build. Build num {{build.number}}.
-      {{/success}}    
+    message: Netsoc Admin successfully built and pushed. Build num {{build.number}}. {{build.link}}
   when:
     event: 
       - push
@@ -75,4 +74,23 @@ steps:
       - master 
     status:
       - success
-      - failure      
+
+- name: discord_notif_failure
+  image: appleboy/drone-discord
+  environment:
+    WEBHOOK_ID:
+      from_secret: discord_webhook_id
+    WEBHOOK_TOKEN:
+      from_secret: discord_webhook_token
+  settings:
+    username: Netsoc CI
+    avatar_url: https://raw.githubusercontent.com/drone/brand/3051b0d85318a2a20b62927ba19fc07e24c0d751/logos/png/white/drone-logo-png-white-256.png
+    color: "#e04414"
+    message: Netsoc Admin failed for {{build.author}}. Build num {{build.number}}. {{build.link}}
+  when:
+    event: 
+      - push
+    branch: 
+      - master 
+    status:
+      - failure  
