@@ -1,5 +1,5 @@
 # stdlib
-import logging
+import structlog
 
 # lib
 import flask
@@ -16,7 +16,7 @@ class Sudo(ProtectedToolView):
         This route will render the page for applying for sudo privilages.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.sudo")
+    logger = structlog.getLogger("netsocadmin.sudo")
 
     page_title = "Apply for Sudo"
 
@@ -36,7 +36,7 @@ class CompleteSudo(Sudo):
             sudo on feynman has been made.
     """
 
-    logger = logging.getLogger("netsocadmin.completesudoapplication")
+    logger = structlog.getLogger("netsocadmin.completesudoapplication")
 
     methods = ["POST"]
 

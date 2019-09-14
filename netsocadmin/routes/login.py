@@ -1,5 +1,5 @@
 # stdlib
-import logging
+import structlog
 
 # lib
 import flask
@@ -22,7 +22,7 @@ class Login(View):
     This route should be reached by a form sending login information to it via a POST request.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.login")
+    logger = structlog.getLogger("netsocadmin.login")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
@@ -60,7 +60,7 @@ class Logout(View):
         This route logs a user out an redirects them back to the index page.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.logout")
+    logger = structlog.getLogger("netsocadmin.logout")
 
     methods = ["GET"]
 

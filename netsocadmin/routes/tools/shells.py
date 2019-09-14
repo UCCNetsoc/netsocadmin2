@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 import flask
 import ldap3
@@ -17,7 +17,7 @@ class ShellsView(ProtectedToolView):
 
     def dispatch_request(self, **data):
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
-        with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+        with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
             username = ldap3.utils.conv.escape_filter_chars(flask.session["username"])
             success = conn.search(
                 search_base="dc=netsoc,dc=co",
@@ -45,7 +45,7 @@ class ChangeShell(ProtectedView):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
     # Logger instance
-    logger = logging.getLogger("netsocadmin.change-shell")
+    logger = structlog.getLogger("netsocadmin.change-shell")
 
     def dispatch_request(self):
         # Ensure the selected shell is in the list of allowed shells
@@ -54,7 +54,7 @@ class ChangeShell(ProtectedView):
             return "Invalid shell received", 400
         # Attempt to update LDAP for the logged in user to update their loginShell
         ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
-        with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+        with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
             # Find the user
             username = flask.session["username"]
             # Put member first since it's the most probable

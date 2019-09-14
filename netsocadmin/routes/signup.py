@@ -1,9 +1,9 @@
 # stdlib
-import logging
 import re
 
 # lib
 import flask
+import structlog
 from flask.views import View
 
 # local
@@ -27,7 +27,7 @@ class CompleteSignup(View):
         given data to the Netsoc LDAP database.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.completeregistration")
+    logger = structlog.getLogger("netsocadmin.completeregistration")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
@@ -161,7 +161,7 @@ class Confirmation(View):
         Sends an email with a link to validate the email holder is who is registering.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.sendcomfirmation")
+    logger = structlog.getLogger("netsocadmin.sendcomfirmation")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
@@ -220,7 +220,7 @@ class Signup(View):
         It checks if the token they have used is valid and corresponds to the email.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.signup")
+    logger = structlog.getLogger("netsocadmin.signup")
 
     def render(self, email: str, token: str, error: bool = False) -> str:
         """Render the template with appropriate messages for whether or not there's an error"""
@@ -247,7 +247,7 @@ class Username(View):
         to test whether or not a username is already used.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.username")
+    logger = structlog.getLogger("netsocadmin.username")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 

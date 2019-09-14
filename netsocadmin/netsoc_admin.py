@@ -3,15 +3,18 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
-import logging
+import traceback
+from uuid import uuid4
 
 import flask
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 
 import config
+import logger as nsa_logger
 import login_tools
 import routes
+import sentry_sdk
+import structlog
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 # init sentry
 sentry_sdk.init(
@@ -25,8 +28,9 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
+nsa_logger.configure()
 
-logger = logging.getLogger("netsocadmin")
+logger = structlog.getLogger("netsocadmin")
 
 
 @app.route('/')
@@ -51,15 +55,37 @@ def index():
     )
 
 
+@app.before_request
+def before_request():
+    uid = uuid4()
+    flask.g.request_id = uid
+    logger.info("before request", request_id=uid, request_path=flask.request.path)
+
+
+@app.after_request
+def after_request(response: flask.Response):
+    logger.info("after request", request_id=flask.g.request_id, request_path=flask.request.path)
+    return response
+
+
+@app.route('/robots.txt')
+def robots():
+    return flask.send_file('static/robots.txt')
+
+
 @app.errorhandler(404)
 def not_found(e):
     logger.error(e)
     return flask.render_template("404.html"), 404
 
 
-@app.errorhandler(500)
-def internal_error(e):
-    logger.error(e)
+@app.errorhandler(Exception)
+def internal_error(e: Exception):
+    sentry_sdk.capture_exception(e)
+    logger.critical('Exception on %s [%s]' % (flask.request.path, flask.request.method),
+                    request_id=flask.g.request_id,
+                    request_path=flask.request.path,
+                    stacktrace=traceback.format_exc())
     return flask.render_template(
         "500.html",
         username=flask.session["username"] if "username" in flask.session else None,

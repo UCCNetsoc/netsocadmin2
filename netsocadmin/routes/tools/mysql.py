@@ -1,4 +1,4 @@
-import logging
+import structlog
 from typing import Tuple, Union
 
 import flask
@@ -16,7 +16,7 @@ class MySQLView(ProtectedToolView):
 
     active = "mysql"
 
-    logger = logging.getLogger("netsocadmin.mysql")
+    logger = structlog.getLogger("netsocadmin.mysql")
 
     def render(self, **data: Union[str, bool]) -> str:
         try:
@@ -78,7 +78,7 @@ class CreateDB(AbstractDBView):
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.createdb")
+    logger = structlog.getLogger("netsocadmin.createdb")
 
     def dispatch_request(self) -> str:
         self.logger.info(f"form: {flask.request.form}")
@@ -113,7 +113,7 @@ class DeleteDB(AbstractDBView):
         logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.deletedb")
+    logger = structlog.getLogger("netsocadmin.deletedb")
 
     def dispatch_request(self) -> str:
         self.logger.info(f"form: {flask.request.form}")
@@ -147,7 +147,7 @@ class ChangePassword(AbstractDBView):
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.changepw")
+    logger = structlog.getLogger("netsocadmin.changepw")
 
     def dispatch_request(self) -> str:
         self.logger.info(f"form: {flask.request.form}")

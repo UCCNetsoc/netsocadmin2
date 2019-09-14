@@ -4,15 +4,15 @@ Contains functions which are used during the login and logout process.
 import crypt
 import functools
 import hmac
-import logging
 import typing
 
 import flask
 import ldap3
+import structlog
 
 import config
 
-logger = logging.getLogger("netsocadmin.login")
+logger = structlog.getLogger("netsocadmin.login")
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 
@@ -90,8 +90,8 @@ def is_correct_password(user: LoginUser) -> bool:
     is_correct_password tells you whether or not a given username + password
     combo are correct
     """
-    logger.info(f"checking password for '{user.username}''")
-    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+    logger.debug(f"checking password for '{user.username}''")
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         user.populate_data(conn)
         if not user.is_pass_correct():
             logger.info(f"password incorrect for '{user.username}'")

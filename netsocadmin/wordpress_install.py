@@ -1,4 +1,4 @@
-import logging
+import structlog
 import os
 import random
 import string
@@ -13,7 +13,7 @@ from jinja2 import Environment, PackageLoader
 
 import config
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 """
 This section contains all the functions that relate to file operations relating to a wordpress install.
@@ -59,7 +59,7 @@ def chown_dir_and_children(path_to_dir, username):
         f"changing owner and group of directory {path_to_dir} and children",
     )
     ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
-    with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         username = ldap3.utils.conv.escape_filter_chars(username)
         success = conn.search(
             search_base="dc=netsoc,dc=co",

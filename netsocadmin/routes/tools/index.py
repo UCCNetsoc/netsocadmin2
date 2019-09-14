@@ -1,7 +1,7 @@
 """File containing classes that represent all of the routes that are related to the `tools.html` template"""
 
 # python
-import logging
+import structlog
 
 # lib
 from flask.views import View
@@ -42,7 +42,7 @@ class ToolIndex(ProtectedToolView):
         Note that this should only be shown when a user is logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.tools")
+    logger = structlog.getLogger("netsocadmin.tools")
 
     template_file = "tools.html"
 
