@@ -54,8 +54,7 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
     @functools.wraps(view_func)
     def protected_view_func(*args, **kwargs):
         if config.LOGGED_IN_KEY not in flask.session or not flask.session[config.LOGGED_IN_KEY]:
-            return flask.redirect("?asdf=lol")
-            return flask.render_template("index.html", error_message="")
+            return flask.redirect("/?asdf=lol")
         return view_func(*args, **kwargs)
     return protected_view_func
 
