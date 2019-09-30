@@ -18,10 +18,14 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
-sentry = Sentry(app, dsn='https://6e5a3e6971c547c383cfa0061bd9363f:c134d013516b44c689945b5673bb470f@sentry.netsoc.co/2')
+sentry = Sentry(
+    app, 
+    logging=True, 
+    level=logging.ERROR, 
+    dsn='https://6e5a3e6971c547c383cfa0061bd9363f:c134d013516b44c689945b5673bb470f@sentry.netsoc.co/2',
+)
 
 logger = logging.getLogger("netsocadmin")
-
 
 @app.route('/')
 def index():
@@ -40,6 +44,10 @@ def index():
         error_message=message
     )
 
+@app.route('/sentry-test')
+def sentry_test():
+    number = 1 / 0
+    return number
 
 @app.errorhandler(404)
 def not_found(e):
