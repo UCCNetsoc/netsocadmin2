@@ -69,7 +69,7 @@ class ChangeShell(ProtectedView):
                     found = True
                     break
             if not found:
-                self.logger.debug(f"user {username} not found. Could not update shell")
+                self.logger.info(f"user {username} not found. Could not update shell")
                 return "Invalid user received. Please contact us for assistance", 500
 
             # Modify the user now
@@ -84,5 +84,5 @@ class ChangeShell(ProtectedView):
             except Exception as e:
                 self.logger.error(f"error changing shell for {username}: {e}")
                 return "failed to set shell", 500
-            self.logger.debug(f"shell changed successfully for {username} to {shell_path}")
+            self.logger.info(f"shell changed successfully for {username} to {shell_path}")
             return "", 200

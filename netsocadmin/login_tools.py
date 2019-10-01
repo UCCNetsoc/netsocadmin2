@@ -71,11 +71,11 @@ def is_correct_password(user: LoginUser) -> bool:
     is_correct_password tells you whether or not a given username + password
     combo are correct
     """
-    logger.debug(f"checking password for '{user.username}''")
+    logger.info(f"checking password for '{user.username}''")
     with ldap3.Connection(ldap_server, auto_bind=True, **config.LDAP_AUTH) as conn:
         user.populate_data(conn)
         if not user.is_pass_correct():
-            logger.debug(f"password incorrect for '{user.username}'")
+            logger.info(f"password incorrect for '{user.username}'")
         return user.is_pass_correct()
 
 

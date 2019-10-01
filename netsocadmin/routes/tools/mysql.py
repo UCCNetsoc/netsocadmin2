@@ -81,7 +81,7 @@ class CreateDB(AbstractDBView):
     logger = logging.getLogger("netsocadmin.createdb")
 
     def dispatch_request(self) -> str:
-        self.logger.debug(f"form: {flask.request.form}")
+        self.logger.info(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -101,7 +101,7 @@ class CreateDB(AbstractDBView):
                 mysql_delete_error="", mysql_active=True,
             )
         # Success (probably should do more than just redirect to / ...)
-        self.logger.debug(f"successfully created database for {username} named {dbname}")
+        self.logger.info(f"successfully created database for {username} named {dbname}")
         return flask.redirect("/tools/mysql")
 
 
@@ -116,7 +116,7 @@ class DeleteDB(AbstractDBView):
     logger = logging.getLogger("netsocadmin.deletedb")
 
     def dispatch_request(self) -> str:
-        self.logger.debug(f"form: {flask.request.form}")
+        self.logger.info(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -150,7 +150,7 @@ class ChangePassword(AbstractDBView):
     logger = logging.getLogger("netsocadmin.changepw")
 
     def dispatch_request(self) -> str:
-        self.logger.debug(f"form: {flask.request.form}")
+        self.logger.info(f"form: {flask.request.form}")
         # Get the fields necessary
         username = flask.request.form.get("username", "")
         password = flask.request.form.get("password", "")
@@ -161,5 +161,5 @@ class ChangePassword(AbstractDBView):
             self.logger.error(f"invalid username and password: {msg}")
             return self.render(mysql_pass_error=msg, mysql_active=True)
         mysql.update_password(username, new_password)
-        self.logger.debug(f"successfully changed mysql password for {username}")
+        self.logger.info(f"successfully changed mysql password for {username}")
         return self.render(success="1", mysql_active=True)

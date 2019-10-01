@@ -36,7 +36,7 @@ class Help(HelpView):
         message = flask.request.form.get("message", "")
         # Ensure all fields are populated
         if not all([email, subject, message]):
-            self.logger.debug("not all fields specified")
+            self.logger.info("not all fields specified")
             return self.render(help_error="Please specify all fields", help_active=True)
 
         sent_email, sent_discord = True, True
