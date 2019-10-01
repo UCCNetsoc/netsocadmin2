@@ -27,6 +27,19 @@
         }
     }
     </script>
+
+<script>
+    function checkUsername() {
+        var err = document.getElementById("error-message");
+        var uid = document.getElementById("username").value;
+        
+        if (! (/^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/).test(uid)) {
+            err.innerHTML = "Username must be all lower case letters, numbers, hyphens or underscores only.<br/>If this is your username, please contact us to have your username changed to a valid one."
+            return false;
+        }
+        return true;
+    }
+</script>
 {% endblock %}
 
 {% block body %}
@@ -60,7 +73,7 @@
                     </form>
                 </div>
                 <div id="login" class="col s12">
-                    <form method="POST" action="/login" class="col row s12">
+                    <form method="POST" action="/login" class="col row s12" onsubmit="return checkUsername()">
                         <br>
                         <div class="row">
                             <div class="input-field">
@@ -74,7 +87,7 @@
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: row; justify-content: space-between">
-                            <button class="btn waves-effect waves-light" type="submit">
+                            <button id="login-button" class="btn waves-effect waves-light" type="submit">
                                 Login<i class="mdi-content-send right"></i>
                             </button>
                             <div>
@@ -83,7 +96,7 @@
                             </div>
                         </div>
                     </form>
-                    <div style="padding: 0 1em;" class="error-message red-text row s6">
+                    <div style="padding: 0 1em;" id="error-message" class="error-message red-text row s6">
                         <i> {{ error_message }} </i>
                     </div>
                 </div>

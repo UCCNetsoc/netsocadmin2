@@ -16,6 +16,10 @@ logger = logging.getLogger("netsocadmin.login")
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 
+class UserNotInLDAPException(Exception):
+    pass
+
+
 class LoginUser:
     def __init__(self, username: str, password: str):
         self.username = ldap3.utils.conv.escape_filter_chars(username)
@@ -29,6 +33,8 @@ class LoginUser:
             search_filter=f"(&(objectClass=account)(uid={self.username}))",
             attributes=["userPassword", "uid", "gidNumber"],
         )
+        if len(conn.entries) == 0:
+            raise UserNotInLDAPException(f"username {self.username} not found in LDAP")
         if not success or len(conn.entries) != 1:
             raise Exception(f"couldnt search from ldap: {conn.last_error}")
         entry = conn.entries[0]

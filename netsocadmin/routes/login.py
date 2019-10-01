@@ -27,23 +27,30 @@ class Login(View):
     methods = ["POST"]
 
     def dispatch_request(self) -> str:
-        user = flask.request.form["username"].lower()
-        # Validate the login request
-        login_user = login_tools.LoginUser(user, flask.request.form["password"])
-        if not login_tools.is_correct_password(login_user):
+        try:
+            user = flask.request.form["username"].lower()
+            # Validate the login request
+            login_user = login_tools.LoginUser(user, flask.request.form["password"])
+            if not login_tools.is_correct_password(login_user):
+                return flask.render_template(
+                    "index.html",
+                    page="login",
+                    error_message="Username or password was incorrect",
+                )
+            # Initialise the user's directory if running on leela
+            if not config.FLASK_CONFIG["debug"]:
+                register_tools.initialise_directories(user, flask.request.form["password"])
+            # Set the session info to reflect that the user is logged in and redirect back to /
+            flask.session[config.LOGGED_IN_KEY] = True
+            flask.session["username"] = user
+            flask.session["admin"] = login_user.is_admin()
+            self.logger.info(f"{flask.session['username']} logged in")
+        except login_tools.UserNotInLDAPException:
             return flask.render_template(
                 "index.html",
                 page="login",
-                error_message="Username or password was incorrect",
+                error_message="No user found for this username"
             )
-        # Initialise the user's directory if running on leela
-        if not config.FLASK_CONFIG["debug"]:
-            register_tools.initialise_directories(user, flask.request.form["password"])
-        # Set the session info to reflect that the user is logged in and redirect back to /
-        flask.session[config.LOGGED_IN_KEY] = True
-        flask.session["username"] = user
-        flask.session["admin"] = login_user.is_admin()
-        self.logger.info(f"{flask.session['username']} logged in")
         return flask.redirect("/")
 
 
