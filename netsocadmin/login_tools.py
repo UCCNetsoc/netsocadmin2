@@ -8,11 +8,11 @@ import typing
 
 import flask
 import ldap3
-import structlog
+import structlog as logging
 
 import config
 
-logger = structlog.getLogger("netsocadmin.login")
+logger = logging.getLogger("netsocadmin.login")
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 

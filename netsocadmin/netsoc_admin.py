@@ -13,7 +13,7 @@ import logger as nsa_logger
 import login_tools
 import routes
 import sentry_sdk
-import structlog
+import structlog as logging
 from sentry_sdk.integrations.flask import FlaskIntegration
 
 # init sentry
@@ -30,7 +30,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
 nsa_logger.configure()
 
-logger = structlog.getLogger("netsocadmin")
+logger = logging.getLogger("netsocadmin")
 
 
 @app.route('/')

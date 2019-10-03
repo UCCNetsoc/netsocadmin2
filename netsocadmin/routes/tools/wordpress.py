@@ -1,4 +1,4 @@
-import structlog
+import structlog as logging
 from typing import Tuple
 
 import flask
@@ -32,7 +32,7 @@ class WordpressInstall(ProtectedToolView):
         This endpoint is pinged via an AJAX request on the clients' side.
     """
     # Logger instance
-    logger = structlog.getLogger("netsocadmin.wordpressinstall")
+    logger = logging.getLogger("netsocadmin.wordpressinstall")
 
     def dispatch_request(self) -> Tuple[str, int]:
         username = flask.session["username"]

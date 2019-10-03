@@ -1,4 +1,4 @@
-import structlog
+import structlog as logging
 
 import flask
 
@@ -28,7 +28,7 @@ class Help(HelpView):
     # Specify the method(s) that are allowed to be used to reach this view
     methods = ["POST"]
     # Logger instance
-    logger = structlog.getLogger("netsocadmin.help")
+    logger = logging.getLogger("netsocadmin.help")
 
     def dispatch_request(self) -> str:
         email = flask.request.form.get("email", "")

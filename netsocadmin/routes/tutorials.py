@@ -1,5 +1,5 @@
 # stdlib
-import structlog
+import structlog as logging
 import os
 
 # lib
@@ -23,7 +23,7 @@ class Tutorials(TemplateView):
         starts-up.
     """
     # Logger instance
-    logger = structlog.getLogger("netsocadmin.tutorials")
+    logger = logging.getLogger("netsocadmin.tutorials")
 
     template_file = "tutorials.html"
 

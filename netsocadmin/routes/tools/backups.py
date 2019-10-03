@@ -1,4 +1,4 @@
-import structlog
+import structlog as logging
 import os
 import re
 
@@ -36,7 +36,7 @@ class Backup(ProtectedToolView):
         Must be in the form YYYY-MM-DD.
     """
     # Logger instance
-    logger = structlog.getLogger("netsocadmin.backup")
+    logger = logging.getLogger("netsocadmin.backup")
 
     def dispatch_request(self, username: str, timeframe: str, backup_date: str) -> str:
         # Validate the parameters

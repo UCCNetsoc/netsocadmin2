@@ -1,4 +1,4 @@
-import structlog
+import structlog as logging
 
 import flask
 import ldap3
@@ -45,7 +45,7 @@ class ChangeShell(ProtectedView):
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
     # Logger instance
-    logger = structlog.getLogger("netsocadmin.change-shell")
+    logger = logging.getLogger("netsocadmin.change-shell")
 
     def dispatch_request(self):
         # Ensure the selected shell is in the list of allowed shells
