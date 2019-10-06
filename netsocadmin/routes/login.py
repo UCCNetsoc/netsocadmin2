@@ -49,7 +49,7 @@ class Login(View):
             return flask.render_template(
                 "index.html",
                 page="login",
-                error_message="No user found for this username"
+                error_message="Username or password was incorrect"
             )
         return flask.redirect("/")
 
