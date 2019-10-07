@@ -28,6 +28,7 @@ app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
 logger = logging.getLogger("netsocadmin")
 
+
 @app.route('/')
 def index():
     """
@@ -44,6 +45,7 @@ def index():
         page="login",
         error_message=message
     )
+
 
 @app.route('/debug-sentry')
 def trigger_error():
