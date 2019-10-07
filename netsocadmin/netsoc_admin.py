@@ -13,6 +13,7 @@ import routes
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+# init sentry
 sentry_sdk.init(
     dsn=config.SENTRY_DSN,
     integrations=[FlaskIntegration()]
@@ -46,6 +47,9 @@ def index():
 
 @app.route('/debug-sentry')
 def trigger_error():
+    """
+    triggers error for sentry to test if it works
+    """
     division_by_zero = 1 / 0
     return division_by_zero
 
