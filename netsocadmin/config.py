@@ -3,6 +3,9 @@ import os
 # flask app secret key
 SECRET_KEY = os.urandom(64)
 
+# Sentry DSN
+SENTRY_DSN = 'http://secret-key@my-sentry:9000/2'
+
 # Config for flask
 FLASK_CONFIG = {
     "host": "0.0.0.0",

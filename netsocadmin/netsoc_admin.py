@@ -10,7 +10,13 @@ import flask
 import config
 import login_tools
 import routes
-from raven.contrib.flask import Sentry
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+sentry_sdk.init(
+    dsn=config.SENTRY_DSN,
+    integrations=[FlaskIntegration()]
+)
 
 app = flask.Flask("netsocadmin")
 app.secret_key = config.SECRET_KEY
@@ -18,12 +24,6 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
-sentry = Sentry(
-    app, 
-    logging=True, 
-    level=logging.ERROR, 
-    dsn='https://6e5a3e6971c547c383cfa0061bd9363f:c134d013516b44c689945b5673bb470f@sentry.netsoc.co/2',
-)
 
 logger = logging.getLogger("netsocadmin")
 
@@ -44,18 +44,22 @@ def index():
         error_message=message
     )
 
-@app.route('/sentry-test')
-def sentry_test():
-    number = 1 / 0
-    return number
+@app.route('/debug-sentry')
+def trigger_error():
+    division_by_zero = 1 / 0
+    return division_by_zero
+
 
 @app.errorhandler(404)
 def not_found(e):
+    sentry_sdk.capture_exception(e)
+    logger.error(e)
     return flask.render_template("404.html"), 404
 
 
 @app.errorhandler(500)
 def internal_error(e):
+    sentry_sdk.capture_exception(e)
     logger.error(e)
     return flask.render_template("500.html"), 500
 
