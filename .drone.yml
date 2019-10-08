@@ -25,7 +25,7 @@ steps:
     registry: docker.netsoc.co
     username:
       from_secret: docker_dev_username
-    auth:
+    password:
       from_secret: docker_dev_auth
   volumes:
   - name: cache
