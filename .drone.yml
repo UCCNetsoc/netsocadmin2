@@ -24,9 +24,9 @@ steps:
     repo: docker.netsoc.co/public/netsocadmin
     registry: docker.netsoc.co
     username:
-      from_secret: docker_username
+      from_secret: docker_dev_username
     auth:
-      from_secret: docker_auth
+      from_secret: docker_dev_auth
   volumes:
   - name: cache
     path: /var/lib/docker  
@@ -43,9 +43,9 @@ steps:
     repo: docker.netsoc.co/netsoc/netsocadmin
     registry: docker.netsoc.co
     username:
-      from_secret: docker_username
+      from_secret: docker_prod_username
     password:
-      from_secret: docker_password
+      from_secret: docker_prod_auth
   volumes:
   - name: cache
     path: /var/lib/docker  
