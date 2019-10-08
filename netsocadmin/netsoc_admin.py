@@ -10,12 +10,21 @@ import flask
 import config
 import login_tools
 import routes
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+
+# init sentry
+sentry_sdk.init(
+    dsn=config.SENTRY_DSN,
+    integrations=[FlaskIntegration()]
+)
 
 app = flask.Flask("netsocadmin")
 app.secret_key = config.SECRET_KEY
 app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
+
 
 logger = logging.getLogger("netsocadmin")
 
@@ -40,11 +49,13 @@ def index():
 
 @app.errorhandler(404)
 def not_found(e):
+    logger.error(e)
     return flask.render_template("404.html"), 404
 
 
 @app.errorhandler(500)
 def internal_error(e):
+    sentry_sdk.capture_exception(e)
     logger.error(e)
     return flask.render_template("500.html"), 500
 

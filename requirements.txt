@@ -25,3 +25,4 @@ subprocess.run==0.0.8
 typing==3.6.4
 urllib3==1.24.2
 wget==3.2
+sentry-sdk[flask]
