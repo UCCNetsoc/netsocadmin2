@@ -47,18 +47,8 @@ def index():
     )
 
 
-@app.route('/debug-sentry')
-def trigger_error():
-    """
-    triggers error for sentry to test if it works
-    """
-    division_by_zero = 1 / 0
-    return division_by_zero
-
-
 @app.errorhandler(404)
 def not_found(e):
-    sentry_sdk.capture_exception(e)
     logger.error(e)
     return flask.render_template("404.html"), 404
 
