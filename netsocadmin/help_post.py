@@ -2,8 +2,10 @@
 This file takes care of sending off the data from the help section to multiple areas
 currently Discord and email of SysAdmins and the main Netsoc email
 '''
+# lib
 import requests
 
+# local
 import config
 import mail_helper
 

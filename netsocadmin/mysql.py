@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+
+# stdlib
 import argparse
 import os
 import pwd
@@ -7,8 +9,10 @@ import re
 import string
 from typing import List
 
+# lib
 import pymysql
 
+# local
 import config
 
 

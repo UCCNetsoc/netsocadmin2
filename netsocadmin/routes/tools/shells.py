@@ -1,8 +1,9 @@
-import structlog as logging
-
+# lib
 import flask
 import ldap3
+import structlog as logging
 
+# local
 import config
 
 from .index import ProtectedToolView, ProtectedView

@@ -1,15 +1,18 @@
 """
 Contains functions which are used during the login and logout process.
 """
+# stdlib
 import crypt
 import functools
 import hmac
 import typing
 
+# lib
 import flask
 import ldap3
 import structlog as logging
 
+# local
 import config
 
 logger = logging.getLogger("netsocadmin.login")

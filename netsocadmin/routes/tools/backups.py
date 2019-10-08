@@ -1,9 +1,12 @@
-import structlog as logging
+# stdlib
 import os
 import re
 
+# lib
 import flask
+import structlog as logging
 
+# local
 import backup_tools
 import config
 

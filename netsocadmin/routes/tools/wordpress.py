@@ -1,8 +1,11 @@
-import structlog as logging
+# stdlib
 from typing import Tuple
 
+# lib
 import flask
+import structlog as logging
 
+# local
 import config
 import wordpress_install
 

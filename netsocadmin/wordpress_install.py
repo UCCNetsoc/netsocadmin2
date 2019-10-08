@@ -1,16 +1,19 @@
-import structlog as logging
+# stdlib
 import os
 import random
 import string
 import subprocess
 from pathlib import Path
 
+# lib
 import ldap3
 import pymysql
 import requests
+import structlog as logging
 import wget
 from jinja2 import Environment, PackageLoader
 
+# local
 import config
 
 logger = logging.getLogger(__name__)

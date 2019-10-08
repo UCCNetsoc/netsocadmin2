@@ -2,6 +2,7 @@
 This file contains functions which are used during
 registration by the main netsoc admin file.
 """
+# stdlib
 import crypt
 import hashlib
 import random
@@ -9,10 +10,12 @@ import sqlite3
 import string
 import typing
 
+# lib
 import ldap3
 import paramiko
 import pymysql
 
+# local
 import config
 import db
 import mail_helper

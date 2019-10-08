@@ -4,8 +4,10 @@ Execute this file in order to reset the database file.
 Import this file into a python interpreter and call
 print_db() in order to examine the contents of the DB.
 """
+# lib
 import sqlite3
 
+# local
 import config
 
 RESET = "DROP TABLE IF EXISTS uris"

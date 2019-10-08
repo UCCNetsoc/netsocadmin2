@@ -1,7 +1,8 @@
+# lib
+import flask
 import structlog as logging
 
-import flask
-
+# local
 import help_post
 
 from .index import ProtectedToolView

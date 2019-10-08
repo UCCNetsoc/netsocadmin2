@@ -1,9 +1,7 @@
 """File containing classes that represent all of the routes that are related to the `tools.html` template"""
 
-# python
-import structlog as logging
-
 # lib
+import structlog as logging
 from flask.views import View
 
 # local
