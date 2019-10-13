@@ -237,6 +237,9 @@
                         <li title="Netsoc Blog">
                             <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
                         </li>
+                        <li title="Netsoc Discord">
+                            <a target="_blank" href="http://discord.netsoc.co/">Discord</a>
+                        </li>
                         {% if is_logged_in %}
                         <li>
                             <a class="dropdown-trigger btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu">{{ username }}</a>
@@ -276,6 +279,22 @@
                                 </i>
                             </a>
                         </li>
+                        <li {% if active == "cloud" %} class="active" {% endif %} title="Create and delele VMs">
+                            <a style="width: 100%" href="/tools/cloud">
+                                <i class="fas fa-cloud">
+                                    <span>Cloud</span>
+                                </i>
+                            </a>
+                        </li>
+                        {% if is_admin %}
+                        <li {% if active == "cloud_admin" %} class="active" {% endif %} title="Create and delele VMs for admins">
+                            <a style="width: 100%" href="/tools/cloud-admin">
+                                <i class="fas fa-cloud">
+                                    <span>Cloud Admin</span>
+                                </i>
+                            </a>
+                        </li>
+                        {% endif %}
                         <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and change your password">
                             <a style="width: 100%" href="/tools/mysql">
                                 <i class="fas fa-database">
@@ -357,6 +376,22 @@
                 </i>
             </a>
         </li>
+        <li {% if active == "cloud" %} class="active" {% endif %} title="Create and delete VMs">
+            <a style="width: 100%" href="/tools/cloud">
+                <i class="fas fa-cloud">
+                    <span style="margin-left: 1em">Cloud</span>
+                </i>
+            </a>
+        </li>
+        {% if is_admin %}        
+        <li {% if active == "cloud_admin" %} class="active" {% endif %} title="Create and delete VMs for admins">
+            <a style="width: 100%" href="/tools/cloud-admin">
+                <i class="fas fa-cloud">
+                    <span style="margin-left: 1em">Cloud Admin</span>
+                </i>
+            </a>
+        </li>
+        {% endif %}
         <li {% if active == "backups" %} class="active" {% endif %} title="List and download backups of your home directory">
             <a style="width: 100%" href="/tools/backups">
                 <i class="fas fa-hdd">

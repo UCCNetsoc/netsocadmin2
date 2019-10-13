@@ -1,0 +1,143 @@
+{% extends "page-skeleton.html" %}
+{% block head %}
+    {{ super() }}
+    
+    <style>
+    .inline {
+        display: inline-block;
+    }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.2.0/zxcvbn.js"></script>
+    <script src="/static/javascript/passwordMeter.js"></script>
+
+{% endblock %}
+
+{% block body %}
+	{{ super() }}
+
+    {# This stuff is the cloud tab #}
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title">VM List:</span>
+                    {% if project|length > 0 %}
+                        <ul class="collection" style="max-height: 7.5em; overflow-y: scroll">
+                            {% for vm in project %}
+                                <li class="collection-item">
+                                    <div>
+                                        {{ vm }}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No Projects to show &nbsp;&nbsp; O_o </p>
+                        <br/>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <div class="card small">
+                <div class="card-content" style="overflow: visible">
+                    <span class="card-title">Create Project:</span>
+                    <div>Create Porject</div>
+                    <span style="display:block;" class="error-msg">{{ project_error }}</span>
+                    <form action="/changepw" method="POST">
+                        <div class="input-field col s6">
+                            <input autocomplete="off" type="text" name="project_name">
+                            <label for="project_name">Project Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input autocomplete="subnet" type="subnet" name="subnet">
+                            <label for="subnet">Subnet</label>
+                        </div>
+                        <div class="col s12">
+                            <button type="submit" class="activator btn waves-effect waves-light">Create Project&nbsp;&nbsp;<i class="material-icons">Project</i></button>
+                        </div>
+                    </form>
+                    {% if success %}
+                    <br/>
+                    <p style="color:green;">Your Project was created</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <div id="database-change-form">
+                        <span class="card-title">New VM:</span>
+                        <div>Create a VM. All databases are prefixed with <code>{{ username }}_</code></div>
+                        <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
+                        <form action="/createdb" method="POST">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username">
+                                <label for="mysql-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password">
+                                <label for="mysql-password">Server password</label>
+                            </div>
+                            <div class="input-field col s12 m3">
+                                <input disabled autocomplete="off" type="text" value="{{ username }}_">
+                                <label for="prefix">Prefix</label>
+                            </div>
+                            <div class="input-field col s12 m9">
+                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}">
+                                <label for="dbname">Database name</label>
+                            </div>
+                            <div>
+                                <button class="btn waves-effect waves-light" type="submit">
+                                    <span id="database-form-button-text"> Create </span>
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col s12 m6">
+            <div class="card">
+                <div class="card-content">
+                    <div id="database-change-form">
+                        <span class="card-title">Delete Database:</span>
+                        <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
+                        <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
+                        <form action="/deletedb" method="POST">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username">
+                                <label for="mysql-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password">
+                                <label for="mysql-password">Server password</label>
+                            </div>
+                            <div class="input-field col s12">
+                                <select name="dbname">
+                                    <option value="" disabled selected>Choose database to delete</option>
+                                    {% for db in databases %}
+                                    <option value="{{ db }}">{{ db }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Database to delete</label>
+                            </div>
+                            <div>
+                                <button class="btn waves-effect waves-light" type="submit">
+                                    <span id="database-form-button-text"> Delete </span>
+                                    <i class="mdi-content-send right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

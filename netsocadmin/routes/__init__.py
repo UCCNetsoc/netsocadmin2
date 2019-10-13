@@ -1,6 +1,7 @@
 """Imports from all the files in the directory and makes the imports available to other parts of the system"""
 from .login import Login, Logout
 from .signup import CompleteSignup, Confirmation, Signup, Username
+from .tools.cloud import CloudView, CloudAdminView
 from .tools.backups import Backup, BackupsView
 from .tools.help import Help, HelpView
 from .tools.index import ToolIndex
@@ -12,6 +13,8 @@ from .tutorials import Tutorials
 from .view import TemplateView
 
 __all__ = [
+    "CloudView",
+    "CloudAdminView",
     "TemplateView",
     # Login / Logout
     "Login",
