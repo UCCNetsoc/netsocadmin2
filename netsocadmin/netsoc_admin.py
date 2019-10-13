@@ -6,12 +6,12 @@ then be proxied to this address.
 import logging
 
 import flask
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 import config
 import login_tools
 import routes
-import sentry_sdk
-from sentry_sdk.integrations.flask import FlaskIntegration
 
 # init sentry
 sentry_sdk.init(
@@ -39,7 +39,11 @@ def index():
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
     # pylint: disable=E1101
-    message = "Please log in to view this page" if flask.request.args.get("asdf") else ''
+    message = ''
+    if flask.request.args.get("asdf") == "lol":
+        message = "Please log in to view this page"
+    elif flask.request.args.get("asdf") == "borger":
+        message = "Access not granted at this time"
     return flask.render_template(
         "index.html",
         page="login",
@@ -57,7 +61,10 @@ def not_found(e):
 def internal_error(e):
     sentry_sdk.capture_exception(e)
     logger.error(e)
-    return flask.render_template("500.html"), 500
+    return flask.render_template(
+        "500.html",
+        username=flask.session["username"] if "username" in flask.session else None,
+    ), 500
 
 
 # ------------------------------Server Signup Routes------------------------------#
@@ -65,6 +72,7 @@ app.add_url_rule('/completeregistration', view_func=routes.CompleteSignup.as_vie
 app.add_url_rule('/sendconfirmation', view_func=routes.Confirmation.as_view('sendconfirmation'))
 app.add_url_rule('/signup', view_func=routes.Signup.as_view('signup'))
 app.add_url_rule('/username', view_func=routes.Username.as_view('username'))
+app.add_url_rule('/exception', view_func=routes.ExceptionView.as_view('exception'))
 
 # -------------------------------Login/Logout Routes-----------------------------#
 app.add_url_rule('/login', view_func=routes.Login.as_view('login'))

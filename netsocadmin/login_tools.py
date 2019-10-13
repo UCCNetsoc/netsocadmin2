@@ -51,6 +51,15 @@ class LoginUser:
         return self.group == 420
 
 
+def admin_only_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
+    @functools.wraps(view_func)
+    def admin_only_view_func(*args, **kwargs):
+        if flask.session["admin"]:
+            return view_func(*args, **kwargs)
+        return flask.redirect("/?asdf=borger")
+    return admin_only_view_func
+
+
 def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
     """
     protected_page is a route function decorator which will check that a user
@@ -65,11 +74,15 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
     return protected_view_func
 
 
-def is_logged_in():
+def is_logged_in() -> bool:
     """
     Returns True if the user is currently logged in.
     """
     return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY]
+
+
+def is_admin() -> bool:
+    return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY] and flask.session["admin"]
 
 
 def is_correct_password(user: LoginUser) -> bool:

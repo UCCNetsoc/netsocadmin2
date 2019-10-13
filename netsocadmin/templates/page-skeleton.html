@@ -237,7 +237,7 @@
                         <li title="Netsoc Blog">
                             <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
                         </li>
-                        {% if is_logged_in %}
+                        {% if username is not none and username|length %}
                         <li>
                             <a class="dropdown-trigger btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu">{{ username }}</a>
                             <ul id="profile-menu" class="dropdown-content">
@@ -257,7 +257,7 @@
 
                     {# This one is used when the screen is small like on mobile #}
                     <ul class="side-nav" id="mobile-demo">
-                        {% if is_logged_in == True %}
+                        {% if is_logged_in %}
                         <li style="margin-top: 1em">
                             <a class="dropdown-trigger-mobile btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu-mobile">{{ username }}</a>
                             <ul id="profile-menu-mobile" class="dropdown-content">
@@ -317,7 +317,16 @@
                                     <span>Help</span>
                                 </i>
                             </a>
-                        </li>                        
+                        </li>
+                        {% if is_admin %}
+                        <li title="Delete everything. Just kidding, triggers an exception">
+                            <a style="width: 100%" href="/exception">
+                                <i class="fas fa-bomb">
+                                    <span>Trigger Exception</span>
+                                </i>
+                            </a>
+                        </li>
+                        {% endif %}
                         <li class="divider" style="margin-top: 0.5em; margin-bottom: 0.5em"></li>
                         <li title="The Netsoc Website">
                             <a target="_blank" href="https://netsoc.co/rk">Netsoc Website</a>
@@ -392,6 +401,15 @@
                 </i>
             </a>
         </li>
+        {% if is_admin %}
+        <li title="Delete everything. Just kidding, triggers an exception">
+            <a style="width: 100%" href="/exception">
+                <i class="fas fa-bomb">
+                    <span style="margin-left: 1em">Trigger Exception</span>
+                </i>
+            </a>
+        </li>
+        {% endif %}
     </ul>
     {% endif %}
     </header>
