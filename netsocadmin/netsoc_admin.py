@@ -59,7 +59,6 @@ def not_found(e):
 
 @app.errorhandler(500)
 def internal_error(e):
-    sentry_sdk.capture_exception(e)
     logger.error(e)
     return flask.render_template(
         "500.html",
