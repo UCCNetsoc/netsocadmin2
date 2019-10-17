@@ -11,7 +11,7 @@ def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List
 
     mail = Mail()
     mail.from_email = From(from_mail, "UCC Netsoc")
-    mail. subject = subject
+    mail.subject = subject
     mail.content = Content("text/plain", content)
 
     p = sendgrid.Personalization()
