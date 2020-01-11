@@ -22,6 +22,8 @@ from sentry_sdk.integrations.flask import FlaskIntegration
 # init sentry
 sentry_sdk.init(
     dsn=config.SENTRY_DSN,
+    default_integrations=False,
+    environment="Development" if config.FLASK_CONFIG['debug'] else "Production",
     integrations=[FlaskIntegration()]
 )
 
@@ -62,12 +64,12 @@ def index():
 def before_request():
     uid = uuid4()
     flask.g.request_id = uid
-    logger.info("before request", request_id=uid, request_path=flask.request.path)
+    # logger.info("before request", request_id=uid, request_path=flask.request.path)
 
 
 @app.after_request
 def after_request(response: flask.Response):
-    logger.info("after request", request_id=flask.g.request_id, request_path=flask.request.path)
+    # logger.info("after request", request_id=flask.g.request_id, request_path=flask.request.path)
     return response
 
 
@@ -84,6 +86,7 @@ def not_found(e):
 
 @app.errorhandler(Exception)
 def internal_error(e: Exception):
+    with sentry_sdk.
     sentry_sdk.capture_exception(e)
     logger.critical('Exception on %s [%s]' % (flask.request.path, flask.request.method),
                     request_id=flask.g.request_id,

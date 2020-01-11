@@ -12,10 +12,11 @@ EXPOSE 5050
 RUN apk update && \
     apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
 
+RUN pip3 install gunicorn==19.10.0
+
 COPY requirements.txt /netsocadmin/requirements.txt
 # install all python requirements
-RUN pip3 install -r /netsocadmin/requirements.txt && \
-    pip3 install gunicorn
+RUN pip3 install -r /netsocadmin/requirements.txt
 
 COPY . /netsocadmin
 
