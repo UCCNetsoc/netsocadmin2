@@ -19,7 +19,7 @@ class WordpressView(ProtectedToolView):
     def dispatch_request(self):
         return self.render(
             wordpress_exists=wordpress_install.wordpress_exists(f"/home/users/{flask.session['username']}"),
-            wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress,
+            wordpress_link=f"http://{flask.session['username']}.netsoc.co/wordpress/wp-admin/index.php",
         )
 
 
