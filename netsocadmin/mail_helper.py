@@ -1,7 +1,7 @@
 from typing import List
 
 import sendgrid
-from sendgrid.helpers.mail import Content, Email, From, Mail, To, ReplyTo
+from sendgrid.helpers.mail import Content, Email, From, Mail, To
 
 import config
 
@@ -13,9 +13,6 @@ def send_mail(from_mail: str, to_mail: str, subject: str, content: str, cc: List
     mail.from_email = From(from_mail, "UCC Netsoc")
     mail.subject = subject
     mail.content = Content("text/plain", content)
-
-    if cc is not None:
-        mail.reply_to = ReplyTo(cc[0], '')
 
     p = sendgrid.Personalization()
     p.add_to(To(to_mail))
