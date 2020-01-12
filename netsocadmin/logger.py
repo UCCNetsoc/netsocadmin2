@@ -1,9 +1,9 @@
 # lib
 import flask
-
-import pythonjsonlogger.jsonlogger
 from structlog import configure as conf
 from structlog import processors, stdlib, threadlocal
+
+import pythonjsonlogger.jsonlogger
 
 
 class JsonFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
@@ -12,11 +12,14 @@ class JsonFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
         log_record['level'] = record.levelname
         log_record['logger'] = record.name
         try:
-            log_record['request_id'] = flask.g.request_id if not None else 'FUCK'
             log_record['request_path'] = flask.request.path
             log_record['request_method'] = flask.request.method
+            log_record['request_id'] = flask.g.request_id if not None else 'FUCK'
+            log_record['ip_address'] = flask.request.remote_addr,
         except RuntimeError:
             pass
+        if "username" in flask.session:
+            log_record["username"] = flask.session["username"]
 
 
 def configure():

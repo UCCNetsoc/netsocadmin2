@@ -9,20 +9,21 @@ from uuid import uuid4
 
 # lib
 import flask
+import sentry_sdk
+import structlog as logging
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 # local
 import config
 import logger as nsa_logger
 import login_tools
 import routes
-import sentry_sdk
-import structlog as logging
-from sentry_sdk.integrations.flask import FlaskIntegration
 
 # init sentry
 sentry_sdk.init(
     dsn=config.SENTRY_DSN,
     default_integrations=False,
+    send_default_pii=True,
     environment="Development" if config.FLASK_CONFIG['debug'] else "Production",
     integrations=[FlaskIntegration()]
 )
@@ -47,12 +48,15 @@ def index():
     """
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
-    # pylint: disable=E1101
     message = ''
-    if flask.request.args.get("asdf") == "lol":
+    if flask.request.args.get("e") == "e":
+        message = "An error occured. Please try again or contact us"
+    elif flask.request.args.get("e") == "l":
         message = "Please log in to view this page"
-    elif flask.request.args.get("asdf") == "borger":
+    elif flask.request.args.get("e") == "d":
         message = "Access not granted at this time"
+    elif flask.request.args.get("e") == "i":
+        message = "Username or password was incorrect"
     return flask.render_template(
         "index.html",
         page="login",
@@ -62,14 +66,38 @@ def index():
 
 @app.before_request
 def before_request():
-    uid = uuid4()
+    uid = str(uuid4())
     flask.g.request_id = uid
-    # logger.info("before request", request_id=uid, request_path=flask.request.path)
+    with sentry_sdk.configure_scope() as scope:
+        if "username" in flask.session:
+            scope.user = {
+                "username": flask.session["username"],
+                "admin": flask.session["admin"],
+            }
+        scope.set_extra("request_id", uid)
+    """ logger.info(
+        "incoming request",
+        request_id=uid,
+        request_path=flask.request.path,
+        user_agent=flask.request.user_agent,
+        http_referrer=flask.request.referrer,
+        ip_address=flask.request.remote_addr,
+    ) """
 
 
 @app.after_request
 def after_request(response: flask.Response):
-    # logger.info("after request", request_id=flask.g.request_id, request_path=flask.request.path)
+    meta = {}
+    if "username" in flask.session:
+        meta["username"] = flask.session["username"]
+    logger.info(
+        "request finished",
+        user_agent=flask.request.user_agent,
+        http_referrer=flask.request.referrer,
+        ip_address=flask.request.remote_addr,
+        status_code=response.status_code,
+        **meta,
+    )
     return response
 
 
@@ -80,13 +108,12 @@ def robots():
 
 @app.errorhandler(404)
 def not_found(e):
-    logger.error(e)
+    logger.warn(e)
     return flask.render_template("404.html"), 404
 
 
 @app.errorhandler(Exception)
 def internal_error(e: Exception):
-    with sentry_sdk.
     sentry_sdk.capture_exception(e)
     logger.critical('Exception on %s [%s]' % (flask.request.path, flask.request.method),
                     request_id=flask.g.request_id,

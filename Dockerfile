@@ -53,4 +53,5 @@ CMD [ "gunicorn", \
     "-b", "0.0.0.0:5050", \
     "--log-config", "/netsocadmin/logging.conf", \
     "-k", "gevent", \
-    "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
+    "-c", "/netsocadmin/gunicorn.conf", \
+    "netsoc_admin:app" ]

@@ -47,19 +47,24 @@ class LoginUser:
     def is_pass_correct(self) -> bool:
         if self.ldap_pass.startswith("{crypt}") or self.ldap_pass.startswith("{CRYPT}"):
             # strips off the "{crypt}" prefix
-            self.ldap_pass = self.ldap_pass[len("{crypt}"):]
-        return hmac.compare_digest(crypt.crypt(self.password, self.ldap_pass), self.ldap_pass)
+            ldap_pass = self.ldap_pass[len("{crypt}"):]
+        return hmac.compare_digest(crypt.crypt(self.password, ldap_pass), ldap_pass)
 
     def is_admin(self) -> bool:
         return self.group == 420
 
 
 def admin_only_page(view_func: typing.Callable[..., None]) -> typing.Callable[..., None]:
+    """
+    admin_only_page is a route function decorator which will check that a user
+    is an admin (group ID 420) before allowing the decorated view function to be shown. If the
+    user is not an admin, it will redirect them to the index page.
+    """
     @functools.wraps(view_func)
     def admin_only_view_func(*args, **kwargs):
         if flask.session["admin"]:
             return view_func(*args, **kwargs)
-        return flask.redirect("/?asdf=borger")
+        return flask.redirect("/?e=d")
     return admin_only_view_func
 
 
@@ -72,7 +77,7 @@ def protected_page(view_func: typing.Callable[..., None]) -> typing.Callable[...
     @functools.wraps(view_func)
     def protected_view_func(*args, **kwargs):
         if config.LOGGED_IN_KEY not in flask.session or not flask.session[config.LOGGED_IN_KEY]:
-            return flask.redirect("/?asdf=lol")
+            return flask.redirect("/?e=l")
         return view_func(*args, **kwargs)
     return protected_view_func
 
@@ -93,16 +98,9 @@ def is_correct_password(user: LoginUser) -> bool:
     is_correct_password tells you whether or not a given username + password
     combo are correct
     """
-    logger.debug(f"checking password for '{user.username}''")
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         user.populate_data(conn)
         if not user.is_pass_correct():
-            logger.info(f"password incorrect for '{user.username}'")
+            logger.info(f"incorect password supplied",
+                        user=user.username)
         return user.is_pass_correct()
-
-
-if __name__ == "__main__":
-    user = input("username: ")
-    password = input("password: ")
-    correct = is_correct_password(user, password)
-    print("Correct" if correct else "Incorrect")
