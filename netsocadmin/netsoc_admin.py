@@ -3,19 +3,28 @@ This file contains the main webapp for netsoc admin.
 Sets up a local server running the website. Requests should
 then be proxied to this address.
 """
-import logging
+# stdlib
+import traceback
+from uuid import uuid4
 
+# lib
 import flask
 import sentry_sdk
+import structlog as logging
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+# local
 import config
+import logger as nsa_logger
 import login_tools
 import routes
 
 # init sentry
 sentry_sdk.init(
     dsn=config.SENTRY_DSN,
+    default_integrations=False,
+    send_default_pii=True,
+    environment="Development" if config.FLASK_CONFIG['debug'] else "Production",
     integrations=[FlaskIntegration()]
 )
 
@@ -25,6 +34,7 @@ app.config["SESSION_REFRESH_EACH_REQUEST"] = True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 10  # seconds
 
+nsa_logger.configure()
 
 logger = logging.getLogger("netsocadmin")
 
@@ -38,12 +48,15 @@ def index():
     """
     if login_tools.is_logged_in():
         return flask.redirect("/tools")
-    # pylint: disable=E1101
     message = ''
-    if flask.request.args.get("asdf") == "lol":
+    if flask.request.args.get("e") == "e":
+        message = "An error occured. Please try again or contact us"
+    elif flask.request.args.get("e") == "l":
         message = "Please log in to view this page"
-    elif flask.request.args.get("asdf") == "borger":
+    elif flask.request.args.get("e") == "d":
         message = "Access not granted at this time"
+    elif flask.request.args.get("e") == "i":
+        message = "Username or password was incorrect"
     return flask.render_template(
         "index.html",
         page="login",
@@ -51,15 +64,61 @@ def index():
     )
 
 
+@app.before_request
+def before_request():
+    uid = str(uuid4())
+    flask.g.request_id = uid
+    with sentry_sdk.configure_scope() as scope:
+        if "username" in flask.session:
+            scope.user = {
+                "username": flask.session["username"],
+                "admin": flask.session["admin"],
+            }
+        scope.set_extra("request_id", uid)
+    """ logger.info(
+        "incoming request",
+        request_id=uid,
+        request_path=flask.request.path,
+        user_agent=flask.request.user_agent,
+        http_referrer=flask.request.referrer,
+        ip_address=flask.request.remote_addr,
+    ) """
+
+
+@app.after_request
+def after_request(response: flask.Response):
+    meta = {}
+    if "username" in flask.session:
+        meta["username"] = flask.session["username"]
+    logger.info(
+        "request finished",
+        user_agent=flask.request.user_agent,
+        http_referrer=flask.request.referrer,
+        ip_address=flask.request.remote_addr,
+        status_code=response.status_code,
+        **meta,
+    )
+    return response
+
+
+@app.route('/robots.txt')
+def robots():
+    return flask.send_file('static/robots.txt')
+
+
 @app.errorhandler(404)
 def not_found(e):
-    logger.error(e)
+    logger.warn(e)
     return flask.render_template("404.html"), 404
 
 
-@app.errorhandler(500)
-def internal_error(e):
-    logger.error(e)
+@app.errorhandler(Exception)
+def internal_error(e: Exception):
+    sentry_sdk.capture_exception(e)
+    logger.critical('Exception on %s [%s]' % (flask.request.path, flask.request.method),
+                    request_id=flask.g.request_id,
+                    request_path=flask.request.path,
+                    stacktrace=traceback.format_exc())
     return flask.render_template(
         "500.html",
         username=flask.session["username"] if "username" in flask.session else None,

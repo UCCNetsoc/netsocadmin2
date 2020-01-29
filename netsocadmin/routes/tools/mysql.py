@@ -1,8 +1,11 @@
-import logging
+# stdlib
 from typing import Tuple, Union
 
+# lib
 import flask
+import structlog as logging
 
+# local
 import login_tools
 import mysql
 

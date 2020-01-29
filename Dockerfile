@@ -1,21 +1,24 @@
 FROM python:alpine3.7 as dev
-LABEL maintainer="netsoc@netsoc.co"
+LABEL maintainer="netsoc@uccsocieties.co"
 
 VOLUME [ "/backups", "/home/users" ]
+
+WORKDIR /netsocadmin/netsocadmin
+
+ENV PYTHONPATH=/netsocadmin
 
 EXPOSE 5050
 
 RUN apk update && \
     apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
 
+RUN pip3 install gunicorn==19.10.0
+
 COPY requirements.txt /netsocadmin/requirements.txt
 # install all python requirements
-RUN pip3 install -r /netsocadmin/requirements.txt && \
-    pip3 install gunicorn
+RUN pip3 install -r /netsocadmin/requirements.txt
 
 COPY . /netsocadmin
-
-WORKDIR /netsocadmin/netsocadmin
 
 CMD [ "gunicorn", \
     "--reload", \
@@ -46,4 +49,9 @@ RUN pip3 install -r /netsocadmin/requirements.txt && \
 
 WORKDIR /netsocadmin/netsocadmin
 
-CMD [ "gunicorn", "-b", "0.0.0.0:5050", "--log-config", "/netsocadmin/logging.conf", "-k", "gevent", "-c", "/netsocadmin/gunicorn.conf", "netsoc_admin:app" ]
+CMD [ "gunicorn", \
+    "-b", "0.0.0.0:5050", \
+    "--log-config", "/netsocadmin/logging.conf", \
+    "-k", "gevent", \
+    "-c", "/netsocadmin/gunicorn.conf", \
+    "netsoc_admin:app" ]

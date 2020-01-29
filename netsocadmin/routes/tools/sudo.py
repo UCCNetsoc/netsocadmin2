@@ -1,8 +1,6 @@
-# stdlib
-import logging
-
 # lib
 import flask
+import structlog as logging
 
 # local
 import help_post

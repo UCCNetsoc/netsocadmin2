@@ -1,8 +1,6 @@
-# stdlib
-import logging
-
 # lib
 import flask
+import structlog as logging
 from flask.views import View
 
 # local
@@ -32,11 +30,7 @@ class Login(View):
             # Validate the login request
             login_user = login_tools.LoginUser(user, flask.request.form["password"])
             if not login_tools.is_correct_password(login_user):
-                return flask.render_template(
-                    "index.html",
-                    page="login",
-                    error_message="Username or password was incorrect",
-                )
+                return flask.redirect("/?e=i")
             # Initialise the user's directory if running on leela
             if not config.FLASK_CONFIG["debug"]:
                 register_tools.initialise_directories(user, flask.request.form["password"])
@@ -44,14 +38,10 @@ class Login(View):
             flask.session[config.LOGGED_IN_KEY] = True
             flask.session["username"] = user
             flask.session["admin"] = login_user.is_admin()
-            self.logger.info(f"{flask.session['username']} logged in")
+            self.logger.info("user logged in successfuly")
         except login_tools.UserNotInLDAPException:
-            return flask.render_template(
-                "index.html",
-                page="login",
-                error_message="Username or password was incorrect"
-            )
-        return flask.redirect("/")
+            return flask.redirect("/?e=i")
+        return flask.redirect("/tools")
 
 
 class Logout(View):
@@ -68,6 +58,6 @@ class Logout(View):
         # Remove the keys in the session that reflect the user
         flask.session.pop(config.LOGGED_IN_KEY, None)
         if flask.session.get("username"):
-            self.logger.info(f"{flask.session['username']} logged out")
+            self.logger.info("user logged out successfully")
             flask.session.pop("username", "")
         return flask.redirect("/")

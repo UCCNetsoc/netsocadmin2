@@ -1,8 +1,11 @@
+# stdlib
 from typing import List
 
+# lib
 import sendgrid
 from sendgrid.helpers.mail import Content, Email, From, Mail, To, ReplyTo
 
+# local
 import config
 
 

@@ -1,9 +1,10 @@
 # stdlib
-import logging
 import re
 
 # lib
 import flask
+import sentry_sdk
+import structlog as logging
 from flask.views import View
 
 # local
@@ -35,6 +36,12 @@ class CompleteSignup(View):
         # make sure token is valid
         email = flask.request.form["email"]
         uri = flask.request.form["_token"]
+
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
         mysql_conn = None
 
         if not register_tools.good_token(email, uri):
@@ -107,11 +114,11 @@ class CompleteSignup(View):
             if not config.FLASK_CONFIG["debug"]:
                 register_tools.initialise_directories(user, info["password"])
 
-            # registration complete, remove their token
-            register_tools.remove_token(email)
-
             # all went well, commit changes to MySQL
             mysql_conn.commit()
+
+            # registration complete, remove their token
+            register_tools.remove_token(email)
         except register_tools.UserExistsInLDAPException:
             return flask.render_template(
                 "index.html",
@@ -133,7 +140,6 @@ class CompleteSignup(View):
                 error_message="An error occured. Please try again or contact us",
             )
         except Exception as e:
-            self.logger.error(f"error creating user: {e}")
             # If an error occured, roll back changes
             register_tools.remove_token(email)
             if mysql_conn is not None:
@@ -168,6 +174,12 @@ class Confirmation(View):
     def dispatch_request(self) -> str:
         # make sure is ucc email
         email = flask.request.form['email']
+
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
         if not re.match(r"[0-9]{8,11}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z.0-9]+@uccsocieties.ie", email):
             self.logger.info(f"email {email} is not a valid UCC email")
             return flask.render_template(
@@ -195,10 +207,7 @@ class Confirmation(View):
         confirmation_resp = register_tools.send_confirmation_email(email, out_email)
         if not str(confirmation_resp.status_code).startswith("20"):
             self.logger.error("confirmation email failed to send")
-            return flask.render_template(
-                "index.html",
-                page="login",
-                error_message="An error occured. Please try again or contact us")
+            return flask.redirect("/?e=e")
 
         caption = "Thank you!"
         if not config.FLASK_CONFIG["debug"]:
@@ -236,6 +245,11 @@ class Signup(View):
     def dispatch_request(self) -> str:
         # Make sure they haven't forged the URL
         email = flask.request.args.get("e")
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
         token = flask.request.args.get("t")
         return self.render(email, token, not register_tools.good_token(email, token))
 
@@ -260,6 +274,12 @@ class Username(View):
         # check if request is legit
         email = flask.request.headers["email"]
         token = flask.request.headers["token"]
+
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
         if not register_tools.good_token(email, token):
             self.logger.info(f"bad token {token} used for email {email}")
             return flask.abort(403)

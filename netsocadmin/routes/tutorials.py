@@ -1,10 +1,10 @@
 # stdlib
-import logging
 import os
 
 # lib
 import flask
 import markdown
+import structlog as logging
 
 # local
 import config
