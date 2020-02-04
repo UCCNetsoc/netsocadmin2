@@ -41,11 +41,12 @@ RUN apk update && \
 RUN mkdir ~/.ssh && \
     ssh-keyscan -t ecdsa leela.netsoc.co >> ~/.ssh/known_hosts
 
+RUN pip3 install gunicorn==19.10.0 && \
+    pip3 install gunicorn[gevent]
+
 COPY --from=dev /netsocadmin /netsocadmin
 
-RUN pip3 install -r /netsocadmin/requirements.txt && \
-    pip3 install gunicorn && \
-    pip3 install gunicorn[gevent]
+RUN pip3 install -r /netsocadmin/requirements.txt
 
 WORKDIR /netsocadmin/netsocadmin
 
