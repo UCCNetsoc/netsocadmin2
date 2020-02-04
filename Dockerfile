@@ -15,7 +15,7 @@ RUN apk update && \
 RUN pip3 install gunicorn==19.10.0
 
 COPY requirements.txt /netsocadmin/requirements.txt
-# install all python requirements
+
 RUN pip3 install -r /netsocadmin/requirements.txt
 
 COPY . /netsocadmin
@@ -28,9 +28,13 @@ CMD [ "gunicorn", \
     "netsoc_admin:app" ]
 
 FROM python:alpine3.7
-LABEL maintainer="netsoc@netsoc.co"
+LABEL maintainer="netsoc@uccsocieties.co"
 
 VOLUME [ "/backups", "/home/users" ]
+
+WORKDIR /netsocadmin/netsocadmin
+
+ENV PYTHONPATH=/netsocadmin
 
 EXPOSE 5050
 
@@ -47,8 +51,6 @@ RUN pip3 install gunicorn==19.10.0 && \
 COPY --from=dev /netsocadmin /netsocadmin
 
 RUN pip3 install -r /netsocadmin/requirements.txt
-
-WORKDIR /netsocadmin/netsocadmin
 
 CMD [ "gunicorn", \
     "-b", "0.0.0.0:5050", \
