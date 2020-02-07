@@ -72,6 +72,13 @@ define ('FS_METHOD', 'direct');
 
 define('WP_DEBUG', false);
 
+define('FORCE_SSL_ADMIN', true);
+
+// Required to mitigate Mixed Content errors when wordpress requests http content from https domain.
+// Wordpress so bad 
+if (strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)
+$_SERVER['HTTPS']='on';
+
 /* That's all, stop editing! Happy blogging. */
 
 /** WordPress absolute path to the Wordpress directory. */
