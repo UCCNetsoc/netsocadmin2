@@ -300,7 +300,15 @@ def remove_ldap_user(user: str) -> bool:
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
 
-def reset_password(user: str):
+def reset_password(user: str, email: str):
+    """
+    Sends an email once a user has reset their password
+
+    :param email the email address which this email is being sent
+    :param user the username which you log into the servers with
+    :returns True if the password was reset succesfully, False otherwise
+    """
+
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         success = conn.search(
             search_base="cn=admins,dc=netsoc,dc=co",
@@ -308,10 +316,52 @@ def reset_password(user: str):
             attributes=["uid", "gidNumber"],
         )
         if success:
-            return
-    
+            return False
+
     remove_ldap_user(user)
-    add_ldap_user(user)
+    info = add_ldap_user(user)
+    return send_reset_email(email, user, info['password'])
+
+
+def send_reset_email(email: str, user: str, password: str) -> bool:
+    """
+    Sends an email once a user has reset their password
+
+    :param email the email address which this email is being sent
+    :param user the username which you log into the servers with
+    :param password the password which you log into the servers with
+    :returns True if the email has been sent succesfully, False otherwise
+    """
+
+    message_body = f"""
+Hello,
+
+Your password has been reset! Your new server log-in details are as follows:
+
+username: {user}
+password: {password}
+
+To log in, run:
+    ssh {user}@leela.netsoc.co
+and enter your password when prompted.
+If you are using Windows, go to http://www.putty.org/ and download the SSH client.
+
+Please change your password when you first log-in to something you'll remember!
+
+Yours,
+
+The UCC Netsoc SysAdmin Team
+    """
+    if not config.FLASK_CONFIG['debug']:
+        response = mail_helper.send_mail(
+            "server.registration@netsoc.co",
+            email,
+            "Account Registration",
+            message_body,
+        )
+    else:
+        response = type("Response", (object,), {"status_code": 200})
+    return str(response.status_code).startswith("20")
 
 class MySQLException(Exception):
     pass

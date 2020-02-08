@@ -179,7 +179,14 @@ class ResetPassword(View):
 
         register_tools.remove_token(email)
 
-        register_tools.reset_password(user)
+        reset_resp = register_tools.reset_password(user, email)
+
+        if reset_resp == False:
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="An error occured. Please try again or contact us",
+            )
 
         template = "message.html"
         caption = "Success!"
