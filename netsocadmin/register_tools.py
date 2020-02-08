@@ -311,16 +311,21 @@ def reset_password(user: str, email: str):
 
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         success = conn.search(
-            search_base="cn=admins,dc=netsoc,dc=co",
+            search_base="dc=netsoc,dc=co",
             search_filter=f"(&(objectClass=account)(uid={user}))",
-            attributes=["uid", "gidNumber"],
+            attributes=["uid", "gidNumber", "userPassword", "cn", "sn"],
         )
-        if success:
+        if not success:
             return False
-
-    remove_ldap_user(user)
-    info = add_ldap_user(user)
-    return send_reset_email(email, user, info['password'])
+        # return conn.entries[0]["sn"]
+        entry = conn.entries[0]
+        old_password = entry["userPassword"]
+        password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+        # pylint: disable=E1101
+        crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
+        if not conn.modify(f"cn={user},cn=member,dc=netsoc,dc=co", {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]}):
+            conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co", {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+        return send_reset_email(email, user, password)
 
 
 def send_reset_email(email: str, user: str, password: str) -> bool:
@@ -352,6 +357,7 @@ Yours,
 
 The UCC Netsoc SysAdmin Team
     """
+    # return message_body
     if not config.FLASK_CONFIG['debug']:
         response = mail_helper.send_mail(
             "server.registration@netsoc.co",

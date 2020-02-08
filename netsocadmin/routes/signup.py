@@ -191,6 +191,7 @@ class ResetPassword(View):
         template = "message.html"
         caption = "Success!"
         message = f"An email has been sent with your new password. Please change your password as soon as you log in."
+        # message = f"<p>{reset_resp}</p>" + message;
         return flask.render_template(template, caption=caption, message=message)
 
     def dispatch_request(self) -> str:
