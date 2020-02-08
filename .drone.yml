@@ -13,7 +13,7 @@ steps:
     - flake8
   when:
     event: 
-      - pull_requeset
+      - pull_request
       - push
 
 - name: build_dev
