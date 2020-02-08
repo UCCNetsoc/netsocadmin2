@@ -301,6 +301,15 @@ def remove_ldap_user(user: str) -> bool:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
 
 def reset_password(user: str):
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
+        success = conn.search(
+            search_base="cn=admins,dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={user}))",
+            attributes=["uid", "gidNumber"],
+        )
+        if success:
+            return
+    
     remove_ldap_user(user)
     add_ldap_user(user)
 
