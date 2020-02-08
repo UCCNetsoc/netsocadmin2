@@ -159,6 +159,7 @@ class CompleteSignup(View):
         self.logger.info(f"successfully signed up {flask.request.form['name']} and confirmation email sent")
         return flask.render_template("message.html", caption=caption, message=message)
 
+
 class ResetPassword(View):
     """
     Route: /resetpassword
@@ -181,7 +182,7 @@ class ResetPassword(View):
 
         reset_resp = register_tools.reset_password(user, email)
 
-        if reset_resp == False:
+        if reset_resp is False:
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -205,6 +206,7 @@ class ResetPassword(View):
 
         token = flask.request.args.get("t")
         return self.render(user, email, token, not register_tools.good_token(email, token))
+
 
 class Forgot(View):
     """

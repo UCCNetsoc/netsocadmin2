@@ -67,6 +67,7 @@ The UCC Netsoc SysAdmin Team
         response = type("Response", (object,), {"status_code": 200, "token": uri, "user": user})
     return response
 
+
 def send_confirmation_email(email: str, server_url: str) -> bool:
     """
     Sends email containing the link which users use to set up their accounts.
@@ -290,6 +291,7 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
             raise LDAPException(f"error adding ldap user: {conn.last_error}")
     return info
 
+
 def remove_ldap_user(user: str) -> bool:
     """
     Removes a user from LDAP
@@ -297,8 +299,10 @@ def remove_ldap_user(user: str) -> bool:
     :param user the username
     :returns True if successful
     """
+
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
+
 
 def reset_password(user: str, email: str):
     """
@@ -318,14 +322,15 @@ def reset_password(user: str, email: str):
         if not success:
             return False
         entry = conn.entries[0]
-        old_password = entry["userPassword"]
         password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
         # pylint: disable=E1101
         crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         if entry["gidNumber"] == 420:
-            conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co", {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+            conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
         else:
-            conn.modify(f"cn={user},cn=member,dc=netsoc,dc=co", {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+            conn.modify(f"cn={user},cn=member,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
         return send_reset_email(email, user, password)
 
 
@@ -369,6 +374,7 @@ The UCC Netsoc SysAdmin Team
     else:
         response = type("Response", (object,), {"status_code": 200})
     return str(response.status_code).startswith("20")
+
 
 class MySQLException(Exception):
     pass
