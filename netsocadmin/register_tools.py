@@ -23,6 +23,50 @@ import mail_helper
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 
+def send_forgot_email(email: str, server_url: str) -> bool:
+    """
+    Sends email containing the user's username and the link which users use to
+    generate a new password
+
+    :param email the email address which the user registered with
+    :param server_url the address of the flask application
+    :returns boolean true if the email was sent succesfully, false otherwise.
+    """
+
+    conn = pymysql.connect(**config.MYSQL_DETAILS)
+    user = ""
+    with conn.cursor() as c:
+        sql = "SELECT uid FROM users WHERE email=%s;"
+        c.execute(sql, (email,))
+        user = c.fetchone()[0]
+
+    uri = generate_uri(email)
+    message_body = f"""
+Hello,
+
+Your server log-in is as follows:
+
+username: {user}
+
+If you wish to reset your password then click the link below.
+
+http://{server_url}/resetpassword?t={uri}&e={email}&u={user}
+
+Yours,
+
+The UCC Netsoc SysAdmin Team
+"""
+    if not config.FLASK_CONFIG['debug']:
+        response = mail_helper.send_mail(
+            "server.registration@netsoc.co",
+            email,
+            "Account Details",
+            message_body,
+        )
+    else:
+        response = type("Response", (object,), {"status_code": 200, "token": uri, "user": user})
+    return response
+
 def send_confirmation_email(email: str, server_url: str) -> bool:
     """
     Sends email containing the link which users use to set up their accounts.
@@ -202,7 +246,7 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
         if not success and conn.last_error is not None:
             raise LDAPException(f"error adding ldap user: {conn.last_error}")
 
-        last = None
+        last = 0
         for account in conn.entries:
             if account["uid"] == user:
                 raise UserExistsInLDAPException(f"{user} exists in LDAP")
@@ -246,7 +290,6 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
             raise LDAPException(f"error adding ldap user: {conn.last_error}")
     return info
 
-
 def remove_ldap_user(user: str) -> bool:
     """
     Removes a user from LDAP
@@ -257,6 +300,9 @@ def remove_ldap_user(user: str) -> bool:
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
 
+def reset_password(user: str):
+    remove_ldap_user(user)
+    add_ldap_user(user)
 
 class MySQLException(Exception):
     pass

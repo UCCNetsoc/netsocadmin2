@@ -1,7 +1,7 @@
 """Imports from all the files in the directory and makes the imports available to other parts of the system"""
 from .exception import ExceptionView
 from .login import Login, Logout
-from .signup import CompleteSignup, Confirmation, Signup, Username
+from .signup import CompleteSignup, ResetPassword, Forgot, Confirmation, Signup, Username
 from .tools.backups import Backup, BackupsView
 from .tools.help import Help, HelpView
 from .tools.index import ToolIndex
@@ -21,6 +21,8 @@ __all__ = [
 
     # Signup
     "CompleteSignup",
+    "ResetPassword",
+    "Forgot",
     "Confirmation",
     "Signup",
     "Username",
