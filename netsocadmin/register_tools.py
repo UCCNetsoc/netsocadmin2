@@ -258,7 +258,7 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
         # creates initial password for user. They will be asked to change
         # this when they first log in.
         password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
-        # pylint: disable=E1101
+
         crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         info["password"] = password
         info["crypt_password"] = crypt_password
@@ -317,13 +317,13 @@ def reset_password(user: str, email: str):
         success = conn.search(
             search_base="dc=netsoc,dc=co",
             search_filter=f"(&(objectClass=account)(uid={user}))",
-            attributes=["uid", "gidNumber", "userPassword", "cn"],
+            attributes=["uid", "gidNumber", "userPassword"],
         )
         if not success:
             return False
         entry = conn.entries[0]
         password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
-        # pylint: disable=E1101
+
         crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
         if entry["gidNumber"] == 420:
             conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co",

@@ -8,16 +8,18 @@
 	    }
 
 		.card-panel {
-      overflow: auto;
+            overflow: auto;
 		}
-    .card-panel::after {
-      content: "";
-      clear: both;
-      display: table;
-    }
-    input[type="checkbox"]+label {
-      cursor: pointer;
-    }
+
+        .card-panel::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        input[type="checkbox"]+label {
+         cursor: pointer;
+        }
 
 		.container:first {
 			padding: 5% 0%;
@@ -38,28 +40,26 @@
         var form = document.getElementById("forgot");
         if (form.style.display === "none") {
             form.style.display = "block";
-            console.log(form);
             document.getElementById("forgot_label").style.textDecoration = "underline";
         } else {
             form.style.display = "none";
-            console.log(form);
             document.getElementById("forgot_label").style.textDecoration = "none";
         }
     }
     </script>
 
-<script>
-    function checkUsername() {
-        var err = document.getElementById("error-message");
-        var uid = document.getElementById("username").value;
+    <script>
+        function checkUsername() {
+            var err = document.getElementById("error-message");
+            var uid = document.getElementById("username").value;
 
-        if (! (/^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/).test(uid)) {
-            err.innerHTML = "Username must be all lower case letters, numbers, hyphens or underscores only.<br/>If this is your username, please contact us to have your username changed to a valid one."
-            return false;
+            if (! (/^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/).test(uid)) {
+                err.innerHTML = "Username must be all lower case letters, numbers, hyphens or underscores only.<br/>If this is your username, please contact us to have your username changed to a valid one."
+                return false;
+            }
+            return true;
         }
-        return true;
-    }
-</script>
+    </script>
 {% endblock %}
 
 {% block body %}

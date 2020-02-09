@@ -37,7 +37,7 @@ class CompleteSignup(View):
     def dispatch_request(self) -> str:
         # make sure token is valid
         email = flask.request.form["email"]
-        uri = flask.request.form["_token"]
+        token = flask.request.form["_token"]
 
         with sentry_sdk.configure_scope() as scope:
             scope.user = {
@@ -46,8 +46,8 @@ class CompleteSignup(View):
 
         mysql_conn = None
 
-        if not register_tools.good_token(email, uri):
-            self.logger.warn(f"invalid token {uri} for email {email}")
+        if not register_tools.good_token(email, token):
+            self.logger.warn("invalid token to signup for email", token=token, email=email)
             return flask.render_template(
                 "index.html",
                 page="login",
@@ -65,7 +65,7 @@ class CompleteSignup(View):
             return flask.render_template(
                 "form.html",
                 email_address=email,
-                token=uri,
+                token=token,
                 error_message="You must fill out all of the fields",
             )
 
@@ -74,7 +74,7 @@ class CompleteSignup(View):
             return flask.render_template(
                 "form.html",
                 email_address=email,
-                token=uri,
+                token=token,
                 error_message="The requested username contains uppercase characters.\
                  Please enter a username in lowercase",
             )
@@ -83,17 +83,18 @@ class CompleteSignup(View):
             return flask.render_template(
                 "form.html",
                 email_address=email,
-                token=uri,
+                token=token,
                 error_message="The requested username is too long. Maximum length is 15 characters",
             )
 
         try:
             if register_tools.is_in_ldap(user):
-                self.logger.info(f"username {user} not available")
+                self.logger.info(f"user tried signing up with already taken username",
+                                 username=user, email=email, token=token)
                 return flask.render_template(
                     "form.html",
                     email_address=email,
-                    token=uri,
+                    token=token,
                     error_message="The requested username is not available",
                 )
 
@@ -109,6 +110,8 @@ class CompleteSignup(View):
 
             # send user's details to them
             if not register_tools.send_details_email(email, user, info["password"], mysql_pass):
+                # We should really either throw exception in send_details_email or return something
+                # more useful :(
                 self.logger.error(f"failed to send confirmation email")
 
             # initialise the user's home directories so they can use netsoc admin
@@ -192,7 +195,6 @@ class ResetPassword(View):
         template = "message.html"
         caption = "Success!"
         message = f"An email has been sent with your new password. Please change your password as soon as you log in."
-        # message = f"<p>{reset_resp}</p>" + message;
         return flask.render_template(template, caption=caption, message=message)
 
     def dispatch_request(self) -> str:
@@ -237,7 +239,6 @@ class Forgot(View):
                 page="login",
                 error_message="Must be a UCC Umail or Society email address")
 
-        # make sure email has not already been used to make an account
         if email in config.EMAIL_WHITELIST or not register_tools.has_account(email):
             self.logger.info(f"account doesn't exist with email {email}")
             return flask.render_template(
