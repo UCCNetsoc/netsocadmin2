@@ -4,12 +4,20 @@
 
     <style>
 	    nav {
-			background-color: rgba(0,0,0,0);	
-	    }	
-		
+			background-color: rgba(0,0,0,0);
+	    }
+
 		.card-panel {
-			min-height: 500px;
+      overflow: auto;
 		}
+    .card-panel::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    input[type="checkbox"]+label {
+      cursor: pointer;
+    }
 
 		.container:first {
 			padding: 5% 0%;
@@ -26,13 +34,25 @@
             document.getElementById("pass_label").style.textDecoration = "none";
         }
     }
+    function forgotToggle() {
+        var form = document.getElementById("forgot");
+        if (form.style.display === "none") {
+            form.style.display = "block";
+            console.log(form);
+            document.getElementById("forgot_label").style.textDecoration = "underline";
+        } else {
+            form.style.display = "none";
+            console.log(form);
+            document.getElementById("forgot_label").style.textDecoration = "none";
+        }
+    }
     </script>
 
 <script>
     function checkUsername() {
         var err = document.getElementById("error-message");
         var uid = document.getElementById("username").value;
-        
+
         if (! (/^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/).test(uid)) {
             err.innerHTML = "Username must be all lower case letters, numbers, hyphens or underscores only.<br/>If this is your username, please contact us to have your username changed to a valid one."
             return false;
@@ -73,6 +93,7 @@
                     </form>
                 </div>
                 <div id="login" class="col s12">
+                    <br>
                     <form method="POST" action="/login" class="col row s12" onsubmit="return checkUsername()">
                         <br>
                         <div class="row">
@@ -80,7 +101,7 @@
                                 <label for="username">Server Username</label>
                                 <input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
                             </div>
-        
+
                             <div class="input-field">
                                 <label for="password">Server Password</label>
                                 <input autocomplete="off" name="password" type="password" id="password">
@@ -94,10 +115,31 @@
                                 <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
                                 <input type="checkbox" id="show_pass" onclick="showPassword()">
                             </div>
+                            <div>
+                                <label for="forgot_toggle" id="forgot_label"><h6>Forgot Username or Password?</h6></label>
+                                <input type="checkbox" id="forgot_toggle" onclick="forgotToggle()">
+                            </div>
                         </div>
                     </form>
                     <div style="padding: 0 1em;" id="error-message" class="error-message red-text row s6">
                         <i> {{ error_message }} </i>
+                    </div>
+                    <div id="forgot" style="display: none;" class="row col s12">
+                        <form method="POST" action="/forgot" class="col row s12">
+                            <br>
+                            <h5>Forgotten Username or Password?</h5>
+                            <div class="row">
+                                <div class="input-field">
+                                    <label for="email">Student or Society Email</label>
+                                    <input autocomplete="off" name="email" type="text" id="email">
+                                </div>
+                            </div>
+                            <button class="btn waves-effect waves-light" type="submit">
+                                Send Verification
+                                <i class="mdi-content-send right"></i>
+                            </button>
+                        </form>
+                        <br>
                     </div>
                 </div>
             </div>

@@ -128,6 +128,8 @@ def internal_error(e: Exception):
 # ------------------------------Server Signup Routes------------------------------#
 app.add_url_rule('/completeregistration', view_func=routes.CompleteSignup.as_view('completeregistration'))
 app.add_url_rule('/sendconfirmation', view_func=routes.Confirmation.as_view('sendconfirmation'))
+app.add_url_rule('/forgot', view_func=routes.Forgot.as_view('forgot'))
+app.add_url_rule('/resetpassword', view_func=routes.ResetPassword.as_view('resetpassword'))
 app.add_url_rule('/signup', view_func=routes.Signup.as_view('signup'))
 app.add_url_rule('/username', view_func=routes.Username.as_view('username'))
 app.add_url_rule('/exception', view_func=routes.ExceptionView.as_view('exception'))

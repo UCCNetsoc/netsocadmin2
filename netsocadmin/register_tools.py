@@ -23,6 +23,51 @@ import mail_helper
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 
+def send_forgot_email(email: str, server_url: str) -> bool:
+    """
+    Sends email containing the user's username and the link which users use to
+    generate a new password
+
+    :param email the email address which the user registered with
+    :param server_url the address of the flask application
+    :returns boolean true if the email was sent succesfully, false otherwise.
+    """
+
+    conn = pymysql.connect(**config.MYSQL_DETAILS)
+    user = ""
+    with conn.cursor() as c:
+        sql = "SELECT uid FROM users WHERE email=%s;"
+        c.execute(sql, (email,))
+        user = c.fetchone()[0]
+
+    uri = generate_uri(email)
+    message_body = f"""
+Hello,
+
+Your server log-in is as follows:
+
+username: {user}
+
+If you wish to reset your password then click the link below.
+
+http://{server_url}/resetpassword?t={uri}&e={email}&u={user}
+
+Yours,
+
+The UCC Netsoc SysAdmin Team
+"""
+    if not config.FLASK_CONFIG['debug']:
+        response = mail_helper.send_mail(
+            "username.reminder@netsoc.co",
+            email,
+            "Account Details",
+            message_body,
+        )
+    else:
+        response = type("Response", (object,), {"status_code": 200, "token": uri, "user": user})
+    return response
+
+
 def send_confirmation_email(email: str, server_url: str) -> bool:
     """
     Sends email containing the link which users use to set up their accounts.
@@ -202,7 +247,7 @@ def add_ldap_user(user: str) -> typing.Dict[str, object]:
         if not success and conn.last_error is not None:
             raise LDAPException(f"error adding ldap user: {conn.last_error}")
 
-        last = None
+        last = 0
         for account in conn.entries:
             if account["uid"] == user:
                 raise UserExistsInLDAPException(f"{user} exists in LDAP")
@@ -254,8 +299,81 @@ def remove_ldap_user(user: str) -> bool:
     :param user the username
     :returns True if successful
     """
+
     with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
         return conn.delete(f"cn={user},cn=member,dc=netsoc,dc=co")
+
+
+def reset_password(user: str, email: str):
+    """
+    Sends an email once a user has reset their password
+
+    :param email the email address which this email is being sent
+    :param user the username which you log into the servers with
+    :returns True if the password was reset succesfully, False otherwise
+    """
+
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
+        success = conn.search(
+            search_base="dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={user}))",
+            attributes=["uid", "gidNumber", "userPassword", "cn"],
+        )
+        if not success:
+            return False
+        entry = conn.entries[0]
+        password = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(12))
+        # pylint: disable=E1101
+        crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
+        if entry["gidNumber"] == 420:
+            conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+        else:
+            conn.modify(f"cn={user},cn=member,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+        return send_reset_email(email, user, password)
+
+
+def send_reset_email(email: str, user: str, password: str) -> bool:
+    """
+    Sends an email once a user has reset their password
+
+    :param email the email address which this email is being sent
+    :param user the username which you log into the servers with
+    :param password the password which you log into the servers with
+    :returns True if the email has been sent succesfully, False otherwise
+    """
+
+    message_body = f"""
+Hello,
+
+Your password has been reset! Your new server log-in details are as follows:
+
+username: {user}
+password: {password}
+
+To log in, run:
+    ssh {user}@leela.netsoc.co
+and enter your password when prompted.
+If you are using Windows, go to http://www.putty.org/ and download the SSH client.
+
+Please change your password when you first log-in to something you'll remember!
+
+Yours,
+
+The UCC Netsoc SysAdmin Team
+    """
+    # return message_body
+    if not config.FLASK_CONFIG['debug']:
+        response = mail_helper.send_mail(
+            "password.reset@netsoc.co",
+            email,
+            "Password Reset",
+            message_body,
+        )
+    else:
+        response = type("Response", (object,), {"status_code": 200})
+    return str(response.status_code).startswith("20")
 
 
 class MySQLException(Exception):

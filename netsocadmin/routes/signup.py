@@ -14,6 +14,8 @@ import register_tools
 
 __all__ = [
     'CompleteSignup',
+    'ResetPassword',
+    'Forgot',
     'Confirmation',
     'Signup',
     'Username',
@@ -158,6 +160,118 @@ class CompleteSignup(View):
         return flask.render_template("message.html", caption=caption, message=message)
 
 
+class ResetPassword(View):
+    """
+    Route: /resetpassword
+        This is the link which they will be taken to with the forgot email.
+        It checks if the token they have used is valid and corresponds to the email.
+        It then resets the password.
+    """
+    # Logger instance
+    logger = logging.getLogger("netsocadmin.resetpassword")
+
+    def render(self, user, email: str, token: str, error: bool = False) -> str:
+        """Render the template with appropriate messages for whether or not there's an error"""
+        if error:
+            self.logger.warn(f"bad token {token} used for email {email}")
+            template = "index.html"
+            kw = {"error_message": "Your request was not valid. Please try again or contact us."}
+            return flask.render_template(template, **kw)
+
+        register_tools.remove_token(email)
+
+        reset_resp = register_tools.reset_password(user, email)
+
+        if reset_resp is False:
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="An error occured. Please try again or contact us",
+            )
+
+        template = "message.html"
+        caption = "Success!"
+        message = f"An email has been sent with your new password. Please change your password as soon as you log in."
+        # message = f"<p>{reset_resp}</p>" + message;
+        return flask.render_template(template, caption=caption, message=message)
+
+    def dispatch_request(self) -> str:
+        # Make sure they haven't forged the URL
+        user = flask.request.args.get("u")
+        email = flask.request.args.get("e")
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
+        token = flask.request.args.get("t")
+        return self.render(user, email, token, not register_tools.good_token(email, token))
+
+
+class Forgot(View):
+    """
+    Route: /forgot
+        Users will be lead to this route when they submit an email for a reminder of their
+        username and, optionally, resetting their password.
+        It then checks that form data to make sure it's a valid UCC email.
+        Sends an email with a link to validate the email holder is who is registering.
+    """
+    # Logger instance
+    logger = logging.getLogger("netsocadmin.forgot")
+    # Specify which method(s) are allowed to be used to access the route
+    methods = ["POST"]
+
+    def dispatch_request(self) -> str:
+        # make sure is ucc email
+        email = flask.request.form['email']
+
+        with sentry_sdk.configure_scope() as scope:
+            scope.user = {
+                "email": email,
+            }
+
+        if not re.match(r"[0-9]{8,11}@umail\.ucc\.ie", email) and not re.match(r"[a-zA-Z.0-9]+@uccsocieties.ie", email):
+            self.logger.info(f"email {email} is not a valid UCC email")
+            return flask.render_template(
+                "index.html",
+                page="login",
+                error_message="Must be a UCC Umail or Society email address")
+
+        # make sure email has not already been used to make an account
+        if email in config.EMAIL_WHITELIST or not register_tools.has_account(email):
+            self.logger.info(f"account doesn't exist with email {email}")
+            return flask.render_template(
+                "message.html",
+                caption="Sorry!",
+                message=(
+                    f"There isn't an existing account with email '{email}'. "
+                    "Please contact us if you think this is an error."
+                ),
+            )
+
+        # send confirmation link to ensure they own the email account
+        out_email = (
+            "admin.netsoc.co" if not config.FLASK_CONFIG["debug"]
+            else f"{config.FLASK_CONFIG['host']}:{config.FLASK_CONFIG['port']}"
+        )
+        forgot_resp = register_tools.send_forgot_email(email, out_email)
+        if not str(forgot_resp.status_code).startswith("20"):
+            self.logger.error("confirmation email failed to send")
+            return flask.redirect("/?e=e")
+
+        caption = "Success!"
+        if not config.FLASK_CONFIG["debug"]:
+            message = f"Your username reminder and password reset link has been sent to {email}"
+        else:
+            host = config.FLASK_CONFIG['host']
+            port = config.FLASK_CONFIG['port']
+            message = f"Forgot URL: \
+                <a href='http://{host}:{port}/resetpassword?t={forgot_resp.token}&e={email}&u={forgot_resp.user}'>\
+                    http://{host}:{port}/resetpassword?t={forgot_resp.token}&e={email}&u={forgot_resp.user}</a>"
+        self.logger.info(f"forgot username link sent to {email}")
+        return flask.render_template("message.html", caption=caption, message=message)
+
+
 class Confirmation(View):
     """
     Route: /sendconfirmation
@@ -167,7 +281,7 @@ class Confirmation(View):
         Sends an email with a link to validate the email holder is who is registering.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.sendcomfirmation")
+    logger = logging.getLogger("netsocadmin.sendconfirmation")
     # Specify which method(s) are allowed to be used to access the route
     methods = ["POST"]
 
