@@ -223,7 +223,9 @@
         <div class="navbar">
             <nav>
                 <div class="nav-wrapper teal lighten-2">
+                    {% if is_logged_in %}
                     <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+                    {% endif %}
                     <span class="brand-logo"> {{ page_title }}</span>
 
                     {# This is the main navbar for when the screen is big enough #}
@@ -256,8 +258,8 @@
                     </ul>
 
                     {# This one is used when the screen is small like on mobile #}
+                    {% if is_logged_in %}
                     <ul class="side-nav" id="mobile-demo">
-                        {% if is_logged_in %}
                         <li style="margin-top: 1em">
                             <a class="dropdown-trigger-mobile btn waves-effect waves-light red accent-2 white-text" href="#" data-activates="profile-menu-mobile">{{ username }}</a>
                             <ul id="profile-menu-mobile" class="dropdown-content">
@@ -268,7 +270,6 @@
                                 <li><a href="#!">Change Password</a></li> -->
                             </ul>
                         </li>
-                        {% endif %}
                         <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin" style="margin-top: 2em">
                             <a style="width: 100%" href="/tools">
                                 <i class="fas fa-home">
@@ -338,6 +339,7 @@
                             <a target="_blank" href="https://blog.netsoc.co/">Blog</a>
                         </li>
                     </ul>
+                    {% endif %}
                 </div>
             </nav>
         </div>
