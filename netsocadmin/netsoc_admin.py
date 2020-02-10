@@ -20,13 +20,14 @@ import login_tools
 import routes
 
 # init sentry
-sentry_sdk.init(
-    dsn=config.SENTRY_DSN,
-    default_integrations=False,
-    send_default_pii=True,
-    environment="Development" if config.FLASK_CONFIG['debug'] else "Production",
-    integrations=[FlaskIntegration()]
-)
+if not config.FLASK_CONFIG['debug']:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN,
+        default_integrations=False,
+        send_default_pii=True,
+        environment="Development" if config.FLASK_CONFIG['debug'] else "Production",
+        integrations=[FlaskIntegration()]
+    )
 
 app = flask.Flask("netsocadmin")
 app.secret_key = config.SECRET_KEY
@@ -161,6 +162,7 @@ app.add_url_rule('/tools/mysql', view_func=routes.MySQLView.as_view('mysql'))
 app.add_url_rule('/tools/shells', view_func=routes.ShellsView.as_view('shells'))
 app.add_url_rule('/tools/backups', view_func=routes.BackupsView.as_view('backups'))
 
+logger.info("netsocadmin has been started")
 
 if __name__ == '__main__':
     app.run(
