@@ -65,24 +65,24 @@
                 <h3 class="center-align"> Register </h3>
                 <form method="POST" action="/completeregistration" accept-charset="UTF-8">
                     <input id="_token" name="_token" type="hidden" value="{{ token }}">
-    
+
                     <div>
                         <div class="input-field">
-                            <label for="email">Student or Society Email</label>
                             <input disabled="disabled" name="email" type="text" value="{{ email_address }}">
+                            <label for="email">Student or Society Email</label>
                             <input autocomplete="off" id="email" name="email" type="hidden" value="{{ email_address }}">
                         </div>
                     </div>
                     <div>
                         <div class="input-field">
-                            <label for="name">Full Name/Society Name</label>
                             <input autocomplete="off" class="example" autofocus="autofocus" name="name" type="text" id="name">
+                            <label for="name">Full Name/Society Name</label>
                         </div>
                     </div>
                     <div>
                         <div class="input-field">
-                            <label for="uid">Username (lowercase-only)</label>
                             <input autocomplete="off" class="example" name="uid" type="text" id="uid" maxlength="15">
+                            <label for="uid">Username (lowercase-only)</label>
                         </div>
                         <br/>
                         <button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>

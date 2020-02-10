@@ -47,19 +47,19 @@
             <div class="card-title">Fill in the form below and sit tight!</div>
             <form class="container" method="POST" action="/completesudoapplication" accept-charset="UTF-8">
                 <div class="input-field">
+                    <input disabled="disabled" name="username" id="email" type="text" value="{{ username }}">
                     <label for="email">Username</label>
-                    <input disabled="disabled" name="username" type="text" value="{{ username }}">
                     <input autocomplete="off" name="username" type="hidden" value="{{ username }}">
                 </div>
 
                 <div class="input-field">
+                    <input autocomplete="off" name="email" id="email" type="text">
                     <label for="email">Email</label>
-                    <input autocomplete="off" name="email" type="text">
                 </div>
 
                 <div class="input-field">
+                    <textarea class="materialize-textarea" name="reason" id="reason"></textarea>
                     <label for="reason">What do you need sudo for?</label>
-                    <textarea class="materialize-textarea" name="reason"></textarea>
                 </div>
 
                 <button class="btn waves-effect waves-light" type="submit" name="action"> Register
