@@ -153,6 +153,7 @@ def update_password(username: str, password: str):
     if and only if a user of that name does already exists.
 
     :param username the requested username whose password to update.
+    :param password the new password to be set for this user.
     :raises UserError if the operation fails.
     """
     if not re.match(config.VALID_USERNAME, username):

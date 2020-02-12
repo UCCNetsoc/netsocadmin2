@@ -277,6 +277,13 @@
                                 </i>
                             </a>
                         </li>
+                        <li {% if active == "account" %} class="active" {% endif %} title="Manage your netsoc server account">
+                            <a style="width: 100%" href="/tools/account">
+                                <i class="fas fa-cogs">
+                                    <span>Account</span>
+                                </i>
+                            </a>
+                        </li>
                         <li {% if active == "mysql" %} class="active" {% endif %} title="Create and delete MySQL Databases and change your password">
                             <a style="width: 100%" href="/tools/mysql">
                                 <i class="fas fa-database">
@@ -358,6 +365,13 @@
             <a style="width: 100%" href="/tools">
                 <i class="fas fa-home">
                     <span style="margin-left: 1em">Home</span>
+                </i>
+            </a>
+        </li>
+        <li {% if active == "account" %} class="active" {% endif %} title="Manage your netsoc server account">
+            <a style="width: 100%" href="/tools/account">
+                <i class="fas fa-cogs">
+                    <span style="margin-left: 1em">Account</span>
                 </i>
             </a>
         </li>

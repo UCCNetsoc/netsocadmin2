@@ -5,7 +5,8 @@ from .signup import CompleteSignup, ResetPassword, Forgot, Confirmation, Signup,
 from .tools.backups import Backup, BackupsView
 from .tools.help import Help, HelpView
 from .tools.index import ToolIndex
-from .tools.mysql import ChangePassword, CreateDB, DeleteDB, MySQLView
+from .tools.mysql import ChangeMySQLPassword, CreateDB, DeleteDB, MySQLView
+from .tools.account import ChangeAccountPassword, AccountView
 from .tools.shells import ChangeShell, ShellsView
 from .tools.sudo import CompleteSudo, Sudo
 from .tools.wordpress import WordpressInstall, WordpressView
@@ -40,7 +41,9 @@ __all__ = [
     "MySQLView",
     "CreateDB",
     "DeleteDB",
-    "ChangePassword",
+    "ChangeMySQLPassword",
+    "AccountView",
+    "ChangeAccountPassword",
     "Help",
     "HelpView",
     "WordpressInstall",

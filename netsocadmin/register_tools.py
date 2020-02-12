@@ -23,6 +23,36 @@ import mail_helper
 ldap_server = ldap3.Server(config.LDAP_HOST, get_info=ldap3.ALL)
 
 
+def update_password(user: str, password: str):
+    """
+    update_password changes a user's password to a given password
+    if and only if a user of that name does already exists.
+
+    :param username the requested username whose password to update.
+    :param password the new password to to be set for this user.
+    :returns boolean true if the password changed succesfully, false otherwise.
+    """
+
+    with ldap3.Connection(ldap_server, auto_bind=True, receive_timeout=5, **config.LDAP_AUTH) as conn:
+        success = conn.search(
+            search_base="dc=netsoc,dc=co",
+            search_filter=f"(&(objectClass=account)(uid={user}))",
+            attributes=["uid", "gidNumber", "userPassword"],
+        )
+        if not success:
+            return False
+        entry = conn.entries[0]
+
+        crypt_password = "{crypt}" + crypt.crypt(password,  crypt.mksalt(crypt.METHOD_SHA512))
+        if entry["gidNumber"] == 420:
+            conn.modify(f"cn={user},cn=admins,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+        else:
+            conn.modify(f"cn={user},cn=member,dc=netsoc,dc=co",
+                        {"userPassword": [(ldap3.MODIFY_REPLACE, [f"{crypt_password}"])]})
+        return True
+
+
 def send_forgot_email(email: str, server_url: str) -> bool:
     """
     Sends email containing the user's username and the link which users use to
@@ -135,6 +165,7 @@ and enter your password when prompted.
 If you are using Windows, go to http://www.putty.org/ and download the SSH client.
 
 Please change your password when you first log-in to something you'll remember!
+You can change your server password at https://admin.netsoc.co/tools/account.
 
 Yours,
 
@@ -358,6 +389,7 @@ and enter your password when prompted.
 If you are using Windows, go to http://www.putty.org/ and download the SSH client.
 
 Please change your password when you first log-in to something you'll remember!
+You can change your server password at https://admin.netsoc.co/tools/account.
 
 Yours,
 

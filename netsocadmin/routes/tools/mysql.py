@@ -142,15 +142,15 @@ class DeleteDB(AbstractDBView):
         return flask.redirect("/tools/mysql")
 
 
-class ChangePassword(AbstractDBView):
+class ChangeMySQLPassword(AbstractDBView):
     """
-    Route: changepw
+    Route: changedbpw
         This route must be accessed via post. It is used to change the user's
         MySQL account password.
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.changepw")
+    logger = logging.getLogger("netsocadmin.changedbpw")
 
     def dispatch_request(self) -> str:
         self.logger.info(f"form: {flask.request.form}")
