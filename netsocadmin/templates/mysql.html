@@ -40,37 +40,41 @@
             </div>
         </div>
         <div class="col s12 m6">
-            <div class="card small">
-                <div class="card-content" style="overflow: visible">
+            <div class="card">
+                <div class="card-content">
                     <span class="card-title">Change Password:</span>
                     <div>Changes the password for your MySQL account</div>
-                    <span style="display:block;" class="error-msg">{{ mysql_pass_error }}</span>
-                    <form action="/changepw" method="POST">
-                        <div class="input-field col s6">
-                            <input autocomplete="off" type="text" name="username">
-                            <label for="username">Server username</label>
+                    <span style="display: block;" class="error-msg">{{ mysql_pass_error }}</span>
+                    <form action="/changedbpw" method="POST">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username" id="change-username">
+                                <label for="change-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password" id="change-password">
+                                <label for="change-password">Server password</label>
+                            </div>
+                            </div>
+                        <div class="row">
+                          <div class="input-field col s6">
+                              <input autocomplete="new-password" type="password" name="new-password" id="new-password">
+                              <label for="new-password">New password</label>
+                          </div>
+                          <div class="input-field col s6">
+                              <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
+                              <label>Password strength</label>
+                              <p id="password-strength-text"> </p>
+                          </div>
+                          {% if success %}
+                          <p style="color:green;">Your MySQL password change was successful</p>
+                          {% endif %}
                         </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="password">
-                            <label for="password">Server password</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="new-password" id="new-password">
-                            <label for="new-password">New password</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <label>Password strength</label>
-                            <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
-                            <p id="password-strength-text"></p>
-                        </div>
-                        <div class="col s12">
-                            <button type="submit" class="activator btn waves-effect waves-light">Change MySQL Password&nbsp;&nbsp;<i class="material-icons">settings_backup_restore</i></button>
-                        </div>
+                        <button type="submit" class="btn waves-effect waves-light">
+                            Change MySQL Password
+                            <i class="material-icons right">settings_backup_restore</i>
+                        </button>
                     </form>
-                    {% if success %}
-                    <br/>
-                    <p style="color:green;">Your MySQL password change was successful</p>
-                    {% endif %}
 
                 </div>
             </div>
@@ -81,54 +85,56 @@
         <div class="col s12 m6">
             <div class="card">
                 <div class="card-content">
-                    <div id="database-change-form">
-                        <span class="card-title">New Database:</span>
-                        <div>Create a database. All databases are prefixed with <code>{{ username }}_</code></div>
-                        <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
-                        <form action="/createdb" method="POST">
+                    <span class="card-title">New Database:</span>
+                    <div>Create a database. All databases are prefixed with <code>{{ username }}_</code></div>
+                    <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
+                    <form action="/createdb" method="POST">
+                        <div class="row">
                             <div class="input-field col s6">
-                                <input autocomplete="off" type="text" name="username">
-                                <label for="mysql-username">Server username</label>
+                                <input autocomplete="off" type="text" name="username" id="new-dbusername">
+                                <label for="new-dbusername">Server username</label>
                             </div>
                             <div class="input-field col s6">
-                                <input autocomplete="new-password" type="password" name="password">
-                                <label for="mysql-password">Server password</label>
+                                <input autocomplete="new-password" type="password" name="password" id="new-dbpassword">
+                                <label for="new-dbpassword">Server password</label>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="input-field col s12 m3">
-                                <input disabled autocomplete="off" type="text" value="{{ username }}_">
+                                <input disabled autocomplete="off" type="text" value="{{ username }}_" id="prefix">
                                 <label for="prefix">Prefix</label>
                             </div>
                             <div class="input-field col s12 m9">
-                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}">
-                                <label for="dbname">Database name</label>
+                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}" id="new-dbname">
+                                <label for="new-dbname">Database name</label>
                             </div>
-                            <div>
-                                <button class="btn waves-effect waves-light" type="submit">
-                                    <span id="database-form-button-text"> Create </span>
-                                    <i class="mdi-content-send right"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit">
+                            Create
+                            <i class="mdi-content-send right"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
         <div class="col s12 m6">
             <div class="card">
                 <div class="card-content">
-                    <div id="database-change-form">
-                        <span class="card-title">Delete Database:</span>
-                        <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
-                        <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
-                        <form action="/deletedb" method="POST">
+                    <span class="card-title">Delete Database:</span>
+                    <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
+                    <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
+                    <form action="/deletedb" method="POST">
+                        <div class="row">
                             <div class="input-field col s6">
-                                <input autocomplete="off" type="text" name="username">
-                                <label for="mysql-username">Server username</label>
+                                <input autocomplete="off" type="text" name="username" id="delete-dbusername">
+                                <label for="delete-dbusername">Server username</label>
                             </div>
                             <div class="input-field col s6">
-                                <input autocomplete="new-password" type="password" name="password">
-                                <label for="mysql-password">Server password</label>
+                                <input autocomplete="new-password" type="password" name="password" id="delete-dbpassword">
+                                <label for="delete-dbpassword">Server password</label>
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="input-field col s12">
                                 <select name="dbname">
                                     <option value="" disabled selected>Choose database to delete</option>
@@ -138,14 +144,12 @@
                                 </select>
                                 <label>Database to delete</label>
                             </div>
-                            <div>
-                                <button class="btn waves-effect waves-light" type="submit">
-                                    <span id="database-form-button-text"> Delete </span>
-                                    <i class="mdi-content-send right"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit">
+                            Delete
+                            <i class="mdi-content-send right"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

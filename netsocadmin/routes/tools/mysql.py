@@ -63,6 +63,9 @@ class AbstractDBView(MySQLView):
             fields = [username, password, dbname]
         if not all(fields):
             return False, "Please specify all fields."
+        # Check if correct username supplied
+        if not login_tools.is_user_logged_in(username):
+            return False, "Please enter your own username"
         # Check that the username / password combination is correct
         login_user = login_tools.LoginUser(username, password)
         if not login_tools.is_correct_password(login_user):
@@ -142,15 +145,15 @@ class DeleteDB(AbstractDBView):
         return flask.redirect("/tools/mysql")
 
 
-class ChangePassword(AbstractDBView):
+class ChangeMySQLPassword(AbstractDBView):
     """
-    Route: changepw
+    Route: changedbpw
         This route must be accessed via post. It is used to change the user's
         MySQL account password.
         This can only be reached if you are logged in.
     """
     # Logger instance
-    logger = logging.getLogger("netsocadmin.changepw")
+    logger = logging.getLogger("netsocadmin.changedbpw")
 
     def dispatch_request(self) -> str:
         self.logger.info(f"form: {flask.request.form}")
@@ -165,4 +168,4 @@ class ChangePassword(AbstractDBView):
             return self.render(mysql_pass_error=msg, mysql_active=True)
         mysql.update_password(username, new_password)
         self.logger.info(f"successfully changed mysql password for {username}")
-        return self.render(success="1", mysql_active=True)
+        return self.render(success=True, mysql_active=True)

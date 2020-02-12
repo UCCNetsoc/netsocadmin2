@@ -82,8 +82,8 @@
                         <br>
                         <div class="row">
                             <div class="input-field">
+                                <input autocomplete="off" name="email" type="text" id="email" id="email">
                                 <label for="email">Student or Society Email</label>
-                                <input autocomplete="off" name="email" type="text" id="email">
                             </div>
                         </div>
                         <button class="btn waves-effect waves-light" type="submit">
@@ -98,13 +98,13 @@
                         <br>
                         <div class="row">
                             <div class="input-field">
-                                <label for="username">Server Username</label>
                                 <input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
+                                <label for="username">Server Username</label>
                             </div>
 
                             <div class="input-field">
-                                <label for="password">Server Password</label>
                                 <input autocomplete="off" name="password" type="password" id="password">
+                                <label for="password">Server Password</label>
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: row; justify-content: space-between">
@@ -112,12 +112,12 @@
                                 Login<i class="mdi-content-send right"></i>
                             </button>
                             <div>
-                                <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
                                 <input type="checkbox" id="show_pass" onclick="showPassword()">
+                                <label for="show_pass" id="pass_label"><h6>Show Password</h6></label>
                             </div>
                             <div>
-                                <label for="forgot_toggle" id="forgot_label"><h6>Forgot Username or Password?</h6></label>
                                 <input type="checkbox" id="forgot_toggle" onclick="forgotToggle()">
+                                <label for="forgot_toggle" id="forgot_label"><h6>Forgot Username or Password?</h6></label>
                             </div>
                         </div>
                     </form>
@@ -130,8 +130,8 @@
                             <h5>Forgotten Username or Password?</h5>
                             <div class="row">
                                 <div class="input-field">
-                                    <label for="email">Student or Society Email</label>
-                                    <input autocomplete="off" name="email" type="text" id="email">
+                                    <input autocomplete="off" name="email" type="text" id="forgotten_email">
+                                    <label for="forgotten_email">Student or Society Email</label>
                                 </div>
                             </div>
                             <button class="btn waves-effect waves-light" type="submit">
