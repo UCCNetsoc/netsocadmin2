@@ -92,6 +92,8 @@ def is_logged_in() -> bool:
 def is_admin() -> bool:
     return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY] and flask.session["admin"]
 
+def is_user_logged_in(user: str) -> bool:
+    return config.LOGGED_IN_KEY in flask.session and flask.session[config.LOGGED_IN_KEY] and flask.session["username"] == user
 
 def is_correct_password(user: LoginUser) -> bool:
     """

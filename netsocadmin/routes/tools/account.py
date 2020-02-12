@@ -44,6 +44,9 @@ class AbstractAccountView(AccountView):
         fields = [username, password]
         if not all(fields):
             return False, "Please specify all fields."
+        # Check if correct username supplied
+        if not login_tools.is_user_logged_in(username):
+            return False, "Please enter your own username"
         # Check that the username / password combination is correct
         login_user = login_tools.LoginUser(username, password)
         if not login_tools.is_correct_password(login_user):
@@ -75,4 +78,4 @@ class ChangeAccountPassword(AbstractAccountView):
             return self.render(account_pass_error=msg, account_active=True)
         register_tools.update_password(username, new_password)
         self.logger.info(f"successfully changed password for {username}")
-        return self.render(success="1", account_active=True)
+        return self.render(success=True, account_active=True)

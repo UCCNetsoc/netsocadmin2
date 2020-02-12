@@ -46,14 +46,16 @@
                     <div>Changes the password for your MySQL account</div>
                     <span style="display: block;" class="error-msg">{{ mysql_pass_error }}</span>
                     <form action="/changedbpw" method="POST">
-                        <div class="input-field col s6">
-                            <input autocomplete="off" type="text" name="username" id="change-username">
-                            <label for="change-username">Server username</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="password" id="change-password">
-                            <label for="change-password">Server password</label>
-                        </div>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username" id="change-username">
+                                <label for="change-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password" id="change-password">
+                                <label for="change-password">Server password</label>
+                            </div>
+                            </div>
                         <div class="row">
                           <div class="input-field col s6">
                               <input autocomplete="new-password" type="password" name="new-password" id="new-password">
@@ -87,21 +89,25 @@
                     <div>Create a database. All databases are prefixed with <code>{{ username }}_</code></div>
                     <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
                     <form action="/createdb" method="POST">
-                        <div class="input-field col s6">
-                            <input autocomplete="off" type="text" name="username" id="new-dbusername">
-                            <label for="new-dbusername">Server username</label>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username" id="new-dbusername">
+                                <label for="new-dbusername">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password" id="new-dbpassword">
+                                <label for="new-dbpassword">Server password</label>
+                            </div>
                         </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="password" id="new-dbpassword">
-                            <label for="new-dbpassword">Server password</label>
-                        </div>
-                        <div class="input-field col s12 m3">
-                            <input disabled autocomplete="off" type="text" value="{{ username }}_" id="prefix">
-                            <label for="prefix">Prefix</label>
-                        </div>
-                        <div class="input-field col s12 m9">
-                            <input autocomplete="off" type="text" name="dbname" length="{{ limit }}" id="new-dbname">
-                            <label for="new-dbname">Database name</label>
+                        <div class="row">
+                            <div class="input-field col s12 m3">
+                                <input disabled autocomplete="off" type="text" value="{{ username }}_" id="prefix">
+                                <label for="prefix">Prefix</label>
+                            </div>
+                            <div class="input-field col s12 m9">
+                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}" id="new-dbname">
+                                <label for="new-dbname">Database name</label>
+                            </div>
                         </div>
                         <button class="btn waves-effect waves-light" type="submit">
                             Create
@@ -118,22 +124,26 @@
                     <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
                     <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
                     <form action="/deletedb" method="POST">
-                        <div class="input-field col s6">
-                            <input autocomplete="off" type="text" name="username" id="delete-dbusername">
-                            <label for="delete-dbusername">Server username</label>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username" id="delete-dbusername">
+                                <label for="delete-dbusername">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password" id="delete-dbpassword">
+                                <label for="delete-dbpassword">Server password</label>
+                            </div>
                         </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="password" id="delete-dbpassword">
-                            <label for="delete-dbpassword">Server password</label>
-                        </div>
-                        <div class="input-field col s12">
-                            <select name="dbname">
-                                <option value="" disabled selected>Choose database to delete</option>
-                                {% for db in databases %}
-                                <option value="{{ db }}">{{ db }}</option>
-                                {% endfor %}
-                            </select>
-                            <label>Database to delete</label>
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <select name="dbname">
+                                    <option value="" disabled selected>Choose database to delete</option>
+                                    {% for db in databases %}
+                                    <option value="{{ db }}">{{ db }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Database to delete</label>
+                            </div>
                         </div>
                         <button class="btn waves-effect waves-light" type="submit">
                             Delete
