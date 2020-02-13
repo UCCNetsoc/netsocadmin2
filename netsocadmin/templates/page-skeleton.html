@@ -268,7 +268,6 @@
                                 <li><a href="#!">Change Password</a></li> -->
                             </ul>
                         </li>
-                        {% endif %}
                         <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin" style="margin-top: 2em">
                             <a style="width: 100%" href="/tools">
                                 <i class="fas fa-home">
@@ -276,7 +275,6 @@
                                 </i>
                             </a>
                         </li>
-                        {% if is_logged_in %}
                         <li {% if active == "account" %} class="active" {% endif %} title="Manage your Netsoc server account">
                             <a style="width: 100%" href="/tools/account">
                                 <i class="fas fa-cogs">
