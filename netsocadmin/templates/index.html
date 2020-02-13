@@ -30,9 +30,9 @@
 
         #login form:nth-child(2) div:nth-child(3) {
             display: flex;
-            flex-direction: row;
+            flex-direction: row-reverse;
             justify-content: space-between;
-            flex-wrap: wrap-reverse;
+            flex-wrap: wrap;
             align-items: center;
         }
     </style>
@@ -116,10 +116,7 @@
                         <label for="password">Server Password</label>
                     </div>
                 </div>
-                <div>
-                    <button id="login-button" class="btn waves-effect waves-light" type="submit">
-                        Login<i class="mdi-content-send right"></i>
-                    </button>
+                <div style="text-align: right">
                     <div>
                         <input type="checkbox" id="show_pass" onclick="showPassword()">
                         <label for="show_pass" id="pass_label">Show Password</label>
@@ -128,6 +125,9 @@
                         <input type="checkbox" id="forgot_toggle" onclick="forgotToggle()">
                         <label for="forgot_toggle" id="forgot_label">Forgot Username or Password?</label>
                     </div>
+                    <button id="login-button" class="btn waves-effect waves-light" type="submit">
+                        Login<i class="mdi-content-send right"></i>
+                    </button>
                 </div>
             </form>
             <div style="padding: 0 1em;" id="error-message" class="error-message red-text row s6">
