@@ -92,7 +92,8 @@
 
         .nav-wrapper {
             padding-right: 5%;
-            padding-left: 260px
+            padding-left: 260px;
+            white-space: nowrap;
         }
 
         .sidenav li a i {
@@ -110,7 +111,7 @@
 
             .nav-wrapper {
                 padding-right: 0px;
-                padding-left: 1em;
+                padding-left: 0px;
             }
         }
 
@@ -167,7 +168,10 @@
                     </a>
                 </div>
             </li>
-            {% if is_logged_in %}
+
+            {% if not is_logged_in %}
+            <li><a class="log-in-out-button btn waves-effect waves-light red accent-2" href="/">Login/Signup</a></li>
+            {% else %}
             <li class="hide-on-large-only">
                 <a class="dropdown-trigger btn waves-effect waves-light red accent-2" href="#" data-target="profile-menu-side">{{ username }}</a>
                 <ul id="profile-menu-side" class="dropdown-content">
