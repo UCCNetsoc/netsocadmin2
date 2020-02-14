@@ -55,24 +55,24 @@
                                 <input autocomplete="new-password" type="password" name="password" id="change-password">
                                 <label for="change-password">Server password</label>
                             </div>
-                            </div>
-                        <div class="row">
-                          <div class="input-field col s6">
-                              <input autocomplete="new-password" type="password" name="new-password" id="new-password">
-                              <label for="new-password">New password</label>
-                          </div>
-                          <div class="input-field col s6">
-                              <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
-                              <label>Password strength</label>
-                              <p id="password-strength-text"> </p>
-                          </div>
-                          {% if success %}
-                          <p style="color:green;">Your MySQL password change was successful</p>
-                          {% endif %}
                         </div>
-                        <button type="submit" class="btn waves-effect waves-light">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="new-password" id="new-password">
+                                <label for="new-password">New password</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
+                                <label>Password strength</label>
+                                <p id="password-strength-text"> </p>
+                            </div>
+                            {% if success %}
+                            <p style="color:green;">Your MySQL password change was successful</p>
+                            {% endif %}
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit">
                             Change MySQL Password
-                            <i class="material-icons right">settings_backup_restore</i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
 
@@ -105,13 +105,13 @@
                                 <label for="prefix">Prefix</label>
                             </div>
                             <div class="input-field col s12 m9">
-                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}" id="new-dbname">
+                                <input autocomplete="off" type="text" name="dbname" maxlength="{{ limit }}" id="new-dbname">
                                 <label for="new-dbname">Database name</label>
                             </div>
                         </div>
                         <button class="btn waves-effect waves-light" type="submit">
                             Create
-                            <i class="mdi-content-send right"></i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
                 </div>
@@ -147,7 +147,7 @@
                         </div>
                         <button class="btn waves-effect waves-light" type="submit">
                             Delete
-                            <i class="mdi-content-send right"></i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
                 </div>

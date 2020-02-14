@@ -17,15 +17,17 @@
                 <div class="card-content">
                     <span class="card-title">Change Password:</span>
                     <div>Changes the password for your Netsoc account</div>
-                        <span style="display: block;" class="error-msg">{{ account_pass_error }}</span>
+                    <span style="display: block;" class="error-msg">{{ account_pass_error }}</span>
                     <form action="/changeaccountpw" method="POST">
-                        <div class="input-field col s6">
-                            <input autocomplete="off" type="text" name="username" id="change-username">
-                            <label for="change-username">Server username</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input autocomplete="new-password" type="password" name="password" id="change-password">
-                            <label for="change-password">Server password</label>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="off" type="text" name="username" id="change-username">
+                                <label for="change-username">Server username</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="password" id="change-password">
+                                <label for="change-password">Server password</label>
+                            </div>
                         </div>
                         <div class="row">
                           <div class="input-field col s6">
@@ -46,11 +48,9 @@
                             <i class="material-icons right">settings_backup_restore</i>
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>
     </div>
 
-    </div>
 {% endblock %}

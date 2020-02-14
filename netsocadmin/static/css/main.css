@@ -3,16 +3,16 @@
 }
 
 #wordpress-image {
-	height: 180px; 
-	padding: 5px; 
-	text-align:center; 
-	display: block; 
+	height: 180px;
+	padding: 5px;
+	text-align:center;
+	display: block;
 	margin: 30px auto;
 }
 
 #wordpress-install-button {
 	margin-top: 30px;
-	text-align:center; 
+	text-align:center;
 
 }
 
@@ -28,18 +28,9 @@
 }
 
 meter {
-	/* Reset the default appearance */
-	-webkit-appearance: none;
-		-moz-appearance: none;
-			appearance: none;
-
 	margin: 0 auto 1em;
 	width: 100%;
 	height: 0.5em;
-
-	/* Applicable only to Firefox */
-	background: none;
-	background-color: rgba(0, 0, 0, 0.1);
 }
 
 meter::-webkit-meter-bar {
