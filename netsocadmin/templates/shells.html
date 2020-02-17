@@ -3,13 +3,6 @@
     {{ super() }}
     <script src="../static/javascript/shellTools.js"></script>
 
-    <style>
-    @media only screen and (min-width: 992px) {
-        body > main > div > div:nth-child(1) > div {
-            padding: 0 !important;
-        }
-    }
-    </style>
 {% endblock %}
 
 {% block body %}
@@ -21,7 +14,7 @@
         <div class="col s12">
             <div class="card">
                 <div class="card-content">
-                    <div class="card-title">Try out a different shell!</div>
+                    <span class="card-title">Try out a different shell!</span>
                     <p>We make available various different shells for you to try out on our public server.</p>
                     <p>Different shells can provide a vastly different experience in the terminal and we highly recommend that everyone try out something different :)</p>
                 </div>
@@ -32,11 +25,10 @@
         <div class="col s12 m6">
             <div class="card">
                 <div class="card-content">
-                    <div class="card-title">Change Login Shell</div>
+                    <span class="card-title">Change Login Shell</span>
                     <p class="red-text" id="shell-error"></p>
-                    <p class="teal-text" id="shell-success">Shell was changed successfully</p>
+                    <p class="green-text" id="shell-success">Shell was changed successfully</p>
                     <p class="orange-text">Please note that due to caching, the changes may take a while to occur</p>
-                    <br/>
                     <form>
                         <div class="input-field col s12">
                             <select name="shell">
@@ -56,7 +48,7 @@
         <div class="col s12 m6">
             <div class="card">
                 <div class="card-content">
-                    <div class="card-title">Info on Different Shells</div>
+                    <span class="card-title">Info on Different Shells</span>
                     <div class="collection">
                         {% for shell in login_shells %}
                             <a class="collection-item" target="_blank"

@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-    {% block head %}
     <title>Netsoc Admin</title>
     <meta name="theme-color" content="#4db6ac">
     <meta name="msapplication-navbutton-color" content="#4db6ac">
@@ -32,6 +31,7 @@
 			"url" : "https://admin.netsoc.co",
 			"sameAs" : ["http://www.facebook.com/UCCNetsoc","http://www.twitter.com/UCCNetsoc","http://plus.google.com/+Netsoc"]
 		}
+    {% block head %}
 	</script>
 
     <link rel="stylesheet" href="../static/css/main.css">
@@ -52,8 +52,12 @@
             flex-direction: column;
         }
 
-        .error-msg {
+        .red-text {
             color: red;
+        }
+
+        header {
+            margin-bottom: 2em;
         }
 
         footer {
@@ -93,11 +97,15 @@
         .nav-wrapper {
             padding-right: 5%;
             padding-left: 260px;
-            white-space: nowrap;
+        }
+
+        .nav-wrapper .brand-logo {
+          white-space: nowrap;
         }
 
         .sidenav li a i {
             margin-right: .5em;
+            color: rgba(0,0,0,0.87);
         }
 
         @media only screen and (max-width: 992px) {
@@ -132,7 +140,7 @@
 </head>
 
 <body>
-    <header style="margin-bottom: 2em;">
+    <header>
         {# This is the navbar ontop of every page. All pages will need this. #}
         <nav>
             <div class="nav-wrapper teal lighten-2">
@@ -224,24 +232,18 @@
         </ul>
     </header>
     <main>
-        <div>
-            {% block body %}{% endblock %}
-        </div>
+        {% block body %}{% endblock %}
     </main>
-    <footer class="page-footer black-text">
+    <footer class="page-footer">
         <div class="row footer-copyright" style="margin-bottom: 0">
-            <div class="col s12 m6">
-                <div class="container">
-                    <span class="black-text">© 2020 UCC Networking Society</span>
-                </div>
+            <div class="col s12 m6 container">
+                <span class="black-text">© 2020 UCC Networking Society</span>
             </div>
-            <div class="col m6 hide-on-small-only" style="text-align: right;">
-                <div class="container">
-                    <a class="black-text" href="https://www.facebook.com/NetsocUCC/">Facebook</a>
-                    <a class="black-text" href="https://twitter.com/UCCNetsoc">Twitter</a>
-                    <a class="black-text" href="https://github.com/UCCNetsoc">GitHub</a>
-                    <a class="black-text" href="https://www.instagram.com/uccnetsoc/">Instagram</a>
-                </div>
+            <div class="col m6 hide-on-small-only container right-align">
+                <a class="black-text" href="https://www.facebook.com/NetsocUCC/">Facebook</a>
+                <a class="black-text" href="https://twitter.com/UCCNetsoc">Twitter</a>
+                <a class="black-text" href="https://github.com/UCCNetsoc">GitHub</a>
+                <a class="black-text" href="https://www.instagram.com/uccnetsoc/">Instagram</a>
             </div>
         </div>
     </footer>
@@ -258,6 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
     M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {coverTrigger: false});
     // Login/Sign up Tabs Initialization
     M.Tabs.init(document.querySelectorAll('.tabs'));
+    // Login/Sign up Tabs Initialization
+    M.Tabs.init(document.querySelectorAll('.tabs'));
+    // Character Tabs Initialization
+    M.CharacterCounter.init(document.querySelectorAll('input[data-length]'));
 });
     </script>
 

@@ -1,5 +1,12 @@
 {% extends "page-skeleton.html" %}
-
+{% block head %}
+    {{ super() }}
+    <style>
+.card .card-content p + p {
+    margin-top: 1rem;
+}
+    </style>
+{% endblock %}
 {% block body %}
     {{ super() }}
 
@@ -8,7 +15,6 @@
         <div class="card-content">
             <span class="card-title">Free server space</span>
             <p>You have a free account on one of our servers, automatically created when you signed up on this website. What you do with it is all up to you!</p>
-            <br/>
             <p>Please do read the <code>ACCEPTABLE_USAGE_POLICY</code> file in your home directory. If you are found to be in violation of this, we will stop whatever you are doing and possibly remove your account.</p>
         </div>
     </div>
@@ -16,23 +22,21 @@
         <div class="card-content">
             <span class="card-title">Free web hosting</span>
             <p>Your <code>public_html</code> folder in you home-directory will be the root of your website. This website can be found at <code><a target="_blank" href="http://{{ username }}.netsoc.co">http://{{ username }}.netsoc.co</a></code>.</p>
-            <br/>
             <p>Please contact us if you wish to have your own domain name point to this site instead. </p>
         </div>
     </div>
     <div class="card">
         <div class="card-content">
             <span class="card-title">WordPress Installation</span>
-            <p>We have a one-click solution for installing WordPress to your home directory. You can find it on this site.</p><br/>
+            <p>We have a one-click solution for installing WordPress to your home directory. You can find it on this site.</p>
             <p>Your own WordPress installation can then be found at <code><a target="_blank" href="http://{{ username }}.netsoc.co/wordpress">http://{{ username }}.netsoc.co/wordpress</a></code></p>
         </div>
-    </div>    
+    </div>
     <div class="card">
         <div class="card-content">
             <span class="card-title">MySQL Databases</span>
-            <p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p><br/>
+            <p>With your account, comes a MySQL account. This database will not be reset after the college year, unlike other offerings of this service from college departments.</p>
             <p>Your MySQL databases can be found at <code>mysql.netsoc.co</code>. Your MySQL username will be your server username. To create new databases, remove databases or change your MySQL password, please see the MySQL tab in your admin tools.</p>
-            <br/>
             <p>Please note, the name of your database will be prefixed with your username and an underscore. So if your username is <code>john</code>, your database names will be of the form "<code>john_&lt;rest of name here&gt;</code>".</p>
         </div>
     </div>
@@ -40,7 +44,6 @@
         <div class="card-content">
             <span class="card-title">Home Directory Backups</span>
             <p>We keep weekly backups of home-directories, going back 4 weeks. At the end of every month, we backup your home directly. These monthly backups go back forever. </p>
-            <br/>
             <p style="padding-bottom: 1em">If you need to recover a backup, see the <code>BACKUPS</code> tab in your admin tools.</p>
         </div>
     </div>
@@ -49,13 +52,12 @@
             <span class="card-title">Minecraft Server</span>
             <p>Accessible at <code><a target="_blank" href="https://minecraft.netsoc.co">minecraft.netsoc.co</a></code> is a public Minecraft Server.</p>
             <p>Checkout the website by clicking the link. Online viewable maps can be found on the website.</p>
-            <br/>
             <p>Featuring: </p>
-                <ul style="list-style-position: inside;">
-                    <li style="list-style-type: disc;">Economy</li>
-                    <li style="list-style-type: disc;">Factions</li>
-                    <li style="list-style-type: disc;">Shops</li>
-                    <li style="list-style-type: disc;">And more!</li>
+                <ul class="browser-default">
+                    <li>Economy</li>
+                    <li>Factions</li>
+                    <li>Shops</li>
+                    <li>And more!</li>
                 </ul>
         </div>
     </div>

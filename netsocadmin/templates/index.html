@@ -13,10 +13,10 @@
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            align-items: center;
         }
-        label>input[type="checkbox"]+span {
+        #login label>input[type="checkbox"]+span {
             margin: .5em 0;
+            height: auto;
         }
     </style>
 
@@ -26,48 +26,29 @@
     {{ super() }}
     <div class="card-panel">
         <img src="/static/banner-icon.svg" class="responsive-img">
+
         <!-- Tab headers -->
-        <div class="col s12">
-            <ul class="tabs tabs-fixed-width">
-                <li class="tab"><a class="teal-text waves-light lighten-2 active" href="#login">Log In</a></li>
-                <li class="tab"><a class="teal-text waves-light lighten-2" href="#signup">Sign Up</a></li>
-            </ul>
-        </div>
+        <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a class="teal-text waves-light lighten-2 active" href="#login">Log In</a></li>
+            <li class="tab"><a class="teal-text waves-light lighten-2" href="#signup">Sign Up</a></li>
+        </ul>
 
         <!-- Tab bodies -->
-        <div id="signup" class="col s12">
-            <form method="POST" action="/sendconfirmation" class="col s12">
+        <div id="login" class="center-align">
             <form method="POST" action="/login{% if redirect %}?r={{ redirect }}{% endif %}" onsubmit="return checkUsername()">
                 <div class="row">
-                    <div class="input-field col s12">
-                        <input name="email" type="email" id="email" class="validate">
-                        <label for="email">Student or Society Email</label>
-                    </div>
-                </div>
-                <button class="btn waves-effect waves-light" type="submit">
-                    Send Verification
-                    <i class="material-icons right">send</i>
-                </button>
-            </form>
-        </div>
-        <div id="login" class="col s12">
-            <p id="error-message" class="error-message red-text">
-                {{ error_message }}
-            </p>
-            <form method="POST" action="/login" class="col s12" onsubmit="return checkUsername()">
-                <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field">
                         <input name="username" type="text" id="username" autocomplete="off" autofocus="autofocus">
                         <label for="username">Server Username</label>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field">
                         <input name="password" type="password" id="password" autocomplete="off">
                         <label for="password">Server Password</label>
                     </div>
                 </div>
-                <p>
+                <p class="left-align">
                     <label id="pass_label">
                         <input type="checkbox" id="show_pass" onclick="showPassword()">
                         <span>Show Password</span>
@@ -84,13 +65,31 @@
                     </button>
                 </p>
             </form>
-            <form method="POST" action="/forgot" class="col s12" id="forgot" style="display: none;">
-                <div class="divider"></div>
-                <h5>Forgotten Username or Password?</h5>
+            <p id="error-message" class="red-text">
+              {{ error_message }}
+            </p>
+            <form method="POST" action="/forgot" id="forgot" class="right-align" hidden>
+                <div class="divider" style="margin: 5% 0"></div>
+                <h5 class="center-align">Forgotten Username or Password?</h5>
                 <div class="row">
-                    <div class="input-field col s12">
+                    <div class="input-field">
                         <input name="email" type="email" id="forgot_email" class="validate">
                         <label for="forgot_email">Student or Society Email</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">
+                    Send Verification
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+
+        <div id="signup">
+            <form method="POST" action="/sendconfirmation" class="right-align">
+                <div class="row">
+                    <div class="input-field">
+                        <input name="email" type="email" id="email" class="validate">
+                        <label for="email">Student or Society Email</label>
                     </div>
                 </div>
                 <button class="btn waves-effect waves-light" type="submit">
@@ -114,12 +113,12 @@
         }
         function forgotToggle() {
             var form = document.getElementById("forgot");
-            if (form.style.display === "none") {
-                form.style.display = "block";
-                document.getElementById("forgot_label").style.textDecoration = "underline";
-            } else {
+            if (form.style.display === "block") {
                 form.style.display = "none";
                 document.getElementById("forgot_label").style.textDecoration = "none";
+            } else {
+                form.style.display = "block";
+                document.getElementById("forgot_label").style.textDecoration = "underline";
             }
         }
         function checkUsername() {

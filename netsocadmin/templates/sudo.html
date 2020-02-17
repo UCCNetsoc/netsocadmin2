@@ -10,7 +10,7 @@
 
     <div class='card'>
         <div class="card-content">
-            <div class="card-title" style="margin-bottom: 1em">Apply for <code> sudo</code> privileges on a Netsoc server</div>
+            <span class="card-title" style="margin-bottom: 1em">Apply for <code> sudo</code> privileges on a Netsoc server</span>
 
             <p>We have decided to open up one of our servers to the public. "But wait, Netsoc already do that".</p>
             <p>While we give free server space and web-hosting to all UCC students, we don't allow students to have <code> sudo</code> privileges on the server. If they did, they could break the whole server in an instant.</p>
@@ -18,22 +18,21 @@
     </div>
     <div class="card">
         <div class="card-content">
-            <div class="card-title">Enter <code> feynman</code></div>
+            <span class="card-title">Enter <code> feynman</code></span>
 
             <p>We are giving <code> sudo</code> priviliges to all those who wish it (and we deem responsible enough to have it).</p>
 
             <ul class="collection with-header" style="margin-top: 2em; margin-bottom: 2em">
-                <li style="background-color: #f6f6f6;" class="collection-header"> <h3 class="header-text">Things to remember:</h3> </li>
+                <li class="collection-header grey lighten-4"> <h3 class="header-text">Things to remember:</h3> </li>
                 <li class="collection-item">
-                    Other people using the server have <code> sudo</code> as well. They might break stuff; you might break stuff.
+                    <p>Other people using the server have <code> sudo</code> as well. They might break stuff; you might break stuff.</p>
                 </li>
                 <li class="collection-item">
-                    You are trusted with <code> sudo</code> so that you can install stuff, run services and run commands that need to be run as root.
+                    <p>You are trusted with <code> sudo</code> so that you can install stuff, run services and run commands that need to be run as root.</p>
                 </li>
                 <li class="collection-item">
-                    You are <em>not</em> being given <code> sudo</code> so that that you can restart or shutdown the server, uninstall applications that others might be using, lock us (the Netsoc SysAdmin Team) out of the server or anything else malicious that will effect the experience of others.
-                    <br/>
-                    (Even if you lock us out, we still have physical access to the server if needs be).
+                    <p>You are <em>not</em> being given <code> sudo</code> so that that you can restart or shutdown the server, uninstall applications that others might be using, lock us (the Netsoc SysAdmin Team) out of the server or anything else malicious that will effect the experience of others.</p>
+                    <p>(Even if you lock us out, we still have physical access to the server if needs be).</p>
                 </li>
             </ul>
 
@@ -44,7 +43,7 @@
     </div>
     <div class="card">
         <div class="card-content">
-            <div class="card-title">Fill in the form below and sit tight!</div>
+            <span class="card-title">Fill in the form below and sit tight!</span>
             <form method="POST" action="/completesudoapplication" accept-charset="UTF-8">
                 <div class="input-field">
                     <input disabled="disabled" name="username" id="username" type="text" value="{{ username }}">

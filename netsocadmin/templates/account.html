@@ -16,8 +16,7 @@
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">Change Password:</span>
-                    <div>Changes the password for your Netsoc account</div>
-                    <span style="display: block;" class="error-msg">{{ account_pass_error }}</span>
+                    <p>Changes the password for your Netsoc account</p>
                     <form action="/changeaccountpw" method="POST">
                         <div class="row">
                             <div class="input-field col s6">
@@ -35,12 +34,15 @@
                               <label for="new-password">New password</label>
                           </div>
                           <div class="input-field col s6">
-                              <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
+                              <meter max="4" id="password-strength-meter"></meter>
                               <label>Password strength</label>
                               <p id="password-strength-text"> </p>
                           </div>
+                          {% if account_pass_error %}
+                          <p class="red-text">{{ account_pass_error }}</p>
+                          {% endif %}
                           {% if success %}
-                          <p style="color:green;">Your Netsoc password change was successful</p>
+                          <p class="green-text">Your Netsoc password change was successful</p>
                           {% endif %}
                         </div>
                         <button type="submit" class="btn waves-effect waves-light">
