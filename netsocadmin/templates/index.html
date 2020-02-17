@@ -37,6 +37,7 @@
         <!-- Tab bodies -->
         <div id="signup" class="col s12">
             <form method="POST" action="/sendconfirmation" class="col s12">
+            <form method="POST" action="/login{% if redirect %}?r={{ redirect }}{% endif %}" onsubmit="return checkUsername()">
                 <div class="row">
                     <div class="input-field col s12">
                         <input name="email" type="email" id="email" class="validate">
