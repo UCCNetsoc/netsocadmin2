@@ -14,7 +14,7 @@ class JsonFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
             log_record['request_path'] = flask.request.path
             log_record['request_method'] = flask.request.method
             log_record['request_id'] = flask.g.request_id if not None else 'FUCK'
-            log_record['ip_address'] = flask.request.get("X-Real-Ip", flask.request.remote_addr)
+            log_record['ip_address'] = flask.request.environ.get("X-Real-Ip", flask.request.remote_addr)
         except RuntimeError:
             pass
         try:
