@@ -172,11 +172,12 @@
             <li title="netsoc.co/rk">
                 <div class="brand-logo">
                     <a target="_blank" href='https://netsoc.co/rk'>
-                        <img src="/static/banner-icon.png" style="width: 100%; display: block; padding: 1em    " />
+                        <img src="/static/banner-icon.png" style="height: 64px; margin: 0 auto -8px; display: block; padding: 1em    " />
                     </a>
                 </div>
             </li>
 
+            <li class="divider" style="margin-bottom: 0.5em"></li>
             {% if not is_logged_in %}
             <li><a class="log-in-out-button btn waves-effect waves-light red accent-2" href="/">Login/Signup</a></li>
             {% else %}
@@ -188,7 +189,7 @@
                     <li><a href="/logout">Logout</a></li>
                 </ul>
             </li>
-            <li class="divider" style="margin-top: 0.5em; margin-bottom: 0.5em"></li>
+            <li class="divider" style="margin-bottom: 0.5em"></li>
             <li {% if active == "home" %} class="active" {% endif %} title="The homepage of Netsoc Admin">
                 <a href="/tools"><i class="fas fa-home"></i>Home</a>
             </li>
