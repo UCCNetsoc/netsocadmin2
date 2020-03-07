@@ -71,6 +71,15 @@ class CompleteSignup(View):
 
         user = flask.request.form["uid"]
 
+        pattern = re.compile("^[a-z0-9]$")
+        if not pattern.match(user):
+            return flask.render_template(
+                "form.html",
+                email_address=email,
+                token=token,
+                error_message="Username must start with a lower case letter or a number only",
+            )
+
         pattern = re.compile("^[a-z0-9]([a-z0-9\\-\\_]{0,60}[a-z0-9])$")
         if not pattern.match(user):
             return flask.render_template(
