@@ -110,7 +110,10 @@ def robots():
 @app.errorhandler(404)
 def not_found(e):
     logger.warn(e)
-    return flask.render_template("404.html"), 404
+    return flask.render_template(
+        "404.html",
+        username=flask.session["username"] if "username" in flask.session else None,
+    ), 404
 
 
 @app.errorhandler(Exception)
