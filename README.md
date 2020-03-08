@@ -11,6 +11,7 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 * Automated user account creation
 * MySQL database managment
 * Backup managment
+* Server password reset functionality
 * Facility to contact a sysadmin
 * WordPress installer
 * Tutorials
@@ -18,7 +19,6 @@ This is intended to be a one-stop shop for users of UCC Netsoc's servers.
 
 ### We will have
 
-* Server password reset functionality
 * Own domain name linking to WordPress installation
 * Slide upload page
 * And more

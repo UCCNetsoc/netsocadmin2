@@ -70,13 +70,23 @@ class CompleteSignup(View):
             )
 
         user = flask.request.form["uid"]
-        if user != user.lower():
+
+        pattern = re.compile("^[a-z0-9]$")
+        if not pattern.match(user):
             return flask.render_template(
                 "form.html",
                 email_address=email,
                 token=token,
-                error_message="The requested username contains uppercase characters.\
-                 Please enter a username in lowercase",
+                error_message="Username must start with a lower case letter or a number only",
+            )
+
+        pattern = re.compile("^[a-z0-9]([a-z0-9\\-\\_]{0,60}[a-z0-9])$")
+        if not pattern.match(user):
+            return flask.render_template(
+                "form.html",
+                email_address=email,
+                token=token,
+                error_message="Username must be all lower case letters, numbers, hyphens or underscores only",
             )
 
         if len(user) > 15:

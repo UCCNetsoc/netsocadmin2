@@ -3,66 +3,130 @@
     {{ super() }}
 
     <style>
-	    nav {
-			background-color: rgba(0,0,0,0);
-	    }
-
-		.card-panel {
-            overflow: auto;
-		}
-
-        .card-panel::after {
-            content: "";
-            clear: both;
-            display: table;
+        .tabs {
+            margin-bottom: 3rem;
         }
-
-        input[type="checkbox"]+label {
-         cursor: pointer;
-         height: auto;
-         margin: .5em 0;
-         margin: .5em 0;
+        .tabs .tab a:focus, .tabs .tab a:focus.active {
+            background-color: rgba(0,0,0,0);
         }
-
-		.container:first {
-			padding: 5% 0%;
-		}
-
-        #login form:nth-child(2) div:nth-child(3) {
+        .tabs .indicator {
+            background-color: #4db6ac !important;
+        }
+        #login form p {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            align-items: center;
+        }
+        #login label>input[type="checkbox"]+span {
+            margin: .5em 0;
+            height: auto;
         }
     </style>
-    <script>
-    function showPassword() {
-        var field = document.getElementById("password");
-        if (field.type === "password") {
-            field.type = "text";
-            document.getElementById("pass_label").style.textDecoration = "underline";
-        } else {
-            field.type = "password";
-            document.getElementById("pass_label").style.textDecoration = "none";
-        }
-    }
-    function forgotToggle() {
-        var form = document.getElementById("forgot");
-        if (form.style.display === "none") {
-            form.style.display = "block";
-            document.getElementById("forgot_label").style.textDecoration = "underline";
-        } else {
-            form.style.display = "none";
-            document.getElementById("forgot_label").style.textDecoration = "none";
-        }
-    }
-    </script>
+
+{% endblock %}
+
+{% block body %}
+    {{ super() }}
+    <div class="card-panel">
+        <img src="/static/banner-icon.svg" class="responsive-img">
+
+        <!-- Tab headers -->
+        <ul class="tabs tabs-fixed-width">
+            <li class="tab"><a class="teal-text waves-light lighten-2 active" href="#login">Log In</a></li>
+            <li class="tab"><a class="teal-text waves-light lighten-2" href="#signup">Sign Up</a></li>
+        </ul>
+
+        <!-- Tab bodies -->
+        <div id="login" class="center-align">
+            <form method="POST" action="/login{% if redirect %}?r={{ redirect }}{% endif %}" onsubmit="return checkUsername()">
+                <div class="row">
+                    <div class="input-field">
+                        <input name="username" type="text" id="username" autocomplete="off" autofocus="autofocus">
+                        <label for="username">Server Username</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field">
+                        <input name="password" type="password" id="password" autocomplete="off">
+                        <label for="password">Server Password</label>
+                    </div>
+                </div>
+                <p class="left-align">
+                    <label id="pass_label">
+                        <input type="checkbox" id="show_pass" onclick="showPassword()">
+                        <span>Show Password</span>
+                    </label>
+
+                    <label id="forgot_label">
+                        <input type="checkbox" id="forgot_toggle" onclick="forgotToggle()">
+                        <span>Forgot Username or Password?</span>
+                    </label>
+
+                    <button id="login-button" class="btn waves-effect waves-light" type="submit">
+                        Login
+                        <i class="material-icons right">send</i>
+                    </button>
+                </p>
+            </form>
+            <p id="error-message" class="red-text">
+              {{ error_message }}
+            </p>
+            <form method="POST" action="/forgot" id="forgot" class="right-align" hidden>
+                <div class="divider" style="margin: 5% 0"></div>
+                <h5 class="center-align">Forgotten Username or Password?</h5>
+                <div class="row">
+                    <div class="input-field">
+                        <input name="email" type="email" id="forgot_email" class="validate">
+                        <label for="forgot_email">Student or Society Email</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">
+                    Send Verification
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+
+        <div id="signup">
+            <form method="POST" action="/sendconfirmation" class="right-align">
+                <div class="row">
+                    <div class="input-field">
+                        <input name="email" type="email" id="email" class="validate">
+                        <label for="email">Student or Society Email</label>
+                    </div>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit">
+                    Send Verification
+                    <i class="material-icons right">send</i>
+                </button>
+            </form>
+        </div>
+    </div>
 
     <script>
+        function showPassword() {
+            var field = document.getElementById("password");
+            if (field.type === "password") {
+                field.type = "text";
+                document.getElementById("pass_label").style.textDecoration = "underline";
+            } else {
+                field.type = "password";
+                document.getElementById("pass_label").style.textDecoration = "none";
+            }
+        }
+        function forgotToggle() {
+            var form = document.getElementById("forgot");
+            if (form.style.display === "block") {
+                form.style.display = "none";
+                document.getElementById("forgot_label").style.textDecoration = "none";
+            } else {
+                form.style.display = "block";
+                document.getElementById("forgot_label").style.textDecoration = "underline";
+            }
+        }
         function checkUsername() {
             var err = document.getElementById("error-message");
             var uid = document.getElementById("username").value;
-
             if (! (/^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/).test(uid)) {
                 err.innerHTML = "Username must be all lower case letters, numbers, hyphens or underscores only.<br/>If this is your username, please contact us to have your username changed to a valid one."
                 return false;
@@ -70,85 +134,4 @@
             return true;
         }
     </script>
-{% endblock %}
-
-{% block body %}
-    {{ super() }}
-    <div class="card-panel" style="text-align: center;">
-        <img src="/static/banner-icon.svg" class="responsive-img">
-        <!-- Tab headers -->
-        <div class="col s12">
-            <ul class="tabs">
-                <li class="col s6 tab"><a class="active teal-text lighten-2" href="#login"> Log In </a></li>
-                <li class="col s6 tab"><a class="teal-text lighten-2" href="#signup"> Sign Up </a></li>
-                <div class="indicator teal lighten-2" style="z-index:1"></div>
-            </ul>
-        </div>
-        <!-- Tab bodies -->
-        <div id="signup" class="col s12">
-            <form method="POST" action="/sendconfirmation" class="col row s12">
-                <br>
-                <div class="row">
-                    <div class="input-field">
-                        <input autocomplete="off" name="email" type="text" id="email" id="email">
-                        <label for="email">Student or Society Email</label>
-                    </div>
-                </div>
-                <button class="btn waves-effect waves-light" type="submit">
-                    Send Verification
-                    <i class="mdi-content-send right"></i>
-                </button>
-            </form>
-        </div>
-        <div id="login" class="col s12">
-            <br>
-            <form method="POST" action="/login" class="col row s12" onsubmit="return checkUsername()">
-                <br>
-                <div class="row">
-                    <div class="input-field">
-                        <input autocomplete="off" autofocus="autofocus" name="username" type="text" id="username">
-                        <label for="username">Server Username</label>
-                    </div>
-
-                    <div class="input-field">
-                        <input autocomplete="off" name="password" type="password" id="password">
-                        <label for="password">Server Password</label>
-                    </div>
-                </div>
-                <div style="text-align: right">
-                    <div>
-                        <input type="checkbox" id="show_pass" onclick="showPassword()">
-                        <label for="show_pass" id="pass_label">Show Password</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="forgot_toggle" onclick="forgotToggle()">
-                        <label for="forgot_toggle" id="forgot_label">Forgot Username or Password?</label>
-                    </div>
-                    <button id="login-button" class="btn waves-effect waves-light" type="submit">
-                        Login<i class="mdi-content-send right"></i>
-                    </button>
-                </div>
-            </form>
-            <div style="padding: 0 1em;" id="error-message" class="error-message red-text row s6">
-                <i> {{ error_message }} </i>
-            </div>
-            <div id="forgot" style="display: none;" class="row col s12">
-                <form method="POST" action="/forgot" class="col row s12">
-                    <br>
-                    <h5>Forgotten Username or Password?</h5>
-                    <div class="row">
-                        <div class="input-field">
-                            <input autocomplete="off" name="email" type="text" id="email">
-                            <label for="email">Student or Society Email</label>
-                        </div>
-                    </div>
-                    <button class="btn waves-effect waves-light" type="submit">
-                        Send Verification
-                        <i class="mdi-content-send right"></i>
-                    </button>
-                </form>
-                <br>
-            </div>
-        </div>
-    </div>
 {% endblock %}

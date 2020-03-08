@@ -25,6 +25,8 @@
                     err.innerText = "Error checking username :("
                 } else if (req.responseText !== "Available") {
                     err.innerText = "Username not available";
+                } else if (! /^[a-z0-9]$/.test(uid)) {
+                    err.innerText = "Username must start with a lower case letter or a number only"
                 } else if (! /^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/.test(uid)) {
                     err.innerText = "Username must be all lower case letters, numbers, hyphens or underscores only"
                 } else {
@@ -39,63 +41,42 @@
             req.send();
         }
 	</script>
-
-	<style>
-		.error {
-			color: red;
-		}
-
-		.good {
-			color: green;
-		}
-
-		.container {
-            padding: 0 15%;
-        }
-    </style>
 {% endblock %}
 
 {% block body %}
 	{{ super() }}
 
-	<div class="row">
-        <div class="card">
-            <div class="card-content">
-                <img src="/static/banner-icon.svg" class="responsive-img">
-                <h3 class="center-align"> Register </h3>
-                <form method="POST" action="/completeregistration" accept-charset="UTF-8">
-                    <input id="_token" name="_token" type="hidden" value="{{ token }}">
-
-                    <div>
-                        <div class="input-field">
-                            <input disabled="disabled" name="email" type="text" value="{{ email_address }}">
-                            <label for="email">Student or Society Email</label>
-                            <input autocomplete="off" id="email" name="email" type="hidden" value="{{ email_address }}">
-                        </div>
-                    </div>
-                    <div>
-                        <div class="input-field">
-                            <input autocomplete="off" class="example" autofocus="autofocus" name="name" type="text" id="name">
-                            <label for="name">Full Name/Society Name</label>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="input-field">
-                            <input autocomplete="off" class="example" name="uid" type="text" id="uid" maxlength="15">
-                            <label for="uid">Username (lowercase-only)</label>
-                        </div>
-                        <br/>
-                        <button onclick="checkUsername()" class="btn waves-effect waves-light" type="button" name="action"> Check Username </button>
-                        <span id="taken-error" class="error-msg"> </span><span id="good-name" class="good"> </span>
-                    </div>
-                    <br/>
-                    <button id="register-button" class="btn waves-effect waves-light" type="submit" name="action" disabled> Register
-                        <i class="mdi-content-send right"></i>
-                    </button>
-                    <input name="token" type="hidden" value="{{ token }}">
-                </form>
-                <div class="error-msg"> {{ error_message }} </div>
+    <div class="card-panel">
+        <img src="/static/banner-icon.svg" class="responsive-img">
+        <h3 class="center-align"> Register </h3>
+        <form method="POST" action="/completeregistration" accept-charset="UTF-8" class="right-align">
+            <input id="_token" name="_token" type="hidden" value="{{ token }}">
+            <div class="row">
+                <div class="input-field">
+                    <input readonly id="email" name="email" type="text" value="{{ email_address }}">
+                    <label for="email">Student or Society Email</label>
+                </div>
             </div>
-        </div>
-	</div>
+            <div class="row">
+                <div class="input-field">
+                    <input autocomplete="off" class="example" autofocus="autofocus" name="name" type="text" id="name">
+                    <label for="name">Full Name/Society Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field">
+                    <input autocomplete="off" class="example" name="uid" type="text" id="uid" maxlength="15" data-length="15">
+                    <label for="uid">Username (lowercase-only)</label>
+                </div>
+            </div>
+            <p id="taken-error" class="center-align red-text">{{ error_message }}</p>
+            <p id="good-name" class="center-align green-text"></p>
+            <button onclick="checkUsername()" class="btn waves-effect waves-light input-field" type="button" name="action"> Check Username </button>
+            <button id="register-button" class="btn waves-effect waves-light input-field" type="submit" name="action" disabled>
+                Register
+                <i class="material-icons right">send</i>
+            </button>
+            <input name="token" type="hidden" value="{{ token }}">
+        </form>
+    </div>
 {% endblock %}

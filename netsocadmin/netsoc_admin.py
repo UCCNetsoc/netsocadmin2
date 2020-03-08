@@ -61,6 +61,7 @@ def index():
     return flask.render_template(
         "index.html",
         page="login",
+        redirect=flask.request.args.get("r"),
         error_message=message
     )
 

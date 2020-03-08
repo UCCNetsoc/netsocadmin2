@@ -2,12 +2,6 @@
 {% block head %}
     {{ super() }}
 
-    <style>
-    .inline {
-        display: inline-block;
-    }
-    </style>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.2.0/zxcvbn.js"></script>
     <script src="/static/javascript/passwordMeter.js"></script>
 
@@ -34,7 +28,6 @@
                         </ul>
                     {% else %}
                         <p>No Databases to show &nbsp;&nbsp; O_o </p>
-                        <br/>
                     {% endif %}
                 </div>
             </div>
@@ -43,8 +36,7 @@
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">Change Password:</span>
-                    <div>Changes the password for your MySQL account</div>
-                    <span style="display: block;" class="error-msg">{{ mysql_pass_error }}</span>
+                    <p>Changes the password for your MySQL account</p>
                     <form action="/changedbpw" method="POST">
                         <div class="row">
                             <div class="input-field col s6">
@@ -55,24 +47,27 @@
                                 <input autocomplete="new-password" type="password" name="password" id="change-password">
                                 <label for="change-password">Server password</label>
                             </div>
-                            </div>
-                        <div class="row">
-                          <div class="input-field col s6">
-                              <input autocomplete="new-password" type="password" name="new-password" id="new-password">
-                              <label for="new-password">New password</label>
-                          </div>
-                          <div class="input-field col s6">
-                              <meter max="4" id="password-strength-meter" style="margin-bottom: 1.5em"></meter>
-                              <label>Password strength</label>
-                              <p id="password-strength-text"> </p>
-                          </div>
-                          {% if success %}
-                          <p style="color:green;">Your MySQL password change was successful</p>
-                          {% endif %}
                         </div>
-                        <button type="submit" class="btn waves-effect waves-light">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input autocomplete="new-password" type="password" name="new-password" id="new-password">
+                                <label for="new-password">New password</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <meter max="4" id="password-strength-meter"></meter>
+                                <label>Password strength</label>
+                                <p id="password-strength-text"> </p>
+                            </div>
+                            {% if mysql_pass_error %}
+                            <p class="red-text">{{ mysql_pass_error }}</p>
+                            {% endif %}
+                            {% if success %}
+                            <p class="green-text">Your MySQL password change was successful</p>
+                            {% endif %}
+                        </div>
+                        <button class="btn waves-effect waves-light" type="submit">
                             Change MySQL Password
-                            <i class="material-icons right">settings_backup_restore</i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
 
@@ -86,8 +81,7 @@
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">New Database:</span>
-                    <div>Create a database. All databases are prefixed with <code>{{ username }}_</code></div>
-                    <span style="display:block;" class="error-msg">{{ mysql_create_error }}</span>
+                    <p>Create a database. All databases are prefixed with <code>{{ username }}_</code></p>
                     <form action="/createdb" method="POST">
                         <div class="row">
                             <div class="input-field col s6">
@@ -105,13 +99,16 @@
                                 <label for="prefix">Prefix</label>
                             </div>
                             <div class="input-field col s12 m9">
-                                <input autocomplete="off" type="text" name="dbname" length="{{ limit }}" id="new-dbname">
+                                <input autocomplete="off" type="text" name="dbname" maxlength="{{ limit }}" id="new-dbname">
                                 <label for="new-dbname">Database name</label>
                             </div>
                         </div>
+                        {% if mysql_create_error %}
+                        <p class="red-text">{{ mysql_create_error }}</p>
+                        {% endif %}
                         <button class="btn waves-effect waves-light" type="submit">
                             Create
-                            <i class="mdi-content-send right"></i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
                 </div>
@@ -121,8 +118,7 @@
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">Delete Database:</span>
-                    <div>Choose a database to delete from the dropdown below. Please note that this is irreversible!</div>
-                    <span style="display: block;" class="error-msg">{{ mysql_delete_error }}</span>
+                    <p>Choose a database to delete from the dropdown below. Please note that this is irreversible!</p>
                     <form action="/deletedb" method="POST">
                         <div class="row">
                             <div class="input-field col s6">
@@ -145,9 +141,12 @@
                                 <label>Database to delete</label>
                             </div>
                         </div>
+                        {% if mysql_delete_error %}
+                        <p class="red-text">{{ mysql_delete_error }}</p>
+                        {% endif %}
                         <button class="btn waves-effect waves-light" type="submit">
                             Delete
-                            <i class="mdi-content-send right"></i>
+                            <i class="material-icons right">send</i>
                         </button>
                     </form>
                 </div>

@@ -38,6 +38,8 @@ class Login(View):
         flask.session["username"] = user
         flask.session["admin"] = login_user.is_admin()
         self.logger.info("user logged in successfuly")
+        if flask.request.args.get("r"):
+            return flask.redirect(flask.request.args.get("r"))
         return flask.redirect("/tools")
 
 

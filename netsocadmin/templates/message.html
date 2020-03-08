@@ -1,26 +1,13 @@
 {% extends "page-skeleton.html" %}
 {% block head %}
     {{ super() }}
-
-    <style>
-        .card-panel {
-            min-height: 470px;
-        }
-        .container {
-            padding: 5% 15%;
-        }
-    </style>
 {% endblock %}
 {% block body %}
-    <div class="row">
-        <div class="card-panel col s12">
-            <img src="/static/banner-icon.svg" class="responsive-img">
-            <div class="center-align">
-                <h3> {{ caption }} </h3>
-                <p> {{ message | safe }} </p>
-            </div>
-            <br><br><br>
-
+    <div class="card-panel center-align">
+        <img src="/static/banner-icon.svg" class="responsive-img">
+        <div class="center-align">
+            <h3> {{ caption }} </h3>
+            <p> {{ message | safe }} </p>
         </div>
     </div>
 {% endblock %}
