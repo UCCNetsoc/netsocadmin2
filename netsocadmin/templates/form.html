@@ -25,8 +25,10 @@
                     err.innerText = "Error checking username :("
                 } else if (req.responseText !== "Available") {
                     err.innerText = "Username not available";
-                } else if (! /^[a-z0-9]$/.test(uid)) {
+                } else if (! /^[a-z0-9]/.test(uid)) {
                     err.innerText = "Username must start with a lower case letter or a number only"
+                } else if (! /[a-z0-9]$/.test(uid)) {
+                    err.innerText = "Username must end with a lower case letter or a number only"
                 } else if (! /^[a-z0-9]([a-z0-9\-\_]{0,60}[a-z0-9])$/.test(uid)) {
                     err.innerText = "Username must be all lower case letters, numbers, hyphens or underscores only"
                 } else {
