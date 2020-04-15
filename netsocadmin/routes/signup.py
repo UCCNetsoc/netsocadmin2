@@ -80,7 +80,7 @@ class CompleteSignup(View):
                 error_message="Username must start with a lower case letter or a number only",
             )
 
-        patternEnd = re.compile("[a-z0-9]$")
+        patternEnd = re.compile(".+[a-z0-9]$")
         if not patternEnd.match(user):
             return flask.render_template(
                 "form.html",
