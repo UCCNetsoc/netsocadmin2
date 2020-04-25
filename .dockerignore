@@ -1,2 +1,5 @@
 ./dev
 ./.vscode
+Dockerfile
+.gitignore
+.drone.yml

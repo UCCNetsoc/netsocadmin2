@@ -1,4 +1,4 @@
-FROM python:alpine3.7 as dev
+FROM python:3.7-slim as dev
 LABEL maintainer="netsoc@uccsocieties.co"
 
 VOLUME [ "/backups", "/home/users" ]
@@ -9,8 +9,9 @@ ENV PYTHONPATH=/netsocadmin
 
 EXPOSE 5050
 
-RUN apk update && \
-    apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
+RUN apt update 
+
+RUN apt install -y libssl-dev openssh-client
 
 RUN pip3 install gunicorn==19.10.0
 
@@ -27,7 +28,7 @@ CMD [ "gunicorn", \
     "-c", "/netsocadmin/gunicorn.conf", \
     "netsoc_admin:app" ]
 
-FROM python:alpine3.7
+FROM python:3.7-slim
 LABEL maintainer="netsoc@uccsocieties.co"
 
 VOLUME [ "/backups", "/home/users" ]
@@ -38,8 +39,10 @@ ENV PYTHONPATH=/netsocadmin
 
 EXPOSE 5050
 
-RUN apk update && \
-    apk add --no-cache python3 openssl-dev openssh pkgconfig python3-dev openssl-dev libffi-dev gcc musl-dev make
+RUN apt update && \
+    apt install -y libssl-dev openssh-client && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* 
 
 # the server SSH's to leela in order to initialise user home directories
 RUN mkdir ~/.ssh && \
