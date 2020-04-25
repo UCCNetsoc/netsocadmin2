@@ -9,9 +9,8 @@ ENV PYTHONPATH=/netsocadmin
 
 EXPOSE 5050
 
-RUN apt update 
-
-RUN apt install -y libssl-dev openssh-client
+RUN apt update && \
+    apt install -y libssl-dev openssh-client
 
 RUN pip3 install gunicorn==19.10.0
 
