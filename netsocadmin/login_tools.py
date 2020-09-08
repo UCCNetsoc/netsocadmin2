@@ -106,10 +106,10 @@ def is_correct_password(user: LoginUser) -> bool:
         try:
             user.populate_data(conn)
         except UserNotInLDAPException:
-            logger.info(f"incorect username supplied",
+            logger.info("incorect username supplied",
                         user=user.username)
             return False
         if not user.is_pass_correct():
-            logger.info(f"incorect password supplied",
+            logger.info("incorect password supplied",
                         user=user.username)
         return user.is_pass_correct()
