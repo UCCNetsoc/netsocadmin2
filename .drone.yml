@@ -24,10 +24,9 @@ steps:
     repo: uccnetsoc/netsocadmin
     registry: docker.io
     username:
-      username:
-        from_secret: docker_hub_user
-      password:
-        from_secret: docker_hub_token
+      from_secret: docker_hub_user
+    password:
+      from_secret: docker_hub_token
 
   volumes:
   - name: cache
@@ -45,10 +44,9 @@ steps:
     repo: uccnetsoc/netsocadmin
     registry: docker.io
     username:
-      username:
-        from_secret: docker_hub_user
-      password:
-        from_secret: docker_hub_token
+      from_secret: docker_hub_user
+    password:
+      from_secret: docker_hub_token
   volumes:
   - name: cache
     path: /var/lib/docker  
