@@ -21,12 +21,14 @@ steps:
   settings:
     tag: dev-env
     target: dev
-    repo: docker.netsoc.co/public/netsocadmin
-    registry: docker.netsoc.co
+    repo: uccnetsoc/netsocadmin
+    registry: docker.io
     username:
-      from_secret: registry_pub_user
-    password:
-      from_secret: registry_pub_token
+      username:
+        from_secret: docker_hub_user
+      password:
+        from_secret: docker_hub_token
+
   volumes:
   - name: cache
     path: /var/lib/docker  
@@ -40,12 +42,13 @@ steps:
   image: plugins/docker
   settings:
     tag: latest
-    repo: docker.netsoc.co/netsoc/netsocadmin
-    registry: docker.netsoc.co
+    repo: uccnetsoc/netsocadmin
+    registry: docker.io
     username:
-      from_secret: registry_prod_user
-    password:
-      from_secret: registry_prod_token
+      username:
+        from_secret: docker_hub_user
+      password:
+        from_secret: docker_hub_token
   volumes:
   - name: cache
     path: /var/lib/docker  
@@ -136,3 +139,17 @@ name: discord_webhook_token
 get:
   path: discord/sysadmins_webhook
   name: discord_webhook_token      
+  
+---
+kind: secret
+name: docker_hub_user
+get:
+  path: docker_registry/docker_hub
+  name: docker_hub_user
+
+---
+kind: secret
+name: docker_hub_token
+get:
+  path: docker_registry/docker_hub
+  name: docker_hub_token
