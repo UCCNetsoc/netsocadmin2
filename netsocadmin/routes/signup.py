@@ -108,7 +108,7 @@ class CompleteSignup(View):
 
         try:
             if register_tools.is_in_ldap(user):
-                self.logger.info(f"user tried signing up with already taken username",
+                self.logger.info("user tried signing up with already taken username",
                                  username=user, email=email, token=token)
                 return flask.render_template(
                     "form.html",
@@ -131,7 +131,7 @@ class CompleteSignup(View):
             if not register_tools.send_details_email(email, user, info["password"], mysql_pass):
                 # We should really either throw exception in send_details_email or return something
                 # more useful :(
-                self.logger.error(f"failed to send confirmation email")
+                self.logger.error("failed to send confirmation email")
 
             # initialise the user's home directories so they can use netsoc admin
             # without ever having to SSH into the server.
@@ -213,7 +213,7 @@ class ResetPassword(View):
 
         template = "message.html"
         caption = "Success!"
-        message = f"An email has been sent with your new password. Please change your password as soon as you log in."
+        message = "An email has been sent with your new password. Please change your password as soon as you log in."
         return flask.render_template(template, caption=caption, message=message)
 
     def dispatch_request(self) -> str:
